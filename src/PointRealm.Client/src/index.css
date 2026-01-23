@@ -1,0 +1,20 @@
+:root {
+  color: #1f2937;
+  background-color: #f8fafc;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app__header {
+  text-align: center;
+}

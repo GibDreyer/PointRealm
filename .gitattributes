@@ -1,0 +1,5 @@
+* text=auto eol=lf
+
+*.cs diff=csharp
+*.sln diff=astextplain
+*.csproj diff=astextplain
