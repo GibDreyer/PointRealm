@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend (.NET)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+          cache: true
+
+      - name: Restore
+        run: dotnet restore PointRealm.sln
+
+      - name: Build
+        run: dotnet build PointRealm.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test PointRealm.sln --configuration Release --no-build
+
+  frontend:
+    name: Frontend (Node)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('src/PointRealm.Client/package.json') }}
+
+      - name: Install
+        run: npm install
+        working-directory: src/PointRealm.Client
+
+      - name: Lint
+        run: npm run lint --if-present
+        working-directory: src/PointRealm.Client
+
+      - name: Test
+        run: npm run test --if-present
+        working-directory: src/PointRealm.Client
+
+      - name: Build
+        run: npm run build
+        working-directory: src/PointRealm.Client
