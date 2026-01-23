@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35027.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PointRealm.Server", "src\PointRealm.Server\PointRealm.Server.csproj", "{1005D681-01E0-49AD-992E-32E2F8A360FA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PointRealm.Shared", "src\PointRealm.Shared\PointRealm.Shared.csproj", "{62BC9356-F8D6-4BAA-89DF-BCFE10137EBD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PointRealm.Tests", "src\PointRealm.Tests\PointRealm.Tests.csproj", "{4FC708EC-846F-48F2-89CB-F798EE02B037}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1005D681-01E0-49AD-992E-32E2F8A360FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1005D681-01E0-49AD-992E-32E2F8A360FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1005D681-01E0-49AD-992E-32E2F8A360FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1005D681-01E0-49AD-992E-32E2F8A360FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62BC9356-F8D6-4BAA-89DF-BCFE10137EBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62BC9356-F8D6-4BAA-89DF-BCFE10137EBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62BC9356-F8D6-4BAA-89DF-BCFE10137EBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62BC9356-F8D6-4BAA-89DF-BCFE10137EBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FC708EC-846F-48F2-89CB-F798EE02B037}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FC708EC-846F-48F2-89CB-F798EE02B037}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FC708EC-846F-48F2-89CB-F798EE02B037}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FC708EC-846F-48F2-89CB-F798EE02B037}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
