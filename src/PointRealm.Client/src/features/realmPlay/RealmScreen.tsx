@@ -4,15 +4,16 @@ import { useRealm } from '../../hooks/useRealm';
 import { QuestLogPanel } from './components/QuestLogPanel';
 import { PartyRosterPanel } from './components/PartyRosterPanel';
 import { EncounterPanel } from './components/EncounterPanel';
-import { RealmBackground } from '../../components/ui/RealmBackground';
+import { RealmShell } from '../../app/layouts/RealmShell';
 import { QuestDialog } from './components/QuestDialog';
+import { ConnectionBanner } from '../realmLobby/components/ConnectionBanner';
+import { motion } from 'framer-motion';
 
 export function RealmScreen() {
-    const { code, realmCode: paramRealmCode } = useParams<{ code?: string; realmCode?: string }>();
-    // Support both /realm/:code and /realms/:realmCode
-    const targetCode = code || paramRealmCode;
+    const { code } = useParams<{ code: string }>();
     
-    const { state, loading, error, isConnected, actions } = useRealm(targetCode);
+    // We use the 'code' from params for hook
+    const { state, loading, error, isConnected, actions, connect } = useRealm(code);
     const [isQuestModalOpen, setQuestModalOpen] = useState(false);
 
     useEffect(() => {
@@ -21,26 +22,36 @@ export function RealmScreen() {
         }
     }, [error]);
 
+    // Handle initial loading or missing state
     if (loading || !state) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <RealmBackground />
-                <div className="text-[var(--pr-primary)] animate-pulse font-bold text-xl">
-                    Entering the Realm...
-                </div>
-            </div>
+            <RealmShell className="items-center justify-center">
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex flex-col items-center gap-6"
+                >
+                    <div className="relative w-16 h-16">
+                        <div className="absolute inset-0 rounded-full border-4 border-pr-primary/20" />
+                        <div className="absolute inset-0 rounded-full border-4 border-t-pr-primary animate-spin" />
+                    </div>
+                    <div className="text-pr-primary font-black uppercase tracking-[0.3em] text-sm animate-pulse">
+                        Entering the Realm
+                    </div>
+                </motion.div>
+            </RealmShell>
         );
     }
 
     const { settings, partyRoster, questLog, encounter } = state;
     
-    // Derived state
-    const myMemberId = targetCode ? sessionStorage.getItem(`pointrealm:v1:realm:${targetCode}:memberId`) : null; 
-    const isGM = partyRoster.members.find(m => m.id === myMemberId)?.role === 'GM';
+    // Auth Check: myMemberId from session storage
+    const myMemberId = code ? sessionStorage.getItem(`pointrealm:v1:realm:${code}:memberId`) : null; 
     const me = partyRoster.members.find(m => m.id === myMemberId);
+    const isGM = me?.role === 'GM';
     
     const activeQuest = questLog.quests.find(q => q.id === encounter?.questId) || 
-                       questLog.quests.find(q => q.id === state.questLog.quests.find(x => x.status === "Open")?.id); 
+                       questLog.quests.find(q => q.status === "Open"); 
 
     const handleVote = async (value: string) => {
         if (!encounter || encounter.isRevealed) return;
@@ -50,14 +61,20 @@ export function RealmScreen() {
     const myVote = encounter?.votes && myMemberId ? encounter.votes[myMemberId] : null;
 
     return (
-        <div className="h-screen w-screen flex flex-col overflow-hidden bg-[var(--pr-bg)] text-[var(--pr-text)] font-sans">
-            <RealmBackground />
+        <RealmShell className="overflow-hidden p-0 max-w-none">
+            {/* Reconnection Banner */}
+             {!isConnected && (
+                  <ConnectionBanner isConnecting={loading} onRetry={() => connect(code || "")} />
+             )}
             
-            {/* Mobile/Tablet Header would go here (hamburger menu for panels) */}
-            
-            <div className="flex-1 flex overflow-hidden z-10 relative">
-                {/* Left Panel: Quest Log */}
-                <aside className="hidden md:flex w-[280px] lg:w-[320px] flex-col h-full border-r border-[var(--pr-border)]">
+            <div className="flex-1 flex overflow-hidden relative w-full h-full">
+                
+                {/* Left Panel: Quest Log (Sidebar) */}
+                <motion.aside 
+                    initial={{ x: -100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    className="hidden md:flex w-[260px] lg:w-[320px] flex-col h-full border-r border-pr-border/20 z-20"
+                >
                     <QuestLogPanel 
                         quests={questLog.quests}
                         activeQuestId={encounter?.questId || undefined}
@@ -67,38 +84,36 @@ export function RealmScreen() {
                              if(isGM) actions.startEncounter(id);
                         }}
                     />
-                </aside>
+                </motion.aside>
 
-                {/* Center Panel: Encounter */}
-                <main className="flex-1 flex flex-col h-full overflow-hidden relative">
-                    {!isConnected && (
-                         <div className="bg-[var(--pr-destructive)] text-white px-4 py-2 text-center text-sm font-bold">
-                            Connection Lost. Reconnecting...
-                         </div>
-                    )}
+                {/* Center Panel: Encounter (Main Stage) */}
+                <main className="flex-1 flex flex-col h-full overflow-hidden relative z-10">
                     <EncounterPanel 
                         quest={activeQuest || null} 
                         encounter={encounter}
                         settings={settings}
                         partyRoster={partyRoster}
                         isGM={!!isGM}
-                        canVote={!!me && me.role !== "GM"} 
+                        canVote={!!me && me.role !== "GM" && !encounter?.isRevealed} 
                         myVote={myVote || null}
                         onVote={handleVote}
                         onStartEncounter={(id) => actions.startEncounter(id)}
                     />
-
                 </main>
 
-                {/* Right Panel: Party Roster */}
-                <aside className="hidden lg:flex w-[260px] xl:w-[300px] flex-col h-full border-l border-[var(--pr-border)]">
+                {/* Right Panel: Party Roster (Sidebar) */}
+                <motion.aside 
+                    initial={{ x: 100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    className="hidden lg:flex w-[240px] xl:w-[280px] flex-col h-full border-l border-pr-border/20 z-20"
+                >
                     <PartyRosterPanel 
                         members={partyRoster.members}
                         currentMemberId={myMemberId || ""}
                         hideVoteCounts={settings.hideVoteCounts}
                         encounterStatus={encounter?.isRevealed ? 'revealed' : (encounter ? 'voting' : 'idle')}
                     />
-                </aside>
+                </motion.aside>
             </div>
 
             {/* Modals */}
@@ -110,6 +125,6 @@ export function RealmScreen() {
                 }}
                 mode="add"
             />
-        </div>
+        </RealmShell>
     );
 }

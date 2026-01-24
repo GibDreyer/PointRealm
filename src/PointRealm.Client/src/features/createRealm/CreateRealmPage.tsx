@@ -6,13 +6,17 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Loader2, AlertTriangle, Dice5, Eye, EyeOff, UserX } from "lucide-react";
 
-import { useTheme } from "../../theme/ThemeProvider";
-import { RealmBackground } from "../../components/ui/RealmBackground";
+import { useTheme } from "@/theme/ThemeProvider";
+import { RealmShell } from "@/app/layouts/RealmShell";
 import { ThemePreview } from "./components/ThemePreview";
 import { ThemePicker } from "./components/ThemePicker";
-import { api } from "../../api/client";
-import { hub } from "../../realtime/hub";
-import { updateProfile, getProfile, STORAGE_KEYS } from "../../lib/storage";
+import { api } from "@/api/client";
+import { hub } from "@/realtime/hub";
+import { updateProfile, getProfile, STORAGE_KEYS } from "@/lib/storage";
+import { Panel } from "@/components/ui/Panel";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Button } from "@/components/Button";
+import { RuneChip } from "@/components/ui/RuneChip";
 
 // --- Schema ---
 
@@ -100,37 +104,27 @@ export function CreateRealmPage() {
 
   const { watch, handleSubmit, control, setValue, formState: { errors } } = form;
   
-  // Update live preview when theme changes in form
   const selectedThemeKey = watch("themeKey");
   const selectedDeckType = watch("deckType");
+  const selectedTheme = availableThemes.find(t => t.key === selectedThemeKey) || availableThemes[0]!;
 
-  // Sync theme preview 
-  // Note: We don't want to change the Global theme until creation, but the `ThemePicker` 
-  // component (and `ThemePreview`) handle the visualization.
-  // The `ThemePicker` *updates* variable `selectedThemeKey`.
-  
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     setServerError(null);
 
     try {
-      // 1. Persist Display Name
       localStorage.setItem(STORAGE_KEYS.DISPLAY_NAME, data.displayName);
       updateProfile({ lastDisplayName: data.displayName });
 
-      // 2. Prepare Payload
       let customDeckValues: string[] | undefined;
       
       if (data.deckType === "CUSTOM") {
         customDeckValues = parseCustomDeck(data.customDeckValuesInput!);
-        
-        // Auto-add '?' if allowAbstain and not present
         if (data.allowAbstain && !customDeckValues.includes("?")) {
             customDeckValues.push("?");
         }
       }
 
-      // 3. Create Realm
       const createPayload = {
         realmName: data.realmName || undefined,
         themeKey: data.themeKey,
@@ -146,7 +140,6 @@ export function CreateRealmPage() {
       const realmResponse = await api.post<{ code: string }>("realms", createPayload);
       const realmCode = realmResponse.code;
 
-      // 4. Join as GM
       const joinPayload = {
         displayName: data.displayName,
         role: "GM"
@@ -154,18 +147,11 @@ export function CreateRealmPage() {
 
       const joinResponse = await api.post<{ memberToken: string, memberId: string }>(`realms/${realmCode}/join`, joinPayload);
 
-      // 5. Store Token
-      // storing in sessionStorage for the session
       sessionStorage.setItem(`pointrealm:v1:realm:${realmCode}:token`, joinResponse.memberToken);
       sessionStorage.setItem(`pointrealm:v1:realm:${realmCode}:memberId`, joinResponse.memberId);
 
-      // 6. Connect SignalR
       await hub.connect(joinResponse.memberToken);
-      
-      // 7. Navigate
-      // Set global theme to match created realm before navigating for smoothness
       setThemeKey(data.themeKey);
-      
       navigate(`/realm/${realmCode}/tavern`);
 
     } catch (err: any) {
@@ -176,36 +162,31 @@ export function CreateRealmPage() {
     }
   };
 
-  // Find current selected theme object for preview
-  const selectedTheme = availableThemes.find(t => t.key === selectedThemeKey) || availableThemes[0]!;
+  const inputClasses = "w-full p-3 rounded-[var(--pr-radius-md)] bg-pr-bg border border-pr-border focus:border-pr-primary focus:ring-1 focus:ring-pr-primary outline-none transition-all";
+  const labelClasses = "text-sm font-medium text-pr-text mb-1.5 block";
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 md:p-8 relative">
-       <RealmBackground /> 
-
-       {/* Entrance Animation */}
+    <RealmShell className="justify-center">
        <motion.div 
-         initial={{ opacity: 0, y: 8 }}
+         initial={{ opacity: 0, y: 10 }}
          animate={{ opacity: 1, y: 0 }}
-         transition={{ duration: 0.3, ease: "easeOut" }}
-         className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
+         className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
        >
-          
           {/* Main Form Panel */}
-          <div className="lg:col-span-7 w-full bg-[var(--pr-surface)] border border-[var(--pr-border)] rounded-[var(--pr-radius-xl)] shadow-[var(--pr-shadow-soft)] overflow-hidden relative">
-              {/* Radial Glow */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1/2 bg-[var(--pr-primary)] opacity-[0.03] blur-3xl pointer-events-none" />
+          <div className="lg:col-span-7">
+              <Panel>
+                  {/* Radial Glow (Summoning Circle effect) */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-pr-primary opacity-[0.02] rounded-full blur-3xl pointer-events-none" />
 
-              <div className="p-6 md:p-8 relative z-10">
-                  <header className="mb-6">
-                      <h1 className="text-2xl font-bold text-[var(--pr-primary)] mb-2" style={{ fontFamily: 'var(--pr-heading-font)' }}>Create Realm</h1>
-                      <p className="text-[var(--pr-text-muted)] text-sm">
-                          Forge a new realm for your party. Settings can be adjusted later by the Game Master.
-                      </p>
+                  <header className="mb-6 relative z-10">
+                      <SectionHeader 
+                        title="Create Realm" 
+                        subtitle="Summon a new session"
+                      />
                   </header>
 
                   {serverError && (
-                      <div className="mb-6 p-4 rounded-[var(--pr-radius-md)] bg-[var(--pr-danger)]/10 border border-[var(--pr-danger)] text-[var(--pr-danger)] flex items-start gap-3">
+                      <div className="mb-6 p-4 rounded-[var(--pr-radius-md)] bg-pr-danger/10 border border-pr-danger text-pr-danger flex items-start gap-3 relative z-10">
                           <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
                           <div>
                               <strong className="block font-bold">The spell fizzled.</strong>
@@ -214,157 +195,120 @@ export function CreateRealmPage() {
                       </div>
                   )}
 
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 relative z-10">
                       
                       {/* Identity */}
                       <div className="space-y-4">
-                          <h2 className="text-sm uppercase tracking-wider font-bold text-[var(--pr-text-muted)] border-b border-[var(--pr-border)] pb-2 mb-4 flex items-center gap-2">
-                              Summoning Circle
-                          </h2>
+                          <h3 className="text-xs uppercase tracking-wider font-bold text-pr-text-muted border-b border-pr-border pb-2">Identity</h3>
                           
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-[var(--pr-text)]">Realm Name <span className="text-[var(--pr-text-muted)] font-normal">(Optional)</span></label>
+                            <div>
+                                <label className={labelClasses}>Realm Name <span className="text-pr-text-muted font-normal">(Optional)</span></label>
                                 <input
                                     {...form.register("realmName")}
-                                    className="w-full p-2.5 rounded-[var(--pr-radius-md)] bg-[var(--pr-bg)] border border-[var(--pr-border)] focus:border-[var(--pr-primary)] focus:ring-1 focus:ring-[var(--pr-primary)] outline-none transition-all"
+                                    className={inputClasses}
                                     placeholder="e.g. The Sprint Retrospective"
                                     disabled={isSubmitting}
                                 />
-                                {errors.realmName && <p className="text-xs text-[var(--pr-danger)]">{errors.realmName.message}</p>}
+                                {errors.realmName && <p className="text-xs text-pr-danger mt-1">{errors.realmName.message}</p>}
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-[var(--pr-text)]">Your Display Name</label>
+                            <div>
+                                <label className={labelClasses}>Your Display Name</label>
                                 <input
                                     {...form.register("displayName")}
-                                    className="w-full p-2.5 rounded-[var(--pr-radius-md)] bg-[var(--pr-bg)] border border-[var(--pr-border)] focus:border-[var(--pr-primary)] focus:ring-1 focus:ring-[var(--pr-primary)] outline-none transition-all"
+                                    className={inputClasses}
                                     placeholder="e.g. Gandalf"
                                     disabled={isSubmitting}
                                 />
-                                {errors.displayName && <p className="text-xs text-[var(--pr-danger)]">{errors.displayName.message}</p>}
+                                {errors.displayName && <p className="text-xs text-pr-danger mt-1">{errors.displayName.message}</p>}
                             </div>
                           </div>
                       </div>
 
                       {/* Theme */}
-                      <div className="space-y-1.5">
+                      <div>
                            <Controller
-                              control={control}
-                              name="themeKey"
-                              render={({ field }) => (
-                                  <ThemePicker 
-                                    selectedThemeKey={field.value} 
-                                    onThemeSelect={field.onChange} 
-                                  />
-                              )}
+                               control={control}
+                               name="themeKey"
+                               render={({ field }) => (
+                                   <ThemePicker 
+                                     selectedThemeKey={field.value} 
+                                     onThemeSelect={field.onChange} 
+                                   />
+                               )}
                            />
                       </div>
 
                       {/* Mechanics */}
-                      <div className="space-y-4 pt-4">
-                          <h2 className="text-sm uppercase tracking-wider font-bold text-[var(--pr-text-muted)] border-b border-[var(--pr-border)] pb-2 mb-4 flex items-center gap-2">
-                              Mechanics
-                          </h2>
+                      <div className="space-y-4">
+                          <h3 className="text-xs uppercase tracking-wider font-bold text-pr-text-muted border-b border-pr-border pb-2">Rite & Rules</h3>
                           
                           <div className="space-y-4">
-                              <div className="space-y-1.5">
-                                  <label className="text-sm font-medium text-[var(--pr-text)]">Deck Type</label>
-                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                              <div>
+                                  <label className={labelClasses}>Rune Set (Deck)</label>
+                                  <div className="flex flex-wrap gap-2">
                                       {(["FIBONACCI", "SHORT_FIBONACCI", "TSHIRT", "CUSTOM"] as const).map(type => (
-                                          <button
+                                          <RuneChip
                                               key={type}
                                               type="button"
+                                              active={selectedDeckType === type}
                                               onClick={() => setValue("deckType", type)}
-                                              className={`
-                                                  p-2 text-sm rounded-[var(--pr-radius-md)] border text-center transition-all
-                                                  ${selectedDeckType === type 
-                                                      ? "border-[var(--pr-primary)] bg-[var(--pr-primary)]/10 text-[var(--pr-primary)] font-bold shadow-[var(--pr-primary-glow)]" 
-                                                      : "border-[var(--pr-border)] bg-[var(--pr-bg)] text-[var(--pr-text-muted)] hover:border-[var(--pr-text-muted)]"
-                                                  }
-                                              `}
                                           >
-                                              {type === "SHORT_FIBONACCI" ? "Short Fib." : type.charAt(0) + type.slice(1).toLowerCase()}
-                                          </button>
+                                              {type === "SHORT_FIBONACCI" ? "Short Fib." : type === "TSHIRT" ? "T-Shirt" : type.charAt(0) + type.slice(1).toLowerCase()}
+                                          </RuneChip>
                                       ))}
                                   </div>
                               </div>
 
                               {selectedDeckType === "CUSTOM" && (
-                                  <div className="space-y-1.5">
-                                      <label className="text-sm font-medium text-[var(--pr-text)]">Custom Values</label>
+                                  <div>
+                                      <label className={labelClasses}>Custom Values</label>
                                       <input
                                           {...form.register("customDeckValuesInput")}
-                                          className="w-full p-2.5 rounded-[var(--pr-radius-md)] bg-[var(--pr-bg)] border border-[var(--pr-border)] focus:border-[var(--pr-primary)] focus:ring-1 focus:ring-[var(--pr-primary)] outline-none transition-all font-mono text-sm"
+                                          className={`${inputClasses} font-mono text-sm`}
                                           placeholder="0, 1, 2, 3, 5, 8, 13, ?, ☕"
                                           disabled={isSubmitting}
                                       />
-                                      <p className="text-xs text-[var(--pr-text-muted)]">Comma separated. Max 24 values.</p>
-                                      {errors.customDeckValuesInput && <p className="text-xs text-[var(--pr-danger)]">{errors.customDeckValuesInput.message}</p>}
+                                      <p className="text-xs text-pr-text-muted mt-1">Comma separated. Max 24 values.</p>
+                                      {errors.customDeckValuesInput && <p className="text-xs text-pr-danger mt-1">{errors.customDeckValuesInput.message}</p>}
                                   </div>
                               )}
                           </div>
                       </div>
 
                       {/* Toggles */}
-                      <div className="space-y-3 pt-2">
-                           <div className="flex items-start gap-3">
-                                <div className="flex items-center h-5">
-                                    <input
-                                        id="autoReveal"
-                                        type="checkbox"
-                                        {...form.register("autoReveal")}
-                                        className="w-4 h-4 rounded border-gray-300 text-[var(--pr-primary)] focus:ring-[var(--pr-primary)]"
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="autoReveal" className="text-sm font-medium text-[var(--pr-text)] flex items-center gap-2">
-                                        <Eye className="w-4 h-4" /> Auto Reveal
-                                    </label>
-                                    <p className="text-xs text-[var(--pr-text-muted)]">Reveal when all party members have chosen.</p>
-                                </div>
-                           </div>
-
-                           <div className="flex items-start gap-3">
-                                <div className="flex items-center h-5">
-                                    <input
-                                        id="allowAbstain"
-                                        type="checkbox"
-                                        {...form.register("allowAbstain")}
-                                        className="w-4 h-4 rounded border-gray-300 text-[var(--pr-primary)] focus:ring-[var(--pr-primary)]"
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="allowAbstain" className="text-sm font-medium text-[var(--pr-text)] flex items-center gap-2">
-                                        <UserX className="w-4 h-4" /> Allow Abstain
-                                    </label>
-                                    <p className="text-xs text-[var(--pr-text-muted)]">Allow '?' for uncertainty.</p>
-                                </div>
-                           </div>
-                           
-                           <div className="flex items-start gap-3">
-                                <div className="flex items-center h-5">
-                                    <input
-                                        id="hideVoteCounts"
-                                        type="checkbox"
-                                        {...form.register("hideVoteCounts")}
-                                        className="w-4 h-4 rounded border-gray-300 text-[var(--pr-primary)] focus:ring-[var(--pr-primary)]"
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="hideVoteCounts" className="text-sm font-medium text-[var(--pr-text)] flex items-center gap-2">
-                                        <EyeOff className="w-4 h-4" /> Hide Vote Counts
-                                    </label>
-                                    <p className="text-xs text-[var(--pr-text-muted)]">Keep progress secret until the prophecy is revealed.</p>
-                                </div>
-                           </div>
+                      <div className="space-y-3 p-4 bg-pr-surface/50 rounded-[var(--pr-radius-lg)] border border-pr-border/50">
+                           <ToggleField 
+                              id="autoReveal" 
+                              label="Prophecy reveals when all have voted" 
+                              description="Auto Reveal"
+                              icon={<Eye className="w-4 h-4 text-pr-primary" />}
+                              register={form.register("autoReveal")} 
+                           />
+                           <ToggleField 
+                              id="allowAbstain" 
+                              label="Permit uncertainty (?)" 
+                              description="Allow Abstain"
+                              icon={<UserX className="w-4 h-4 text-pr-primary" />}
+                              register={form.register("allowAbstain")} 
+                           />
+                           <ToggleField 
+                              id="hideVoteCounts" 
+                              label="Hide vote counts" 
+                              description="Visibility"
+                              icon={<EyeOff className="w-4 h-4 text-pr-primary" />}
+                              register={form.register("hideVoteCounts")} 
+                           />
                       </div>
 
-                      <div className="pt-6">
-                           <button
+                      <div className="pt-4">
+                           <Button
                                 type="submit"
+                                fullWidth
                                 disabled={isSubmitting}
-                                className="w-full flex items-center justify-center py-3 px-4 rounded-[var(--pr-radius-md)] bg-[var(--pr-primary)] text-[var(--pr-bg)] font-bold text-lg shadow-[var(--pr-shadow-soft)] hover:shadow-[var(--pr-shadow-hover)] hover:translate-y-[-1px] active:translate-y-[0px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                variant="primary"
+                                className="text-lg py-6"
                            >
                                 {isSubmitting ? (
                                     <>
@@ -374,29 +318,51 @@ export function CreateRealmPage() {
                                 ) : (
                                     <>
                                         <Dice5 className="w-5 h-5 mr-2" />
-                                        Create Realm
+                                        Summon Realm
                                     </>
                                 )}
-                           </button>
+                           </Button>
                       </div>
-
                   </form>
-              </div>
+              </Panel>
           </div>
 
           {/* Preview Panel (Desktop) */}
-          <div className="hidden lg:block lg:col-span-5 sticky top-8">
-              <ThemePreview theme={selectedTheme} />
+          <div className="hidden lg:block lg:col-span-5 sticky top-8 space-y-6">
+              <Panel variant="subtle" className="mx-4 lg:mx-0">
+                  <SectionHeader title="Visual Preview" className="mb-4" />
+                  <ThemePreview theme={selectedTheme} />
+              </Panel>
               
-              <div className="mt-8 p-4 rounded-[var(--pr-radius-md)] bg-[var(--pr-surface)] border border-[var(--pr-border)]">
-                  <h3 className="text-sm font-bold text-[var(--pr-text)] mb-2">About {selectedTheme.name}</h3>
-                  <p className="text-sm text-[var(--pr-text-muted)]">
+              <Panel variant="outline" noPadding className="p-4 mx-4 lg:mx-0 text-center">
+                  <h3 className="text-sm font-bold text-pr-text mb-1">Theme: {selectedTheme.name}</h3>
+                  <p className="text-xs text-pr-text-muted">
                       {selectedTheme.description}
                   </p>
-              </div>
+              </Panel>
           </div>
 
        </motion.div>
-    </div>
+    </RealmShell>
   );
 }
+
+// Helper for toggles
+const ToggleField = ({ id, label, description, icon, register }: any) => (
+  <div className="flex items-start gap-3">
+        <div className="flex items-center h-5">
+            <input
+                id={id}
+                type="checkbox"
+                {...register}
+                className="w-4 h-4 rounded border-pr-border bg-pr-bg text-pr-primary focus:ring-pr-primary"
+            />
+        </div>
+        <div>
+            <label htmlFor={id} className="text-sm font-medium text-pr-text flex items-center gap-2">
+                {icon} {description}
+            </label>
+            <p className="text-xs text-pr-text-muted">{label}</p>
+        </div>
+   </div>
+);

@@ -1,7 +1,10 @@
 import { Encounter, Quest, RealmSettings, RealmStateDto } from '../../../types/realm';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Sword, Quote } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { ProphecyReveal } from '../../reveal/ProphecyReveal';
+import { RuneCard } from './RuneCard';
+import { motion, AnimatePresence } from 'framer-motion';
+import { SectionHeader } from '../../../components/ui/SectionHeader';
 
 interface EncounterPanelProps {
     quest: Quest | null;
@@ -18,91 +21,131 @@ interface EncounterPanelProps {
 export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, canVote, myVote, onVote }: EncounterPanelProps) {
     if (!quest) {
         return (
-            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-[var(--pr-bg)]/80">
-                <div className="max-w-md p-8 rounded-2xl border-2 border-dashed border-[var(--pr-border)]">
-                    <h2 className="text-xl font-bold text-[var(--pr-text-muted)] mb-2">No Active Quest</h2>
-                    <p className="text-[var(--pr-text-dim)]">The Realm is currently quiet. {isGM ? "Select a quest from the log to begin an encounter." : "Wait for the Game Master to begin."}</p>
-                </div>
+            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-pr-bg/50">
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="max-w-md p-10 rounded-[var(--pr-radius-xl)] border border-pr-border/30 bg-pr-surface-dim/40 backdrop-blur-sm relative"
+                >
+                    <div className="absolute inset-0 bg-pr-primary/5 rounded-[var(--pr-radius-xl)] blur-3xl -z-10" />
+                    <Sword className="w-12 h-12 text-pr-primary/20 mx-auto mb-6" />
+                    <SectionHeader 
+                        title="The Realm is Quiet" 
+                        subtitle={isGM ? "Select a quest from the log to begin an encounter." : "Wait for the Game Master to initiate the ordeal."}
+                        align="center"
+                    />
+                </motion.div>
             </div>
         );
     }
 
-    // Determine deck values
-    // TODO: Centralize this logic or get from helper
     const getDeckValues = (s: RealmSettings) => {
         if (s.deckType === 'fibonacci') return ['1', '2', '3', '5', '8', '13', '21', '?', 'coffee'];
         if (s.deckType === 'tshirt') return ['XS', 'S', 'M', 'L', 'XL', '?', 'coffee'];
         if (s.deckType === 'custom' && s.customDeckValues) return s.customDeckValues;
-        return ['1', '2', '3', '5', '8', '13', '?', 'coffee']; // Fallback
+        return ['1', '2', '3', '5', '8', '13', '?', 'coffee'];
     };
     const deckValues = getDeckValues(settings);
 
     return (
-        <div className="flex-1 flex flex-col h-full bg-[var(--pr-bg)] relative overflow-hidden">
+        <div className="flex-1 flex flex-col h-full bg-transparent relative overflow-hidden">
             <div className="flex-1 overflow-y-auto custom-scrollbar">
-                <div className="max-w-5xl mx-auto p-4 md:p-8 lg:p-12 space-y-8">
-                    {/* Header */}
-                    {!encounter?.isRevealed && (
-                        <header className="space-y-4 text-center mb-12">
-                            <div className="inline-block px-3 py-1 rounded-full bg-[var(--pr-primary)]/10 text-[var(--pr-primary)] text-xs font-bold uppercase tracking-widest">
-                                Current Quest
-                            </div>
-                            <h1 className="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-[var(--pr-text)] to-[var(--pr-text-muted)]" style={{ fontFamily: 'var(--pr-heading-font)' }}>
-                                {quest.title}
-                            </h1>
-                            {quest.externalUrl && (
-                                <a href={quest.externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-[var(--pr-primary)] hover:text-[var(--pr-primary-hover)] transition-colors">
-                                    <ExternalLink className="w-4 h-4" />
-                                    <span>View External Details</span>
-                                </a>
-                            )}
-                            {quest.description && (
-                                <p className="text-lg text-[var(--pr-text-dim)] max-w-2xl mx-auto leading-relaxed">
-                                    {quest.description}
-                                </p>
-                            )}
-                        </header>
-                    )}
+                <div className="max-w-6xl mx-auto p-4 md:p-8 lg:p-12 space-y-12">
+                    
+                    {/* Header Zone */}
+                    <AnimatePresence mode="wait">
+                        {!encounter?.isRevealed && (
+                            <motion.header 
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20, height: 0, marginBottom: 0 }}
+                                className="space-y-6 text-center"
+                            >
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pr-primary/10 border border-pr-primary/20 text-pr-primary text-[10px] font-black uppercase tracking-[0.2em]">
+                                    Active Quest
+                                </div>
+                                
+                                <h1 className="text-4xl md:text-6xl font-black text-pr-text leading-tight tracking-tighter" style={{ fontFamily: 'var(--pr-heading-font)' }}>
+                                    {quest.title}
+                                </h1>
 
-                    {/* Content Area */}
-                    <div className={cn("transition-all duration-500", encounter?.isRevealed ? "flex-1 h-full" : "mt-8")}>
+                                {quest.description && (
+                                    <div className="relative max-w-2xl mx-auto py-4">
+                                        <Quote className="absolute -left-8 -top-2 w-6 h-6 text-pr-primary/10" />
+                                        <p className="text-lg md:text-xl text-pr-text-muted font-medium leading-relaxed italic">
+                                            {quest.description}
+                                        </p>
+                                    </div>
+                                )}
+
+                                {quest.externalUrl && (
+                                    <a 
+                                        href={quest.externalUrl} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer" 
+                                        className="inline-flex items-center gap-2 text-xs font-bold text-pr-primary hover:text-pr-primary/80 transition-colors uppercase tracking-widest border-b border-pr-primary/30 pb-1"
+                                    >
+                                        <ExternalLink size={14} />
+                                        Inscribe Details
+                                    </a>
+                                )}
+                            </motion.header>
+                        )}
+                    </AnimatePresence>
+
+                    {/* Ritual Area (Voting or Reveal) */}
+                    <div className={cn("transition-all duration-700 ease-in-out", encounter?.isRevealed ? "h-full" : "mt-4")}>
                         {encounter?.isRevealed ? (
-                            <div className="min-h-[500px]">
+                            <motion.div 
+                                initial={{ opacity: 0, scale: 0.98 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="min-h-[500px]"
+                            >
                                 <ProphecyReveal 
                                     encounter={encounter}
                                     partyRoster={partyRoster.members}
                                     isGM={isGM}
                                     deckValues={deckValues}
                                     onSealOutcome={async (val) => {
-                                        // TODO: Wire up to action context
+                                        // TODO: This should be passed down as an action
                                         console.log("Sealing outcome:", val);
                                     }}
                                     hideVoteCounts={settings.hideVoteCounts}
                                 />
-                            </div>
+                            </motion.div>
                         ) : (
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 justify-center">
-                                {deckValues.map((val: string) => (
-                                    <button
-                                        key={val}
-                                        disabled={!canVote}
-                                        onClick={() => onVote(val)}
-                                        className={cn(
-                                            "aspect-[2/3] rounded-lg border-2 flex items-center justify-center text-xl font-bold transition-all transform hover:scale-105 hover:shadow-lg active:scale-95",
-                                            myVote === val 
-                                                ? "bg-[var(--pr-primary)] border-[var(--pr-primary)] text-black shadow-[0_0_20px_var(--pr-primary-glow)] scale-105" 
-                                                : "bg-[var(--pr-surface)] border-[var(--pr-border)] hover:border-[var(--pr-primary-dim)] text-[var(--pr-text)]"
-                                        )}
-                                    >
-                                        {val}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                        
-                        {!encounter?.isRevealed && !canVote && !isGM && (
-                            <div className="mt-8 text-center text-[var(--pr-text-muted)] text-sm italic">
-                                “The party deliberates...”
+                            <div className="space-y-12">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 justify-center max-w-4xl mx-auto">
+                                    {deckValues.map((val: string, idx: number) => (
+                                        <motion.div
+                                            key={val}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: idx * 0.05 }}
+                                        >
+                                            <RuneCard 
+                                                value={val}
+                                                isSelected={myVote === val}
+                                                disabled={!canVote}
+                                                onClick={() => onVote(val)}
+                                            />
+                                        </motion.div>
+                                    ))}
+                                </div>
+                                
+                                <AnimatePresence>
+                                    {!canVote && !isGM && (
+                                        <motion.div 
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            className="text-center"
+                                        >
+                                            <span className="text-xs uppercase tracking-[0.3em] font-black text-pr-text-muted animate-pulse">
+                                                “Deliberating with the Council...”
+                                            </span>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         )}
                     </div>
@@ -111,4 +154,3 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
         </div>
     );
 }
-

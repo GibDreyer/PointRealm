@@ -48,6 +48,20 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // PointRealm Theme Tokens
+        pr: {
+          bg: "var(--pr-bg)",
+          surface: "var(--pr-surface)",
+          "surface-2": "var(--pr-surface2)",
+          text: "var(--pr-text)",
+          "text-muted": "var(--pr-text-muted)",
+          primary: "var(--pr-primary)",
+          secondary: "var(--pr-secondary)",
+          success: "var(--pr-success)",
+          danger: "var(--pr-danger)",
+          border: "var(--pr-border)",
+          shadow: "var(--pr-shadow)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

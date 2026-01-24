@@ -14,10 +14,13 @@ import {
     RecentRealmItem,
     STORAGE_KEYS 
 } from '../../lib/storage';
-import { RealmBackground } from '../../components/ui/RealmBackground';
+import { RealmShell } from '../../app/layouts/RealmShell';
 import { parseRealmCode } from './utils';
 import { RoleToggle, RealmRole } from './components/RoleToggle';
 import { RecentRealmsList } from './components/RecentRealmsList';
+import { Panel } from '../../components/ui/Panel';
+import { SectionHeader } from '../../components/ui/SectionHeader';
+import { Button } from '../../components/Button';
 
 export function JoinRealmPage() {
   const navigate = useNavigate();
@@ -34,23 +37,17 @@ export function JoinRealmPage() {
 
   // Initialize
   useEffect(() => {
-    // 1. Get Display Name Priority: Storage Flat Key -> Profile -> Empty
     const savedName = localStorage.getItem(STORAGE_KEYS.DISPLAY_NAME) || getProfile().lastDisplayName;
     if (savedName) setDisplayName(savedName);
-    
-    // 2. Load recent realms
     setRecentRealms(getRecentRealms());
   }, []);
 
-  // Handlers
   const handleNameBlur = () => {
     if (displayName.trim()) {
         localStorage.setItem(STORAGE_KEYS.DISPLAY_NAME, displayName.trim());
         updateProfile({ lastDisplayName: displayName.trim() });
     }
   };
-
-
 
   const handleJoin = async (overrideInput?: string, overrideDisplayName?: string, overrideRole?: RealmRole) => {
     setError(null);
@@ -60,7 +57,6 @@ export function JoinRealmPage() {
     const nameToUse = overrideDisplayName || displayName;
     const roleToUse = overrideRole || role;
 
-    // 1. Parse & Validate Code
     const { code, error: parseError, isUrl } = parseRealmCode(inputToUse);
     
     if (parseError || !code) {
@@ -72,17 +68,14 @@ export function JoinRealmPage() {
         return;
     }
 
-    // 2. Validate Name
     if (!nameToUse.trim()) {
        setError("Please enter a display name for your adventurer.");
        return;
     }
 
-    // 3. Update Persistence
     localStorage.setItem(STORAGE_KEYS.DISPLAY_NAME, nameToUse.trim());
     updateProfile({ lastDisplayName: nameToUse.trim() });
 
-    // 4. API Call
     setIsLoading(true);
     
     try {
@@ -91,9 +84,6 @@ export function JoinRealmPage() {
             role: roleToUse
         });
 
-        // 5. Success - Store Token & Recent
-        // Token logic (usually handled by auth provider or stored in session/local - Requirement said "memory only (React state store)" but we need to pass it to the next page or simple storage for now as we don't have a global auth store set up for this yet in this file context. 
-        // Based on CreateRealmPage, it uses sessionStorage. Let's stick to that for "session" persistence which is close enough to memory for tab life.)
         if (response.memberToken) {
              sessionStorage.setItem(`pointrealm:v1:realm:${code}:token`, response.memberToken);
              if (response.memberId) {
@@ -101,26 +91,21 @@ export function JoinRealmPage() {
              }
         }
 
-        // Update Recent List
         addOrUpdateRecentRealm({
             realmCode: code,
             displayNameUsed: nameToUse,
-            realmName: response.realmName, // Assuming API returns this
+            realmName: response.realmName,
             joinUrl: isUrl ? inputToUse : undefined,
             role: roleToUse,
             themeKey: response.themeKey
         });
 
-        // Determine destination
-        // If API returns a specific route or we just go to /realm/{code}
         navigate(`/realm/${code}`);
 
     } catch (err: any) {
         console.error(err);
-        
-        // Error Mapping - ApiError has status directly on the error object
         let msg = "The portal refused to open. Unknown error.";
-        const status = err.status; // ApiError style (from our fetch-based client)
+        const status = err.status;
 
         if (status === 404) {
             msg = "That Realm doesn’t exist.";
@@ -131,7 +116,6 @@ export function JoinRealmPage() {
         } else if (!status && (err.message === 'Failed to fetch' || err.message === 'Network Error')) {
             msg = "The portal is unstable. Check your connection.";
         } else if (err.data?.detail) {
-            // ProblemDetails format from ASP.NET
             msg = err.data.detail;
         } else if (err.message) {
             msg = err.message;
@@ -143,18 +127,11 @@ export function JoinRealmPage() {
     }
   };
 
-  // Recent Realm Actions
   const handleRecentSelect = (item: RecentRealmItem) => {
-      // Auto-fill and Join
-      // If user has a name typed, use it? Or use the one from history?
-      // Requirement: "If display name is empty, prefill from localStorage...". 
-      // But for recent list click, "Enter button... Join behavior".
-      // Let's use the stored name for that realm if available, otherwise current input.
       const nameToUse = item.displayNameUsed || displayName;
       setRealmInput(item.realmCode);
       setDisplayName(nameToUse);
-      if (item.role) setRole(item.role); // Restore role
-      
+      if (item.role) setRole(item.role);
       handleJoin(item.realmCode, nameToUse, item.role || 'participant');
   };
 
@@ -170,146 +147,117 @@ export function JoinRealmPage() {
       }
   };
   
-  // Input paste handler
   const handlePaste = (e: React.ClipboardEvent) => {
       const pasted = e.clipboardData.getData('text');
       const { code, isUrl } = parseRealmCode(pasted);
       if (code && isUrl) {
           e.preventDefault();
           setRealmInput(code);
-          // Briefly flash success or just set it?
-          // Setting it is fine.
       }
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center p-4 md:p-8 relative">
-       <RealmBackground />
-
+    <RealmShell className="justify-center">
        <motion.div 
          initial={{ opacity: 0, y: 10 }}
          animate={{ opacity: 1, y: 0 }}
-         transition={{ duration: 0.35, ease: "easeOut" }}
-         className="w-full max-w-lg z-10"
+         className="w-full max-w-lg mx-auto"
        >
-          {/* Header */}
-          <div className="text-center mb-8 relative">
-               <Link to="/" className="absolute left-0 top-1 text-[var(--pr-text-muted)] hover:text-[var(--pr-primary)] transition-colors" title="Back to Home">
-                   <ArrowLeft size={24} />
-               </Link>
-               <h1 className="text-3xl md:text-4xl font-bold text-[var(--pr-primary)] mb-2" style={{ fontFamily: 'var(--pr-heading-font)' }}>
-                  Enter the Realm
-               </h1>
-               <p className="text-[var(--pr-text-muted)] text-lg">
-                  Join a Session
-               </p>
+          <Panel className="relative">
+              {/* Header */}
+              <header className="mb-8 text-center relative">
+                  <Link to="/" className="absolute left-0 top-1 text-pr-text-muted hover:text-pr-primary transition-colors" title="Back to Home">
+                      <ArrowLeft size={20} />
+                  </Link>
+                  <SectionHeader 
+                    title="Enter the Realm" 
+                    subtitle="Join a session" 
+                    align="center"
+                    className="mb-0"
+                  />
+              </header>
+
+              <div className="space-y-6">
+                  {/* Realm Input */}
+                  <div className="space-y-2">
+                      <label className="text-sm font-medium text-pr-text-muted flex items-center gap-2">
+                          <Globe size={16} /> Realm Code or Link
+                      </label>
+                      <input 
+                          value={realmInput}
+                          onChange={(e) => {
+                              setRealmInput(e.target.value);
+                              if (inputError) setInputError(null);
+                          }}
+                          onPaste={handlePaste}
+                          onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleJoin()}
+                          placeholder="CODE or LINK"
+                          className="w-full p-4 rounded-[var(--pr-radius-md)] bg-pr-bg border border-pr-border focus:border-pr-primary focus:ring-1 focus:ring-pr-primary text-pr-text transition-colors text-lg font-mono placeholder:font-sans uppercase"
+                          disabled={isLoading}
+                      />
+                      {inputError && <p className="text-xs text-pr-danger font-medium mt-1">{inputError}</p>}
+                  </div>
+
+                  {/* Display Name */}
+                  <div className="space-y-2">
+                      <label className="text-sm font-medium text-pr-text-muted flex items-center gap-2">
+                          <User size={16} /> Display Name
+                      </label>
+                      <input 
+                          value={displayName}
+                          onChange={(e) => setDisplayName(e.target.value)}
+                          onBlur={handleNameBlur}
+                          onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleJoin()}
+                          placeholder="Name your adventurer" 
+                          className="w-full p-4 rounded-[var(--pr-radius-md)] bg-pr-bg border border-pr-border focus:border-pr-primary focus:ring-1 focus:ring-pr-primary text-pr-text transition-colors text-lg"
+                          disabled={isLoading}
+                      />
+                  </div>
+
+                  <RoleToggle 
+                      value={role} 
+                      onChange={setRole} 
+                      disabled={isLoading}
+                  />
+
+                  {error && (
+                      <div className="p-4 rounded-[var(--pr-radius-md)] bg-pr-danger/10 border border-pr-danger text-pr-danger text-sm flex items-start gap-3">
+                          <AlertTriangle className="w-5 h-5 shrink-0" />
+                          <span>{error}</span>
+                      </div>
+                  )}
+
+                  <Button 
+                      onClick={() => handleJoin()}
+                      disabled={isLoading || !realmInput.trim() || !displayName.trim()}
+                      fullWidth
+                      variant="primary"
+                      className="py-4 text-lg"
+                  >
+                      {isLoading ? (
+                          <>
+                              <Loader2 className="animate-spin mr-2" size={20} />
+                              Opening Portal...
+                          </>
+                      ) : (
+                          <>
+                              Enter the Realm <ArrowRight className="ml-2" size={20} />
+                          </>
+                      )}
+                  </Button>
+              </div>
+          </Panel>
+
+          {/* Recent Realms Section */}
+          <div className="mt-8">
+              <RecentRealmsList 
+                  realms={recentRealms}
+                  onSelect={handleRecentSelect}
+                  onForget={handleForgetRecent}
+                  onClearAll={handleClearAllRecent}
+              />
           </div>
-
-          {/* Main Card */}
-          <div className="bg-[var(--pr-surface)] border border-[var(--pr-border)] rounded-[var(--pr-radius-xl)] shadow-[var(--pr-shadow-soft)] p-6 md:p-8 mb-8">
-               <div className="space-y-6">
-                   
-                   {/* Realm Input */}
-                   <div className="space-y-2">
-                        <label className="text-sm font-medium text-[var(--pr-text-muted)] flex items-center gap-2">
-                            <Globe size={16} /> Realm Code or Link
-                        </label>
-                        <div className="relative">
-                            <input 
-                                value={realmInput}
-                                onChange={(e) => {
-                                    setRealmInput(e.target.value);
-                                    if (inputError) setInputError(null);
-                                }}
-                                onPaste={handlePaste}
-                                onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleJoin()}
-                                placeholder="Realm code (e.g. A1B2C3) or full invite link"
-                                className="w-full p-4 rounded-[var(--pr-radius-md)] bg-[var(--pr-bg)] border border-[var(--pr-border)] focus:outline-none focus:border-[var(--pr-primary)] focus:ring-1 focus:ring-[var(--pr-primary)] text-[var(--pr-text)] transition-colors text-lg font-mono placeholder:font-sans uppercase"
-                                disabled={isLoading}
-                            />
-                        </div>
-                        {inputError && (
-                            <motion.p 
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                className="text-xs text-[var(--pr-danger)] font-medium"
-                            >
-                                {inputError}
-                            </motion.p>
-                        )}
-                   </div>
-
-                   {/* Display Name */}
-                   <div className="space-y-2">
-                        <label className="text-sm font-medium text-[var(--pr-text-muted)] flex items-center gap-2">
-                            <User size={16} /> Display Name
-                        </label>
-                        <input 
-                            value={displayName}
-                            onChange={(e) => setDisplayName(e.target.value)}
-                            onBlur={handleNameBlur}
-                            onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleJoin()}
-                            placeholder="Name your adventurer" 
-                            className="w-full p-4 rounded-[var(--pr-radius-md)] bg-[var(--pr-bg)] border border-[var(--pr-border)] focus:outline-none focus:border-[var(--pr-primary)] focus:ring-1 focus:ring-[var(--pr-primary)] text-[var(--pr-text)] transition-colors text-lg"
-                            disabled={isLoading}
-                        />
-                   </div>
-
-                   {/* Role Toggle */}
-                   <RoleToggle 
-                        value={role} 
-                        onChange={setRole} 
-                        disabled={isLoading}
-                   />
-
-                   {/* Error Banner */}
-                   {error && (
-                       <motion.div 
-                            initial={{ opacity: 0, y: -5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="p-4 rounded-[var(--pr-radius-md)] bg-[var(--pr-danger)]/10 border border-[var(--pr-danger)] text-[var(--pr-danger)] text-sm flex items-start gap-3"
-                        >
-                            <AlertTriangle className="w-5 h-5 shrink-0" />
-                            <span>{error}</span>
-                       </motion.div>
-                   )}
-
-                   {/* Action Buttons */}
-                   <div className="pt-2 flex flex-col gap-3">
-                        <button 
-                            onClick={() => handleJoin()}
-                            disabled={isLoading || !realmInput.trim() || !displayName.trim()}
-                            className="w-full py-4 rounded-[var(--pr-radius-md)] bg-[var(--pr-primary)] text-[var(--pr-bg)] font-bold text-lg shadow-[var(--pr-shadow-soft)] hover:shadow-[var(--pr-shadow-hover)] hover:translate-y-[-1px] active:translate-y-[0px] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                        >
-                            {isLoading ? (
-                                <>
-                                    <Loader2 className="animate-spin" size={20} />
-                                    Opening the portal...
-                                </>
-                            ) : (
-                                <>
-                                    Enter the Realm <ArrowRight size={20} />
-                                </>
-                            )}
-                        </button>
-                        
-                        <div className="flex justify-center mt-2">
-                           <Link to="/" className="text-sm text-[var(--pr-text-muted)] hover:text-[var(--pr-primary)] underline decoration-dotted underline-offset-4">
-                               Back to Home
-                           </Link>
-                        </div>
-                   </div>
-               </div>
-          </div>
-
-          {/* Recent Realms */}
-          <RecentRealmsList 
-              realms={recentRealms}
-              onSelect={handleRecentSelect}
-              onForget={handleForgetRecent}
-              onClearAll={handleClearAllRecent}
-          />
        </motion.div>
-    </div>
+    </RealmShell>
   );
 }

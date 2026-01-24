@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 interface RuneCardMiniProps {
   value: string | null;
   revealed: boolean;
-  isCensored?: boolean; // For "hidden until reveal" even if data is present
+  isCensored?: boolean;
   className?: string;
   delay?: number;
 }
@@ -17,7 +17,6 @@ export const RuneCardMini: React.FC<RuneCardMiniProps> = ({
   className,
   delay = 0
 }) => {
-  // If value is null (abstained/unknown), we usually show '?' or '-'
   const displayValue = value === null ? '?' : value;
 
   return (
@@ -26,31 +25,32 @@ export const RuneCardMini: React.FC<RuneCardMiniProps> = ({
         className="w-full h-full relative preserve-3d"
         initial={false}
         animate={{ rotateY: revealed && !isCensored ? 180 : 0 }}
-        transition={{ duration: 0.3, delay: delay, ease: "easeInOut" }}
+        transition={{ duration: 0.5, delay: delay, ease: [0.23, 1, 0.32, 1] }}
       >
-        {/* Card Back */}
+        {/* Card Back - The Unrevealed State */}
         <div 
           className={cn(
-            "absolute inset-0 backface-hidden rounded border border-border bg-surface",
-            "flex items-center justify-center",
-            "bg-[url('/assets/card-back-pattern.png')] bg-cover bg-center opacity-80" // Placeholder texture if any
+            "absolute inset-0 backface-hidden rounded-md border border-pr-border/30 bg-pr-surface",
+            "flex items-center justify-center overflow-hidden"
           )}
           style={{ transform: "rotateY(0deg)" }}
         >
-          <div className="w-6 h-8 rounded border border-white/10 flex items-center justify-center">
-             <div className="w-3 h-3 rounded-full bg-primary/20" />
+          {/* Subtle Rune pattern on back */}
+          <div className="absolute inset-0 bg-pr-primary/5 opacity-20 pointer-events-none" />
+          <div className="w-5 h-7 rounded border border-pr-primary/10 flex items-center justify-center">
+             <div className="w-2 h-2 rounded-full bg-pr-primary/20 shadow-[0_0_8px_rgba(6,182,212,0.2)]" />
           </div>
         </div>
 
-        {/* Card Face */}
+        {/* Card Face - The Revealed State */}
         <div 
           className={cn(
-            "absolute inset-0 backface-hidden rounded border border-primary/30 bg-surfaceElevated",
-            "flex items-center justify-center shadow-[0_0_10px_-2px_rgba(6,182,212,0.3)]"
+            "absolute inset-0 backface-hidden rounded-md border border-pr-primary/40 bg-pr-surface-2",
+            "flex items-center justify-center shadow-[0_0_15px_-5px_rgba(6,182,212,0.3)]"
           )}
           style={{ transform: "rotateY(180deg)" }}
         >
-          <span className="text-lg font-bold font-heading text-primary drop-shadow-[0_0_5px_rgba(6,182,212,0.5)]">
+          <span className="text-lg font-black tracking-tighter text-pr-primary">
             {displayValue}
           </span>
         </div>

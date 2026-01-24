@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Crown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Crown, Sword, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Panel } from '@/components/ui/Panel';
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Button } from '@/components/Button';
 
 interface SuggestedOathPanelProps {
   suggestion: { kind: 'median' | 'mode'; value: string } | null;
@@ -21,7 +24,7 @@ export const SuggestedOathPanel: React.FC<SuggestedOathPanelProps> = ({
   const [sealingValue, setSealingValue] = useState<string | null>(null);
 
   const handleSeal = async (val: string) => {
-    if (sealingValue) return; // Prevent double click
+    if (sealingValue) return; 
     setSealingValue(val);
     try {
       await onSealOutcome(val);
@@ -29,84 +32,96 @@ export const SuggestedOathPanel: React.FC<SuggestedOathPanelProps> = ({
       console.error("Failed to seal", e);
       setSealingValue(null);
     }
-    // Success flow usually handled by parent/server update, but we can reset if needed or keep loading
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)}>
+    <div className={cn("flex flex-col gap-8", className)}>
       
       {/* Suggestion Section */}
-      {suggestion && (
-        <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="rounded-xl bg-surface/50 border border-primary/20 p-4 relative overflow-hidden"
-        >
-            <div className="absolute top-0 right-0 p-2 opacity-10 pointer-events-none">
-                <Crown size={64} />
-            </div>
-            
-            <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2 flex items-center gap-2">
-               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-               Suggested Oath
-            </h4>
-            
-            <div className="flex items-center gap-4">
-                <div className="w-12 h-16 rounded-lg bg-surfaceElevated border border-primary flex items-center justify-center text-2xl font-heading font-bold text-primary shadow-lg shadow-primary/10">
-                    {suggestion.value}
-                </div>
-                <div>
-                   <div className="text-sm font-bold text-text">
-                       Based on {suggestion.kind === 'median' ? 'Median' : 'Mode'}
-                   </div>
-                   <div className="text-xs text-textMuted max-w-[200px]">
-                       {suggestion.kind === 'median' ? 'A steady middle path.' : 'The party’s most chosen rune.'}
-                   </div>
-                </div>
-            </div>
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {suggestion && (
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="relative"
+            >
+                <Panel variant="default" className="border-pr-primary/30 bg-pr-primary/5 flex items-center justify-between p-5 relative overflow-hidden group">
+                    <div className="absolute -right-4 -top-4 text-pr-primary/10 group-hover:scale-110 transition-transform duration-700 pointer-events-none">
+                        <Sparkles size={120} />
+                    </div>
+                    
+                    <div className="flex items-center gap-5 relative z-10">
+                        <div className="w-16 h-20 rounded-xl bg-pr-surface border-2 border-pr-primary flex items-center justify-center text-3xl font-black text-pr-primary shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+                            {suggestion.value}
+                        </div>
+                        <div>
+                           <SectionHeader 
+                             title="Suggested Oath" 
+                             subtitle={`A path formed by ${suggestion.kind === 'median' ? 'Steady Consensus' : 'Majority Voice'}`}
+                             className="mb-0"
+                           />
+                        </div>
+                    </div>
 
-      {/* GM Controls */}
+                    {isGM && (
+                        <Button 
+                            onClick={() => handleSeal(suggestion.value)}
+                            variant="primary"
+                            disabled={!!sealingValue}
+                            className="hidden md:flex ml-4 px-6 h-12"
+                        >
+                            Accept Path
+                        </Button>
+                    )}
+                </Panel>
+            </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* GM Controls Zone */}
       {isGM && (
-        <div className="space-y-3">
-             <h3 className="text-sm font-bold uppercase tracking-widest text-[var(--pr-secondary)] border-b border-[var(--pr-secondary)]/30 pb-2 flex items-center gap-2">
-                <Crown size={14} /> Seal the Outcome
-             </h3>
+        <Panel className="border-l-4 border-l-pr-secondary relative overflow-hidden bg-pr-secondary/[0.02]">
+             <div className="flex items-center justify-between mb-4">
+                 <SectionHeader 
+                    title="Seal the Prophecy" 
+                    subtitle="Finalize the outcome" 
+                    className="mb-0 text-pr-secondary"
+                 />
+                 <Crown className="text-pr-secondary opacity-40" size={20} />
+             </div>
              
-             <div className="flex flex-wrap gap-2">
+             <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 mb-6">
                 {deckValues.map(val => (
                     <button
                         key={val}
                         onClick={() => handleSeal(val)}
                         disabled={!!sealingValue}
                         className={cn(
-                            "relative w-10 h-10 rounded border text-sm font-bold transition-all",
-                            "hover:scale-105 active:scale-95",
+                            "h-10 rounded border text-xs font-black transition-all uppercase tracking-tighter shadow-sm",
                             sealingValue === val 
-                               ? "bg-[var(--pr-secondary)] text-black border-[var(--pr-secondary)]"
-                               : "bg-surface border-border hover:border-[var(--pr-secondary)] hover:text-[var(--pr-secondary)]"
+                               ? "bg-pr-secondary text-pr-bg border-pr-secondary shadow-[0_0_10px_rgba(245,158,11,0.5)]"
+                               : "bg-pr-surface border-pr-border/40 text-pr-text/80 hover:border-pr-secondary hover:text-pr-secondary"
                         )}
-                        aria-label={`Seal outcome as ${val}`}
+                        aria-label={`Seal as ${val}`}
                     >
                         {sealingValue === val ? (
-                            <motion.div 
-                                animate={{ rotate: 360 }}
-                                transition={{ repeat: Infinity, duration: 1 }}
-                                className="w-4 h-4 border-2 border-black border-t-transparent rounded-full mx-auto"
-                            />
-                        ) : (
-                            val
-                        )}
+                            <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} className="flex justify-center">
+                                <div className="w-4 h-4 border-2 border-pr-bg border-t-transparent rounded-full" />
+                            </motion.div>
+                        ) : val}
                     </button>
                 ))}
              </div>
              
-             <p className="text-[10px] text-textMuted italic">
-                Finalizing will update the quest log and notify all members.
-             </p>
-        </div>
+             <div className="flex items-center gap-2 p-3 rounded-lg bg-pr-bg/40 border border-pr-border/20">
+                 <div className="w-8 h-8 rounded-full bg-pr-secondary/10 flex items-center justify-center text-pr-secondary">
+                    <Sword size={16} />
+                 </div>
+                 <p className="text-[10px] text-pr-text-muted font-bold uppercase tracking-tight italic">
+                    Finalizing will update the quest log and notify all travelers of the fate agreed upon.
+                 </p>
+             </div>
+        </Panel>
       )}
     </div>
   );

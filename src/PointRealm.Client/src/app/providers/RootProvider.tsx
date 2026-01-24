@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode } from "react";
 import { ThemeProvider } from "../../theme/ThemeProvider";
-import { ToastProvider } from "../../features/ui/ToastContext";
+import { ToastProvider } from "../../components/ui/ToastSystem";
 
 const queryClient = new QueryClient();
 

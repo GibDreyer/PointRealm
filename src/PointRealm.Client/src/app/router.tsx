@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
-import { PublicShell } from "@/app/layouts/PublicShell";
-import { RealmShell } from "@/app/layouts/RealmShell";
+
+import { RealmLayout } from "@/app/layouts/RealmLayout"; // Logic/Data layout
 import { LandingPage } from "@/features/landing/LandingPage";
 import { CreateRealmPage } from "@/features/createRealm/CreateRealmPage";
 import { JoinRealmPage } from "@/features/joinRealm/JoinRealmPage";
@@ -19,12 +19,20 @@ export const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <PublicShell />,
+    // We use RealmShell directly in pages or here? 
+    // LandingPage has its own RealmShell. Create/Join should probably have one too.
+    // If we put it here, LandingPage gets double wrapped.
+    // Let's use a Outlet-only wrapper or nothing if pages handle it.
+    // Spec says 'Full-page PageShell' for Landing.
+    // Start with no shell here, let pages define their shell (or use a shared visual layout if content allows).
+    // Given the visual differences (Landing is unique), let's keep it simple.
+    // Actually, Create/Join/Landing all share "Public" context.
+    element: <OutletLayout />,
     errorElement: <ErrorPage />,
     children: [
       {
         index: true,
-        element: <LandingPage />,
+        element: <LandingPage />, 
       },
       {
         path: "create",
@@ -46,31 +54,26 @@ export const router = createBrowserRouter([
   },
   {
     path: "/realm/:code",
-    element: <RealmShell />,
+    element: <RealmLayout />,
     errorElement: <ErrorPage />,
     children: [
+      {
+        index: true,
+        element: <RealmScreen />,
+      },
       {
         path: "lobby",
         element: <TavernLobbyPage />,
       },
-      {
-        path: "tavern",
-        element: <TavernLobbyPage />,
-      },
     ],
-  },
-  {
-    path: "/realm/:code/play",
-    element: <RealmScreen />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: "/realms/:realmCode",
-    element: <RealmScreen />,
-    errorElement: <ErrorPage />,
   },
   {
     path: "*",
     element: <NotFoundPage />,
   },
 ]);
+
+import { Outlet } from "react-router-dom";
+function OutletLayout() {
+  return <Outlet />;
+}

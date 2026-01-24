@@ -1,147 +1,133 @@
 import React, { useState } from 'react';
-import { RealmShell } from '../realmPlay/components/RealmShell';
-import { RuneCard } from '../../components/RuneCard';
-import { QuestLog } from '../realmPlay/components/QuestLog';
-import { PartyRoster } from '../realmPlay/components/PartyRoster';
-import { GMControls } from '../realmPlay/components/GMControls';
-import { useToast } from '../ui/ToastContext';
+import { RealmShell } from '../../app/layouts/RealmShell';
+import { RuneCard } from '../realmPlay/components/RuneCard';
+import { QuestLogPanel } from '../realmPlay/components/QuestLogPanel';
+import { PartyRosterPanel } from '../realmPlay/components/PartyRosterPanel';
+import { useToast } from '../../components/ui/ToastSystem';
 import { ProphecyReveal } from '../reveal/ProphecyReveal';
 
 export const DevComponentsPage: React.FC = () => {
-  // State for components
   const [selectedRune, setSelectedRune] = useState<string | null>(null);
   const [hideVotes, setHideVotes] = useState(false);
-  const { addToast } = useToast();
+  const { toast } = useToast();
 
-  // Mock Data
-  const [quests, setQuests] = useState<any[]>([
+  const [quests] = useState<any[]>([
     { id: '1', title: 'Determine Project Scope', status: 'active' },
     { id: '2', title: 'Select Tech Stack', status: 'completed', estimate: '5' },
     { id: '3', title: 'Design Database Schema', status: 'pending' },
     { id: '4', title: 'Implement Authentication', status: 'pending' },
   ]);
 
-  const [members/*, setMembers*/] = useState<any[]>([
-    { id: '1', name: 'Gandalf (GM)', role: 'gm', presence: 'online', hasVoted: true },
-    { id: '2', name: 'Aragorn', role: 'player', presence: 'online', hasVoted: true },
-    { id: '3', name: 'Legolas', role: 'player', presence: 'online', hasVoted: false },
-    { id: '4', name: 'Gimli', role: 'player', presence: 'away', hasVoted: true },
-    { id: '5', name: 'Boromir', role: 'player', presence: 'disconnected', hasVoted: false },
+  const [members] = useState<any[]>([
+    { id: '1', name: 'Gandalf (GM)', role: 'GM', isOnline: true, status: 'ready' },
+    { id: '2', name: 'Aragorn', role: 'Traveler', isOnline: true, status: 'choosing' },
+    { id: '3', name: 'Legolas', role: 'Traveler', isOnline: true, status: 'resting' },
+    { id: '4', name: 'Gimli', role: 'Traveler', isOnline: false, status: 'resting' },
   ]);
 
   return (
-    <RealmShell title="Dev Components" subtitle="Component Interaction Laboratory">
-      {/* Column 1: Quests & Controls */}
-      <div className="lg:col-span-3 flex flex-col gap-6">
-        <QuestLog 
-          quests={quests}
-          activeQuestId="1"
-          canManage={true}
-          onSelectQuest={(id) => addToast(`Selected Quest: ${id}`, 'info')}
-          onAddQuest={() => addToast('Add Quest Clicked', 'info')}
-          onEditQuest={(id) => addToast(`Edit Quest: ${id}`, 'info')}
-          onDeleteQuest={(id) => addToast(`Delete Quest: ${id}`, 'warning')}
-          onReorder={(ids) => {
-             addToast('Quests Reordered', 'success');
-             // Naive reorder locally
-             const reordered = ids.map(id => quests.find(q => q.id === id));
-             setQuests(reordered);
-          }}
-        />
+    <RealmShell>
+      <div className="w-full max-w-6xl mx-auto flex flex-col gap-10">
+        <header className="py-6 border-b border-pr-border/20">
+            <h1 className="text-2xl font-black text-pr-primary uppercase tracking-widest">Arcane Repository</h1>
+            <p className="text-pr-text-muted text-sm italic">Component Interaction Laboratory</p>
+        </header>
 
-        <GMControls 
-          phase="revealed"
-          canGM={true}
-          onStartEncounter={async () => { await new Promise(r => setTimeout(r, 1000)); addToast('Encounter Started', 'success'); }}
-          onReveal={async () => { await new Promise(r => setTimeout(r, 1000)); addToast('Prophecy Revealed', 'rune'); }}
-          onReroll={async () => { await new Promise(r => setTimeout(r, 1000)); addToast('Fates Re-rolled', 'warning'); }}
-          onSealOutcome={async (val) => addToast(`Outcome Sealed: ${val}`, 'rune')}
-        />
-        
-        <div className="p-4 rounded border border-border/50 bg-surface/30">
-           <h3 className="text-sm font-bold mb-2">Toast Triggers</h3>
-           <div className="flex flex-wrap gap-2">
-             <button className="px-2 py-1 bg-info/20 text-info rounded text-xs" onClick={() => addToast('Info Toast', 'info')}>Info</button>
-             <button className="px-2 py-1 bg-success/20 text-success rounded text-xs" onClick={() => addToast('Success Toast', 'success')}>Success</button>
-             <button className="px-2 py-1 bg-warning/20 text-warning rounded text-xs" onClick={() => addToast('Warning Toast', 'warning')}>Warning</button>
-             <button className="px-2 py-1 bg-danger/20 text-danger rounded text-xs" onClick={() => addToast('Error Toast', 'error')}>Error</button>
-             <button className="px-2 py-1 bg-secondary/20 text-secondary rounded text-xs" onClick={() => addToast('Rune Toast', 'rune')}>Rune</button>
-           </div>
-        </div>
-      </div>
-
-      {/* Column 2: Voting & Reveal Area */}
-      <div className="lg:col-span-6 flex flex-col items-center justify-center min-h-[400px]">
-        {selectedRune === 'REVEAL_DEMO' ? (
-             <div className="w-full h-[600px] border border-border/50 rounded-xl overflow-hidden bg-bg">
-                 <ProphecyReveal 
-                    encounter={{
-                        id: 'dev-enc',
-                        questId: '1',
-                        status: 'Active',
-                        isRevealed: true,
-                        votes: {
-                            '1': '5',
-                            '2': '8',
-                            '3': '5',
-                            '4': '3',
-                            '5': null 
-                        },
-                        distribution: [], // letting component calc for now or mock if needed
-                        suggestedOath: { kind: 'median', value: '5' }
-                    } as any}
-                    partyRoster={members}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Column 1: Quests & Controls */}
+            <div className="lg:col-span-3 flex flex-col gap-6">
+                <QuestLogPanel 
+                    quests={quests}
+                    activeQuestId="1"
                     isGM={true}
-                    deckValues={['1','2','3','5','8','13','?']}
-                    onSealOutcome={async (val) => addToast(`Sealed: ${val}`, 'success')}
-                    hideVoteCounts={hideVotes}
-                 />
-             </div>
-        ) : (
-            <>
-                <div className="flex flex-wrap justify-center gap-4">
-                  {['1', '2', '3', '5', '8', '13', '?', '☕'].map((val) => (
-                    <RuneCard
-                      key={val}
-                      value={val}
-                      selected={selectedRune === val}
-                      onSelect={(v) => setSelectedRune(v === selectedRune ? null : v)}
-                    />
-                  ))}
-                </div>
-                
-                <div className="mt-8 flex gap-4">
-                   <RuneCard value="Disabled" disabled onSelect={() => {}} />
-                   <button 
-                       className="px-4 py-2 bg-secondary text-black font-bold rounded"
-                       onClick={() => setSelectedRune('REVEAL_DEMO')}
-                   >
-                       Test Reveal Animation
-                   </button>
-                </div>
-            </>
-        )}
-      </div>
+                    onSelectQuest={(id) => toast(`Selected Quest: ${id}`, 'info')}
+                    onAddQuest={() => toast('Add Quest Clicked', 'info')}
+                />
 
-      {/* Column 3: Party Roster */}
-      <div className="lg:col-span-3 flex flex-col gap-6">
-        <PartyRoster
-          members={members}
-          totalVoters={5}
-          votedCount={3}
-          hideVoteCounts={hideVotes}
-        />
-        
-        <div className="p-4 rounded border border-border/50 bg-surface/30">
-          <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
-            <input 
-              type="checkbox" 
-              checked={hideVotes} 
-              onChange={(e) => setHideVotes(e.target.checked)} 
-              className="rounded border-border bg-surface"
-            />
-            Hide Vote Counts
-          </label>
+                <div className="p-4 rounded-[var(--pr-radius-md)] border border-pr-border/50 bg-pr-surface/30">
+                    <h3 className="text-sm font-bold mb-2">Notice Controls</h3>
+                    <p className="text-xs text-pr-text-muted mb-4 italic">Simulate GM and state actions</p>
+                    <div className="flex flex-wrap gap-2">
+                        <button className="px-3 py-1 bg-pr-primary/20 text-pr-primary rounded-full text-xs font-bold" onClick={() => toast('Encounter Started', 'success')}>Start</button>
+                        <button className="px-3 py-1 bg-pr-secondary/20 text-pr-secondary rounded-full text-xs font-bold" onClick={() => toast('Prophecy Revealed', 'info')}>Reveal</button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Column 2: Voting & Reveal Area */}
+            <div className="lg:col-span-6 flex flex-col items-center justify-center min-h-[400px]">
+                {selectedRune === 'REVEAL_DEMO' ? (
+                    <div className="w-full h-[600px] border border-pr-border/20 rounded-xl overflow-hidden bg-pr-bg/40 backdrop-blur-sm p-6">
+                        <ProphecyReveal 
+                            encounter={{
+                                id: 'dev-enc',
+                                questId: '1',
+                                status: 'Active',
+                                isRevealed: true,
+                                votes: {
+                                    '1': '5',
+                                    '2': '8',
+                                    '3': '5',
+                                    '4': '3'
+                                }
+                            } as any}
+                            partyRoster={members}
+                            isGM={true}
+                            deckValues={['1','2','3','5','8','13','?']}
+                            onSealOutcome={async (val) => toast(`Sealed: ${val}`, 'success')}
+                            hideVoteCounts={hideVotes}
+                        />
+                    </div>
+                ) : (
+                    <div className="space-y-12 w-full text-center">
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+                            {['1', '2', '3', '5', '8', '13', '?', 'coffee'].map((val) => (
+                                <RuneCard
+                                    key={val}
+                                    value={val}
+                                    isSelected={selectedRune === val}
+                                    onClick={() => setSelectedRune(val === selectedRune ? null : val)}
+                                />
+                            ))}
+                        </div>
+                        
+                        <div className="flex flex-col items-center gap-4">
+                            <div className="flex gap-4">
+                                <RuneCard value="Disabled" disabled />
+                                <button 
+                                    className="px-6 py-3 bg-pr-secondary text-pr-bg font-black uppercase tracking-widest rounded-lg shadow-lg hover:shadow-pr-secondary/20 transition-all active:scale-95"
+                                    onClick={() => setSelectedRune('REVEAL_DEMO')}
+                                >
+                                    Test Reveal Ritual
+                                </button>
+                            </div>
+                            <p className="text-[10px] text-pr-text-muted uppercase tracking-widest font-bold">Inscribe your intent</p>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Column 3: Party Roster */}
+            <div className="lg:col-span-3 flex flex-col gap-6">
+                <PartyRosterPanel
+                    members={members}
+                    currentMemberId="1"
+                    hideVoteCounts={hideVotes}
+                    encounterStatus={selectedRune === 'REVEAL_DEMO' ? 'revealed' : 'voting'}
+                />
+                
+                <div className="p-4 rounded-[var(--pr-radius-md)] border border-pr-border/50 bg-pr-surface/30">
+                    <label className="flex items-center gap-3 text-xs cursor-pointer select-none font-bold uppercase tracking-widest text-pr-text-muted">
+                        <input 
+                            type="checkbox" 
+                            checked={hideVotes} 
+                            onChange={(e) => setHideVotes(e.target.checked)} 
+                            className="w-4 h-4 rounded border-pr-border bg-pr-bg text-pr-primary focus:ring-pr-primary"
+                        />
+                        Shroud the Consensus
+                    </label>
+                </div>
+            </div>
         </div>
       </div>
     </RealmShell>

@@ -3,6 +3,8 @@ import { X, Save, Loader2, Eye, EyeOff, UserX } from 'lucide-react';
 import { RealmSettings } from '../types';
 import { ThemePicker } from '../../createRealm/components/ThemePicker';
 import { api } from '../../../api/client';
+import { Button } from '../../../components/Button';
+import { SectionHeader } from '../../../components/ui/SectionHeader';
 
 interface Props {
     realmCode: string;
@@ -34,13 +36,11 @@ export function RealmSettingsDialog({ realmCode, currentSettings, currentThemeKe
             onClose();
         } catch (err) {
             console.error("Failed to update settings", err);
-            // Could set error state here
         } finally {
             setIsSaving(false);
         }
     };
     
-    // Helper for checkboxes
     const toggle = (key: keyof RealmSettings) => {
         setSettings(prev => ({ ...prev, [key]: !prev[key] }));
     };
@@ -48,82 +48,119 @@ export function RealmSettingsDialog({ realmCode, currentSettings, currentThemeKe
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="w-full max-w-2xl bg-[var(--pr-surface)] border border-[var(--pr-border)] rounded-[var(--pr-radius-xl)] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-                <div className="p-4 border-b border-[var(--pr-border)] flex items-center justify-between">
-                    <h2 className="text-xl font-bold text-[var(--pr-text)]">Realm Settings</h2>
-                    <button onClick={onClose} className="text-[var(--pr-text-muted)] hover:text-[var(--pr-text)] disabled:opacity-50" disabled={isSaving}>
-                        <X size={24} />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-pr-bg/80 backdrop-blur-sm">
+            <div className="w-full max-w-2xl bg-pr-surface border border-pr-border rounded-[var(--pr-radius-xl)] shadow-2xl flex flex-col max-h-[90vh] relative overflow-hidden">
+                {/* Visual Accent */}
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-pr-primary to-transparent opacity-50" />
+
+                <div className="p-5 border-b border-pr-border/30 flex items-center justify-between">
+                    <SectionHeader title="Realm Settings" subtitle={`Modifying ${realmCode}`} className="mb-0" />
+                    <button 
+                        onClick={onClose} 
+                        className="p-2 text-pr-text-muted hover:text-pr-text hover:bg-pr-surface-2 rounded-full transition-all disabled:opacity-50" 
+                        disabled={isSaving}
+                    >
+                        <X size={20} />
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                    
+                <div className="flex-1 overflow-y-auto p-6 space-y-8">
                     {/* Toggles */}
                     <div className="space-y-4">
-                         <h3 className="text-sm font-bold uppercase text-[var(--pr-text-muted)]">Mechanics</h3>
+                         <h3 className="text-[10px] font-black uppercase text-pr-text-muted tracking-[0.2em]">Mechanics & Rules</h3>
                          
-                         <label className="flex items-center justify-between p-3 rounded-[var(--pr-radius-md)] hover:bg-[var(--pr-surface-hover)] cursor-pointer">
-                            <div className="flex items-center gap-3">
-                                <Eye className="text-[var(--pr-primary)]" />
-                                <div>
-                                    <span className="block font-medium text-[var(--pr-text)]">Auto Reveal</span>
-                                    <span className="text-xs text-[var(--pr-text-muted)]">Show cards when everyone votes</span>
-                                </div>
-                            </div>
-                            <input type="checkbox" checked={settings.autoReveal} onChange={() => toggle('autoReveal')} className="w-5 h-5 accent-[var(--pr-primary)]" disabled={isSaving} />
-                         </label>
-
-                         <label className="flex items-center justify-between p-3 rounded-[var(--pr-radius-md)] hover:bg-[var(--pr-surface-hover)] cursor-pointer">
-                            <div className="flex items-center gap-3">
-                                <UserX className="text-[var(--pr-primary)]" />
-                                <div>
-                                    <span className="block font-medium text-[var(--pr-text)]">Allow Abstain</span>
-                                    <span className="text-xs text-[var(--pr-text-muted)]">Allow '?' card</span>
-                                </div>
-                            </div>
-                            <input type="checkbox" checked={settings.allowAbstain} onChange={() => toggle('allowAbstain')} className="w-5 h-5 accent-[var(--pr-primary)]" disabled={isSaving} />
-                         </label>
-
-                         <label className="flex items-center justify-between p-3 rounded-[var(--pr-radius-md)] hover:bg-[var(--pr-surface-hover)] cursor-pointer">
-                            <div className="flex items-center gap-3">
-                                <EyeOff className="text-[var(--pr-primary)]" />
-                                <div>
-                                    <span className="block font-medium text-[var(--pr-text)]">Hide Vote Counts</span>
-                                    <span className="text-xs text-[var(--pr-text-muted)]">Don't show who has voted</span>
-                                </div>
-                            </div>
-                            <input type="checkbox" checked={settings.hideVoteCounts} onChange={() => toggle('hideVoteCounts')} className="w-5 h-5 accent-[var(--pr-primary)]" disabled={isSaving} />
-                         </label>
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                             <ToggleRow 
+                                label="Auto Reveal" 
+                                description="Show cards when everyone votes"
+                                icon={<Eye size={18} />}
+                                checked={settings.autoReveal}
+                                onChange={() => toggle('autoReveal')}
+                                disabled={isSaving}
+                             />
+                             <ToggleRow 
+                                label="Allow Abstain" 
+                                description="Allow '?' card"
+                                icon={<UserX size={18} />}
+                                checked={settings.allowAbstain}
+                                onChange={() => toggle('allowAbstain')}
+                                disabled={isSaving}
+                             />
+                             <ToggleRow 
+                                label="Hide Vote Counts" 
+                                description="Don't show who has voted"
+                                icon={<EyeOff size={18} />}
+                                checked={settings.hideVoteCounts}
+                                onChange={() => toggle('hideVoteCounts')}
+                                disabled={isSaving}
+                             />
+                         </div>
                     </div>
 
-                    <div className="h-px bg-[var(--pr-border)]" />
+                    <div className="h-px bg-pr-border/20" />
 
                      {/* Theme Picker */}
                      <div className="space-y-4">
-                         <h3 className="text-sm font-bold uppercase text-[var(--pr-text-muted)]">Theme</h3>
+                         <h3 className="text-[10px] font-black uppercase text-pr-text-muted tracking-[0.2em]">Visual Theme</h3>
                          <ThemePicker selectedThemeKey={themeKey} onThemeSelect={setThemeKey} />
                      </div>
                 </div>
 
-                <div className="p-4 border-t border-[var(--pr-border)] flex justify-end gap-3 bg-[var(--pr-surface)]">
-                    <button 
+                <div className="p-5 border-t border-pr-border/30 flex justify-end gap-3 bg-pr-surface-2/50">
+                    <Button 
                         onClick={onClose}
                         disabled={isSaving}
-                        className="px-4 py-2 text-[var(--pr-text-muted)] hover:text-[var(--pr-text)] font-medium"
+                        variant="secondary"
+                        className="px-6"
                     >
-                        Cancel
-                    </button>
-                    <button
+                        Discard
+                    </Button>
+                    <Button
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="px-6 py-2 bg-[var(--pr-primary)] text-[var(--pr-bg)] rounded-[var(--pr-radius-md)] font-bold shadow-[var(--pr-shadow-soft)] hover:shadow-[var(--pr-shadow-hover)] flex items-center gap-2 disabled:opacity-50"
+                        variant="primary"
+                        className="px-8"
                     >
-                        {isSaving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-                        Save Changes
-                    </button>
+                        {isSaving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save className="mr-2" size={18} />}
+                        Inscribe Changes
+                    </Button>
                 </div>
             </div>
         </div>
     );
 }
+
+function ToggleRow({ label, description, icon, checked, onChange, disabled }: any) {
+    return (
+        <label className={cn(
+            "flex items-center justify-between p-4 rounded-[var(--pr-radius-md)] border transition-all cursor-pointer",
+            checked ? "bg-pr-primary/5 border-pr-primary/30 shadow-[0_0_15px_-5px_rgba(6,182,212,0.1)]" : "bg-pr-bg/40 border-pr-border/20 hover:border-pr-border/50",
+            disabled && "opacity-50 cursor-not-allowed"
+        )}>
+            <div className="flex items-center gap-3">
+                <div className={cn(
+                    "w-10 h-10 rounded-lg flex items-center justify-center border transition-colors",
+                    checked ? "bg-pr-primary/10 border-pr-primary/20 text-pr-primary" : "bg-pr-surface-2 border-pr-border/20 text-pr-text-muted"
+                )}>
+                    {icon}
+                </div>
+                <div>
+                    <span className="block font-bold text-sm text-pr-text">{label}</span>
+                    <span className="text-[10px] text-pr-text-muted font-medium uppercase tracking-tighter opacity-70">{description}</span>
+                </div>
+            </div>
+            <div className={cn(
+                "w-10 h-5 rounded-full relative transition-colors duration-200 border",
+                checked ? "bg-pr-primary border-pr-primary" : "bg-pr-bg border-pr-border/30"
+            )}>
+                <div className={cn(
+                    "absolute top-0.5 w-[14px] h-[14px] rounded-full transition-transform duration-200 shadow-sm",
+                    checked ? "translate-x-[20px] bg-pr-bg" : "translate-x-1 bg-pr-text-muted/50"
+                )} />
+            </div>
+            <input type="checkbox" checked={checked} onChange={onChange} className="sr-only" disabled={disabled} />
+        </label>
+    );
+}
+
+import { cn } from '../../../lib/utils';

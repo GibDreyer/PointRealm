@@ -15,7 +15,7 @@ vi.mock('framer-motion', async () => {
   return {
     ...actual,
     Reorder: {
-      Group: ({ children, onReorder }: any) => (
+      Group: ({ children }: any) => (
         <div data-testid="reorder-group">
           {children}
           {/* Expose a way to trigger reorder for testing if needed, or just skip drag test */}

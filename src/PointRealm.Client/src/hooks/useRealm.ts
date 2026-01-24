@@ -21,6 +21,7 @@ interface UseRealmResult {
         reorderQuests: (newOrderKeys: string[]) => Promise<void>;
         setDisplayName: (name: string) => Promise<void>;
     };
+    connect: (code: string) => Promise<void>;
 }
 
 export function useRealm(realmCode?: string): UseRealmResult {
@@ -99,6 +100,7 @@ export function useRealm(realmCode?: string): UseRealmResult {
             deleteQuest: (id) => wrapAction('DeleteQuest', id),
             reorderQuests: (order) => wrapAction('ReorderQuests', order),
             setDisplayName: (name) => wrapAction('SetDisplayName', name),
-        }
+        },
+        connect
     };
 }

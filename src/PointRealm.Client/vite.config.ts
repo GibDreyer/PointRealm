@@ -36,7 +36,6 @@ export default defineConfig(({ mode }) => {
       outDir: 'dist',
       emptyOutDir: true,
     },
-    // @ts-expect-error - vitest types are not automatically picked up by vite define config
     test: {
       globals: true,
       environment: 'jsdom',

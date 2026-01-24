@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Copy, CheckCircle2, XCircle, Link as LinkIcon } from 'lucide-react';
+import { Panel } from '../../../components/ui/Panel';
+import { Button } from '../../../components/Button';
+import { SectionHeader } from '../../../components/ui/SectionHeader';
 
 interface Props {
     joinUrl: string;
@@ -15,8 +18,6 @@ export function RealmPortalCard({ joinUrl }: Props) {
             await navigator.clipboard.writeText(joinUrl);
             setCopyState('success');
             triggerRipple();
-            
-            // Revert after delay
             setTimeout(() => setCopyState('idle'), 2000);
         } catch (err) {
             console.error('Failed to copy', err);
@@ -31,99 +32,92 @@ export function RealmPortalCard({ joinUrl }: Props) {
     };
 
     return (
-        <div className="w-full bg-[var(--pr-surface)] border border-[var(--pr-border)] rounded-[var(--pr-radius-xl)] p-5 shadow-[var(--pr-shadow-soft)]">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--pr-text-muted)] mb-4 flex items-center gap-2">
-                <LinkIcon size={16} /> Realm Portal
-            </h3>
+        <Panel className="relative overflow-hidden">
+            {/* Ambient Pulse in background */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-pr-primary/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
 
-            <div className="relative flex gap-2">
-                <div className="relative flex-1">
+            <SectionHeader 
+                title="Realm Portal" 
+                subtitle="Invite your party members" 
+                className="mb-4"
+            />
+
+            <div className="flex flex-col gap-3">
+                <div className="relative group">
                     <input 
                         readOnly
                         value={joinUrl}
-                        className="w-full h-12 pl-4 pr-4 rounded-[var(--pr-radius-md)] bg-[var(--pr-bg)] border border-[var(--pr-border)] text-[var(--pr-text)] text-sm font-mono focus:outline-none focus:ring-1 focus:ring-[var(--pr-primary)] truncate"
+                        className="w-full h-11 pl-4 pr-10 rounded-[var(--pr-radius-md)] bg-pr-bg border border-pr-border text-pr-text text-xs font-mono focus:border-pr-primary/50 outline-none truncate transition-colors"
                         onClick={(e) => e.currentTarget.select()}
                     />
-                    <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[var(--pr-bg)] to-transparent pointer-events-none" />
+                    <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-pr-bg to-transparent pointer-events-none rounded-r-[var(--pr-radius-md)]" />
+                    <LinkIcon size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-pr-text-muted/30 group-hover:text-pr-primary/50 transition-colors" />
                 </div>
                 
-                <button
+                <Button
                     onClick={handleCopy}
-                    className="relative shrink-0 w-12 h-12 flex items-center justify-center rounded-[var(--pr-radius-md)] bg-[var(--pr-primary)] text-[var(--pr-bg)] hover:shadow-[var(--pr-shadow-hover)] hover:translate-y-[-1px] active:translate-y-[0px] transition-all overflow-hidden focus:outline-none focus:ring-2 focus:ring-[var(--pr-primary)] focus:ring-offset-2 focus:ring-offset-[var(--pr-bg)]"
-                    aria-label="Copy Join Link"
+                    variant="secondary"
+                    className="h-11 relative overflow-hidden"
+                    fullWidth
                 >
                     <AnimatePresence mode='wait'>
                         {copyState === 'success' ? (
                             <motion.div
                                 key="check"
-                                initial={{ scale: 0.5, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                exit={{ scale: 0.5, opacity: 0 }}
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: -20, opacity: 0 }}
+                                className="flex items-center gap-2"
                             >
-                                <CheckCircle2 size={20} />
+                                <CheckCircle2 size={16} className="text-pr-success" />
+                                <span>Link Captured</span>
                             </motion.div>
                         ) : copyState === 'error' ? (
                             <motion.div
                                 key="error"
-                                initial={{ scale: 0.5, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                exit={{ scale: 0.5, opacity: 0 }}
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: -20, opacity: 0 }}
+                                className="flex items-center gap-2"
                             >
-                                <XCircle size={20} />
+                                <XCircle size={16} className="text-pr-danger" />
+                                <span>Magic Failed</span>
                             </motion.div>
                         ) : (
                             <motion.div
                                 key="copy"
-                                initial={{ scale: 0.5, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                exit={{ scale: 0.5, opacity: 0 }}
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: -20, opacity: 0 }}
+                                className="flex items-center gap-2"
                             >
-                                <Copy size={20} />
+                                <Copy size={16} />
+                                <span>Copy Join Link</span>
                             </motion.div>
                         )}
                     </AnimatePresence>
 
-                    {/* Ripple Effect */}
                     {ripple && (
-                        <span className="absolute inset-0 bg-white/30 rounded-[var(--pr-radius-md)] animate-ping-slow pointer-events-none" />
+                        <span className="absolute inset-0 bg-pr-primary/10 animate-ping-slow pointer-events-none" />
                     )}
-                </button>
-                
-                {/* QR Placeholder */}
-                <button
-                    className="shrink-0 w-12 h-12 flex items-center justify-center rounded-[var(--pr-radius-md)] bg-[var(--pr-surface-hover)] border border-[var(--pr-border)] text-[var(--pr-text-muted)] hover:text-[var(--pr-text)] transition-colors opacity-50 cursor-not-allowed"
-                    title="QR Code (Coming soon)"
-                    disabled
-                >
-                    <div className="w-5 h-5 border-2 border-current border-dashed rounded-[2px]" />
-                </button>
+                </Button>
             </div>
 
             {/* In-place Toast/Feedback Message just below */}
-            <div className="h-6 mt-2 relative">
+            <div className="h-4 mt-2 relative">
                 <AnimatePresence>
                     {copyState === 'success' && (
                         <motion.p
-                            initial={{ opacity: 0, y: -5 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0 }}
-                            className="text-xs text-[var(--pr-success)] font-medium absolute left-0"
+                            className="text-[10px] text-pr-success/80 font-bold uppercase tracking-tighter absolute left-0"
                         >
                             Portal link copied to your satchel.
                         </motion.p>
                     )}
-                    {copyState === 'error' && (
-                        <motion.p
-                            initial={{ opacity: 0, y: -5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0 }}
-                            className="text-xs text-[var(--pr-danger)] font-medium absolute left-0"
-                        >
-                            Couldn’t copy. Your browser refused the magic.
-                        </motion.p>
-                    )}
                 </AnimatePresence>
             </div>
-        </div>
+        </Panel>
     );
 }

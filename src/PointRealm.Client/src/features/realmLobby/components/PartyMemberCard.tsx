@@ -1,86 +1,96 @@
 import { motion } from 'framer-motion';
 import { User, Crown, Sword, Scroll, Wand2 } from 'lucide-react';
 import { PartyMember } from '../types';
+import { Panel } from '../../../components/ui/Panel';
+import { cn } from '../../../lib/utils';
 
 interface Props {
     member: PartyMember;
 }
 
-// Simple mapping for badge keys (future proofing)
 const getIcon = (key?: string) => {
     switch (key) {
-        case 'warrior': return <Sword size={20} />;
-        case 'mage': return <Wand2 size={20} />;
-        case 'scholar': return <Scroll size={20} />;
-        default: return <User size={20} />;
+        case 'warrior': return <Sword size={18} />;
+        case 'mage': return <Wand2 size={18} />;
+        case 'scholar': return <Scroll size={18} />;
+        default: return <User size={18} />;
     }
 };
 
 export function PartyMemberCard({ member }: Props) {
     const isOffline = member.presence === 'Offline';
     
-    // Status Logic
     let statusText = "In Tavern";
-    let statusColor = "text-[var(--pr-text-muted)]";
-    let statusBg = "bg-[var(--pr-surface-hover)]";
+    let statusClasses = "text-pr-text-muted border-pr-border/30 bg-pr-surface-2";
 
     if (isOffline) {
         statusText = "Disconnected";
-        statusColor = "text-[var(--pr-text-muted)]"; 
-        statusBg = "bg-[var(--pr-bg)]";
+        statusClasses = "text-pr-text-muted/50 border-pr-border/10 bg-pr-bg opacity-50";
     } else {
         if (member.voteState === 'LockedIn') {
             statusText = "Ready";
-            statusColor = "text-[var(--pr-success)]";
-            statusBg = "bg-[var(--pr-success)]/15";
+            statusClasses = "text-pr-success border-pr-success/30 bg-pr-success/10 shadow-[0_0_10px_-2px_rgba(34,197,94,0.2)]";
         } else if (member.voteState === 'Choosing') {
             statusText = "Choosing rune";
-            statusColor = "text-[var(--pr-primary)]";
-            statusBg = "bg-[var(--pr-primary)]/15";
+            statusClasses = "text-pr-primary border-pr-primary/30 bg-pr-primary/10 animate-pulse";
         }
     }
 
     return (
         <motion.div
             layout
-            initial={{ opacity: 0, x: -15 }}
+            initial={{ opacity: 0, x: -10 }}
             animate={{ 
-                opacity: isOffline ? 0.6 : 1, 
+                opacity: isOffline ? 0.5 : 1, 
                 x: 0,
-                filter: isOffline ? 'grayscale(60%)' : 'none'
+                scale: isOffline ? 0.98 : 1
             }}
-            exit={{ opacity: 0 }}
-            transition={{ 
-                layout: { duration: 0.2 },
-                opacity: { duration: 0.25 },
-                x: { duration: 0.25, ease: "easeOut" }
-            }}
-            className="flex items-center gap-4 p-3 rounded-[var(--pr-radius-lg)] border border-[var(--pr-border)] bg-[var(--pr-surface)] shadow-sm relative overflow-hidden group"
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="group"
         >
-            {/* Class Icon */}
-            <div className={`
-                w-10 h-10 rounded-full flex items-center justify-center border border-[var(--pr-border)] transition-colors
-                ${isOffline ? 'bg-[var(--pr-bg)] text-[var(--pr-text-muted)]' : 'bg-[var(--pr-bg)] text-[var(--pr-primary)]'}
-            `}>
-                {member.isGM ? <Crown size={20} /> : getIcon(member.classBadgeKey)}
-            </div>
-            
-            {/* Name */}
-            <div className="flex-1 min-w-0 flex flex-col justify-center">
-                <div className="flex items-center gap-2">
-                    <span className="font-bold text-[var(--pr-text)] truncate text-base" title={member.displayName}>
-                        {member.displayName}
-                    </span>
-                    {member.isGM && (
-                       <span className="text-[10px] font-bold font-mono tracking-wider uppercase bg-[var(--pr-primary)] text-[var(--pr-bg)] px-1.5 py-0.5 rounded-[var(--pr-radius-sm)]">GM</span>
-                    )}
+            <Panel 
+                variant={isOffline ? 'subtle' : 'default'} 
+                noPadding
+                className={cn(
+                    "flex items-center gap-4 p-3 transition-all",
+                    !isOffline && "group-hover:translate-x-1 group-hover:border-pr-primary/30",
+                    isOffline && "grayscale"
+                )}
+            >
+                {/* Class Icon */}
+                <div className={cn(
+                    "w-10 h-10 rounded-full flex items-center justify-center border transition-all shrink-0",
+                    isOffline 
+                        ? "bg-pr-bg border-pr-border/20 text-pr-text-muted/40" 
+                        : "bg-pr-bg border-pr-primary/20 text-pr-primary group-hover:border-pr-primary group-hover:shadow-[0_0_15px_-5px_rgba(6,182,212,0.5)]"
+                )}>
+                    {member.isGM ? <Crown size={20} className="text-pr-secondary" /> : getIcon(member.classBadgeKey)}
                 </div>
-            </div>
+                
+                {/* Name */}
+                <div className="flex-1 min-w-0 flex flex-col justify-center">
+                    <div className="flex items-center gap-2">
+                        <span className={cn(
+                            "font-bold truncate text-base",
+                            isOffline ? "text-pr-text-muted" : "text-pr-text"
+                        )} title={member.displayName}>
+                            {member.displayName}
+                        </span>
+                        {member.isGM && (
+                           <span className="text-[9px] font-black tracking-tighter uppercase bg-pr-secondary text-pr-bg px-1 rounded-sm">GM</span>
+                        )}
+                    </div>
+                    {isOffline && <span className="text-[10px] text-pr-text-muted/40 uppercase tracking-widest font-bold">Spectral Presence</span>}
+                </div>
 
-            {/* Status Pill */}
-            <div className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap border border-transparent ${statusBg} ${statusColor}`}>
-                {statusText}
-            </div>
+                {/* Status Pill */}
+                <div className={cn(
+                    "px-3 py-1 rounded border text-[10px] font-black uppercase tracking-wider whitespace-nowrap transition-all",
+                    statusClasses
+                )}>
+                    {statusText}
+                </div>
+            </Panel>
         </motion.div>
     );
 }
