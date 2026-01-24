@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Application\PointRealm.Server.Application.csproj" />
+    <ProjectReference Include="..\Infrastructure\PointRealm.Server.Infrastructure.csproj" />
+    <ProjectReference Include="..\Contracts\PointRealm.Server.Contracts.csproj" />
+    <ProjectReference Include="..\Common\PointRealm.Server.Common.csproj" />
+  </ItemGroup>
+
+</Project>
