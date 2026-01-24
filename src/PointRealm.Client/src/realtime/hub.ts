@@ -1,4 +1,5 @@
 import * as signalR from "@microsoft/signalr";
+import { getClientId } from "../lib/storage";
 
 const HUB_URL = import.meta.env.VITE_SIGNALR_HUB_URL || "/hubs/realm";
 
@@ -8,7 +9,11 @@ class RealmHub {
 
   constructor() {
     this.connection = new signalR.HubConnectionBuilder()
-      .withUrl(HUB_URL)
+      .withUrl(HUB_URL, {
+          headers: {
+              'X-PointRealm-ClientId': getClientId()
+          }
+      })
       .withAutomaticReconnect()
       .build();
 

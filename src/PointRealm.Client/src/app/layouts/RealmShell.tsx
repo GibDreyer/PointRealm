@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { api } from "../../api/client";
 import { useTheme } from "../../theme/ThemeProvider";
+import { getRecentRealms, addOrUpdateRecentRealm } from "../../lib/storage";
 
 export function RealmShell() {
   const { realmCode } = useParams<{ realmCode: string }>();
@@ -18,7 +19,25 @@ export function RealmShell() {
     if (realm?.themeKey) {
       setThemeKey(realm.themeKey);
     }
-  }, [realm?.themeKey, setThemeKey]);
+
+    if (realm && realmCode) {
+      // Update persistence if we have seen this realm before
+      // This ensures we refresh the "lastVisitedAt" timestamp and sync name/theme
+      const recent = getRecentRealms();
+      const existing = recent.find(r => r.realmCode.toUpperCase() === realmCode.toUpperCase());
+      
+      if (existing) {
+        addOrUpdateRecentRealm({
+          realmCode: existing.realmCode,
+          displayNameUsed: existing.displayNameUsed,
+          joinUrl: existing.joinUrl,
+          realmName: realm.name || existing.realmName,
+          themeKey: realm.themeKey || existing.themeKey,
+          role: existing.role
+        });
+      }
+    }
+  }, [realm, realmCode, setThemeKey]);
 
   return (
     <div className="min-h-screen bg-[var(--pr-bg)] text-[var(--pr-text)] flex transition-colors duration-300">

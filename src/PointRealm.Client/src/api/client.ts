@@ -1,5 +1,7 @@
 
 
+import { getClientId } from '../lib/storage/identity';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 export class ApiError extends Error {
@@ -13,6 +15,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   
   const headers = {
     'Content-Type': 'application/json',
+    'X-PointRealm-ClientId': getClientId(),
     ...options.headers,
   };
 
