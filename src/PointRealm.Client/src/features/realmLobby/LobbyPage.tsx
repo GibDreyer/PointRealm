@@ -212,6 +212,23 @@ export function TavernLobbyPage() {
                         />
                     )}
                 </div>
+
+                <div className={styles.footerRow}>
+                    <button
+                        type="button"
+                        className={`${styles.footerButton} px-6 py-3 rounded-[var(--pr-radius-md)] border border-pr-border/60 bg-pr-surface/40 text-pr-text-muted font-bold uppercase tracking-widest text-xs hover:text-pr-text hover:border-pr-border transition-all`}
+                        onClick={() => navigate('/')}
+                    >
+                        Back to Tavern
+                    </button>
+                    <button
+                        type="button"
+                        className={`${styles.footerButton} px-6 py-3 rounded-[var(--pr-radius-md)] border border-pr-primary/40 bg-pr-primary/10 text-pr-primary font-bold uppercase tracking-widest text-xs hover:brightness-110 transition-all`}
+                        onClick={() => realmCode && navigate(`/realm/${realmCode}`)}
+                    >
+                        {isGM ? 'Start Realm' : 'Join Realm'}
+                    </button>
+                </div>
             </div>
 
             {showSettings && isGM && (

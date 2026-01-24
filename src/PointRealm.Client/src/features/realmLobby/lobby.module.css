@@ -116,6 +116,19 @@
   gap: 0.6rem;
 }
 
+.footerRow {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.footerButton {
+  min-width: 180px;
+}
+
 @media (min-width: 1024px) {
   .panelGrid {
     grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
