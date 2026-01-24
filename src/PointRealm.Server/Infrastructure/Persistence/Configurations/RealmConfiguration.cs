@@ -11,6 +11,7 @@ public sealed class RealmConfiguration : IEntityTypeConfiguration<Realm>
     public void Configure(EntityTypeBuilder<Realm> builder)
     {
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id).ValueGeneratedNever();
 
         builder.HasIndex(x => x.Code).IsUnique();
 

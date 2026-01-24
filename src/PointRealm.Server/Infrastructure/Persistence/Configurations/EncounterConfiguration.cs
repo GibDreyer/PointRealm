@@ -9,6 +9,7 @@ public sealed class EncounterConfiguration : IEntityTypeConfiguration<Encounter>
     public void Configure(EntityTypeBuilder<Encounter> builder)
     {
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id).ValueGeneratedNever();
 
         // Encounter links to Quest
         builder.HasOne<Quest>()

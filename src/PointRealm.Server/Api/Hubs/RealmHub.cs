@@ -185,7 +185,6 @@ public class RealmHub : Hub<IRealmClient>
         await SendRealmStateAsync(realm.Id);
     }
 
-    // Quest Management
     public async Task AddQuest(string title, string description)
     {
         var (realm, member) = await GetCallerContextAsync();
@@ -194,8 +193,19 @@ public class RealmHub : Hub<IRealmClient>
         var result = realm.AddQuest(title, description);
         if (result.IsFailure) throw new HubException(result.Error.Description);
 
-        await _dbContext.SaveChangesAsync();
-        await SendRealmStateAsync(realm.Id);
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+            await SendRealmStateAsync(realm.Id);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            // If we hit concurrency, try refreshing from DB and retrying once
+            _dbContext.Entry(realm).Reload();
+            realm.AddQuest(title, description);
+            await _dbContext.SaveChangesAsync();
+            await SendRealmStateAsync(realm.Id);
+        }
     }
 
     public async Task UpdateQuest(Guid questId, string title, string description)
@@ -391,8 +401,14 @@ public class RealmHub : Hub<IRealmClient>
             {
                 TotalQuests = realm.Quests.Count,
                 ActiveQuestId = activeQuest?.Id.ToString(),
-                ActiveQuestTitle = activeQuest?.Title
-            }
+                ActiveQuestTitle = activeQuest?.Title,
+                Quests = realm.Quests.OrderBy(q => q.Order).Select(q => new LobbyQuestDto
+                {
+                    Id = q.Id.ToString(),
+                    Title = q.Title
+                }).ToList()
+            },
+            ActiveEncounterId = realm.CurrentEncounterId?.ToString()
         };
     }
 
@@ -403,7 +419,7 @@ public class RealmHub : Hub<IRealmClient>
         var encounter = realm.Encounters.FirstOrDefault(e => e.Id == realm.CurrentEncounterId);
         if (encounter == null || encounter.Status != EncounterStatus.Voting) return "NotVoting";
         
-        var hasVoted = encounter.Votes.Any(v => v.PartyMemberId == member.Id);
+        var hasVoted = encounter.Votes?.Any(v => v?.PartyMemberId == member.Id) ?? false;
         return hasVoted ? "LockedIn" : "Choosing";
     }
 
@@ -413,49 +429,57 @@ public class RealmHub : Hub<IRealmClient>
             ? realm.Encounters.FirstOrDefault(e => e.Id == realm.CurrentEncounterId)
             : null;
 
+        var settings = realm.Settings ?? RealmSettings.Default();
+
         return new RealmStateDto
         {
-            RealmCode = realm.Code,
-            ThemeKey = realm.Theme,
+            RealmCode = realm.Code ?? "UNKNOWN",
+            ThemeKey = realm.Theme ?? "default",
             Settings = new RealmSettingsDto
             {
-                AutoReveal = realm.Settings.AutoReveal,
-                AllowAbstain = realm.Settings.AllowAbstain,
-                HideVoteCounts = realm.Settings.HideVoteCounts
+                AutoReveal = settings.AutoReveal,
+                AllowAbstain = settings.AllowAbstain,
+                HideVoteCounts = settings.HideVoteCounts
             },
             PartyRoster = new PartyRosterDto
             {
-                Members = realm.Members.Select(m => MapToMemberDto(m, activeEncounter)).OrderBy(m => m.Name).ToList()
+                Members = realm.Members
+                    .Where(m => m != null)
+                    .Select(m => MapToMemberDto(m, activeEncounter))
+                    .OrderBy(m => m.Name ?? "")
+                    .ToList()
             },
             QuestLog = new QuestLogDto
             {
                 Quests = realm.Quests.OrderBy(q => q.Order).Select(q => new QuestDto
                 {
                     Id = q.Id,
-                    Title = q.Title,
-                    Description = q.Description,
+                    Title = q.Title ?? "Untitled Quest",
+                    Description = q.Description ?? "",
                     Status = q.Status.ToString(),
                     Order = q.Order
                 }).ToList()
             },
-            Encounter = MapToEncounterDto(activeEncounter, realm.Settings.HideVoteCounts)
+            Encounter = MapToEncounterDto(activeEncounter, settings.HideVoteCounts)
         };
     }
 
     private PartyMemberDto MapToMemberDto(PartyMember m, Encounter? activeEncounter)
     {
+        if (m == null) return new PartyMemberDto();
+
         // Status logic: ready/choosing/disconnected
         string status = "ready";
         if (activeEncounter != null && activeEncounter.Status == EncounterStatus.Voting)
         {
-            var hasVoted = activeEncounter.Votes.Any(v => v.PartyMemberId == m.Id);
+            var hasVoted = activeEncounter.Votes?.Any(v => v?.PartyMemberId == m.Id) ?? false;
             status = hasVoted ? "ready" : "choosing";
         }
 
         return new PartyMemberDto
         {
             Id = m.Id,
-            Name = m.Name,
+            Name = m.Name ?? "Unknown Traveler",
             Role = m.IsHost ? "GM" : "Member",
             Status = status,
             IsOnline = true // Simplified - would need connection tracker for real implementation
@@ -464,25 +488,33 @@ public class RealmHub : Hub<IRealmClient>
 
     private EncounterDto? MapToEncounterDto(Encounter? encounter, bool hideVoteCounts)
     {
-        if (encounter == null) return null;
+        if (encounter is null) return null;
 
         var isRevealed = encounter.Status == EncounterStatus.Revealed;
         var votes = new Dictionary<Guid, string?>();
         var distribution = new Dictionary<string, int>();
 
-        foreach (var v in encounter.Votes)
+        if (encounter.Votes != null)
         {
-            if (isRevealed)
+            foreach (var v in encounter.Votes)
             {
-                // Show actual value after reveal
-                votes[v.PartyMemberId] = v.Value.Label;
-                if (!distribution.ContainsKey(v.Value.Label)) distribution[v.Value.Label] = 0;
-                distribution[v.Value.Label]++;
-            }
-            else
-            {
-                // Before reveal: clients only see whether each member has voted, not values
-                votes[v.PartyMemberId] = null; // masked
+                if (v == null) continue;
+
+                if (isRevealed)
+                {
+                    // Show actual value after reveal
+                    votes[v.PartyMemberId] = v.Value?.Label;
+                    if (v.Value != null)
+                    {
+                        if (!distribution.ContainsKey(v.Value.Label)) distribution[v.Value.Label] = 0;
+                        distribution[v.Value.Label]++;
+                    }
+                }
+                else
+                {
+                    // Before reveal: clients only see whether each member has voted, not values
+                    votes[v.PartyMemberId] = null; // masked
+                }
             }
         }
 

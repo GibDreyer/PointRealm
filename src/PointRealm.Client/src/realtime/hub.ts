@@ -6,10 +6,14 @@ class RealmHub {
   private connection: signalR.HubConnection | null = null;
   private startedPromise: Promise<void> | null = null;
   private currentMemberToken: string | null = null;
+  private currentClientId: string | null = null;
   private listeners: Map<string, ((...args: any[]) => void)[]> = new Map();
 
-  public async connect(memberToken: string) {
-    if (this.connection && this.currentMemberToken === memberToken && this.connection.state === signalR.HubConnectionState.Connected) {
+  public async connect(memberToken: string, clientId?: string) {
+    if (this.connection && 
+        this.currentMemberToken === memberToken && 
+        this.currentClientId === clientId &&
+        this.connection.state === signalR.HubConnectionState.Connected) {
         return;
     }
 
@@ -18,13 +22,18 @@ class RealmHub {
     }
     
     this.currentMemberToken = memberToken;
+    this.currentClientId = clientId || null;
+
+    const options: signalR.IHttpConnectionOptions = {
+        accessTokenFactory: () => memberToken,
+    };
+
+    if (clientId) {
+        options.headers = { "X-Client-ID": clientId };
+    }
 
     this.connection = new signalR.HubConnectionBuilder()
-      .withUrl(HUB_URL, {
-          // Pass the JWT token via accessTokenFactory for SignalR authentication
-          // The server extracts this from the query string and validates it
-          accessTokenFactory: () => memberToken
-      })
+      .withUrl(HUB_URL, options)
       .withAutomaticReconnect()
       .build();
     

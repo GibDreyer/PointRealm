@@ -9,6 +9,7 @@ public sealed class PartyMemberConfiguration : IEntityTypeConfiguration<PartyMem
     public void Configure(EntityTypeBuilder<PartyMember> builder)
     {
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.Id).ValueGeneratedNever();
 
         builder.HasIndex(x => new { x.RealmId, x.ClientInstanceId }).IsUnique();
 

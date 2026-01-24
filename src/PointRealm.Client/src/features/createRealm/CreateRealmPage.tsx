@@ -82,7 +82,7 @@ export function CreateRealmPage() {
   const [serverError, setServerError] = useState<string | null>(null);
 
   // Initial display name from storage
-  const initialDisplayName = localStorage.getItem(STORAGE_KEYS.LAST_DISPLAY_NAME) || getProfile().lastDisplayName || "";
+  const initialDisplayName = localStorage.getItem(STORAGE_KEYS.DISPLAY_NAME) || getProfile().lastDisplayName || "";
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -115,7 +115,7 @@ export function CreateRealmPage() {
 
     try {
       // 1. Persist Display Name
-      localStorage.setItem(STORAGE_KEYS.LAST_DISPLAY_NAME, data.displayName);
+      localStorage.setItem(STORAGE_KEYS.DISPLAY_NAME, data.displayName);
       updateProfile({ lastDisplayName: data.displayName });
 
       // 2. Prepare Payload

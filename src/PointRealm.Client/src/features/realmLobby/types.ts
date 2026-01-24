@@ -36,6 +36,7 @@ export interface QuestLogSummary {
     totalQuests: number;
     activeQuestId?: string;
     activeQuestTitle?: string;
+    quests: { id: string; title: string; }[];
 }
 
 export interface LobbySnapshot {
@@ -44,4 +45,5 @@ export interface LobbySnapshot {
     party: PartyMember[];
     portal: PortalInfo;
     questLogSummary: QuestLogSummary;
+    activeEncounterId?: string;
 }

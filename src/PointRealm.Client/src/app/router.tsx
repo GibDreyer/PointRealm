@@ -4,7 +4,7 @@ import { RealmShell } from "@/app/layouts/RealmShell";
 import { LandingPage } from "@/features/landing/LandingPage";
 import { CreateRealmPage } from "@/features/createRealm/CreateRealmPage";
 import { JoinRealmPage } from "@/features/joinRealm/JoinRealmPage";
-import { LobbyPage } from "@/features/realmLobby/LobbyPage";
+import { TavernLobbyPage } from "@/features/realmLobby/LobbyPage";
 import { PlayPage } from "@/features/realmPlay/PlayPage";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { RegisterPage } from "@/features/auth/RegisterPage";
@@ -46,11 +46,11 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "lobby",
-        element: <LobbyPage />,
+        element: <TavernLobbyPage />,
       },
       {
         path: "tavern",
-        element: <LobbyPage />,
+        element: <TavernLobbyPage />,
       },
       {
         path: "play",

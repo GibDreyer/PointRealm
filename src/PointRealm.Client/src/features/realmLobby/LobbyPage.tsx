@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import { getClientId } from '../../lib/storage';
 import { useTheme } from '../../theme/ThemeProvider';
 import { hub } from '../../realtime/hub';
 import { LobbySnapshot } from './types';
@@ -44,7 +45,7 @@ function CardWrapper({ children, delay = 0 }: { children: React.ReactNode, delay
     );
 }
 
-export function LobbyPage() {
+export function TavernLobbyPage() {
     const params = useParams<{ code: string }>();
     const realmCode = params.code; // Router uses :code
     
@@ -67,8 +68,10 @@ export function LobbyPage() {
 
          try {
              setStatus('connecting');
+             const clientId = getClientId();
              // Token contains memberId and realmId claims - passed via accessTokenFactory
-             await hub.connect(token);
+             // ClientId passed via header
+             await hub.connect(token, clientId);
              
              // JoinRealm now only needs the realm code - identity comes from JWT claims
              await hub.invoke('JoinRealm', realmCode);
@@ -87,31 +90,45 @@ export function LobbyPage() {
         }
 
         // Setup Listeners
-        hub.on('RealmSnapshot', (data: LobbySnapshot) => {
-             // console.log("Snapshot", data);
+        const onSnapshot = (data: LobbySnapshot) => {
              setSnapshot(data);
              if (data.realm.themeKey) {
                  setThemeKey(data.realm.themeKey);
              }
-        });
+             if (data.activeEncounterId) {
+                 navigate(`/realm/${realmCode}/play`);
+             }
+        };
 
-        hub.on('reconnecting', () => setStatus('reconnecting'));
-        
-        hub.on('reconnected', () => {
+        const onStateUpdated = (state: any) => {
+             if (state.encounter) {
+                 navigate(`/realm/${realmCode}/play`);
+             }
+        };
+
+        const onReconnecting = () => setStatus('reconnecting');
+        const onReconnected = () => {
              console.log("Reconnected - rejoining realm...");
-             // Re-invoke JoinRealm - identity comes from token
              hub.invoke('JoinRealm', realmCode).catch(console.error);
              setStatus('connected');
-        });
+        };
+        const onClose = () => setStatus('disconnected');
 
-        hub.on('close', () => setStatus('disconnected'));
+        hub.on('RealmSnapshot', onSnapshot);
+        hub.on('RealmStateUpdated', onStateUpdated);
+        hub.on('reconnecting', onReconnecting);
+        hub.on('reconnected', onReconnected);
+        hub.on('close', onClose);
 
         // Start
         connectToRealm();
 
         return () => {
-            hub.off('RealmSnapshot', () => {});
-            hub.stop();
+            hub.off('RealmSnapshot', onSnapshot);
+            hub.off('RealmStateUpdated', onStateUpdated);
+            hub.off('reconnecting', onReconnecting);
+            hub.off('reconnected', onReconnected);
+            hub.off('close', onClose);
         };
     }, [realmCode, connectToRealm, setThemeKey, navigate]);
     
@@ -197,6 +214,7 @@ export function LobbyPage() {
                              <CardWrapper delay={0.1}>
                                  <GMPanel 
                                     activeQuestId={snapshot.questLogSummary.activeQuestId}
+                                    quests={snapshot.questLogSummary.quests || []}
                                     onManageSettings={() => setShowSettings(true)}
                                  />
                              </CardWrapper>

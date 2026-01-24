@@ -35,7 +35,7 @@ export function JoinRealmPage() {
   // Initialize
   useEffect(() => {
     // 1. Get Display Name Priority: Storage Flat Key -> Profile -> Empty
-    const savedName = localStorage.getItem(STORAGE_KEYS.LAST_DISPLAY_NAME) || getProfile().lastDisplayName;
+    const savedName = localStorage.getItem(STORAGE_KEYS.DISPLAY_NAME) || getProfile().lastDisplayName;
     if (savedName) setDisplayName(savedName);
     
     // 2. Load recent realms
@@ -45,7 +45,7 @@ export function JoinRealmPage() {
   // Handlers
   const handleNameBlur = () => {
     if (displayName.trim()) {
-        localStorage.setItem(STORAGE_KEYS.LAST_DISPLAY_NAME, displayName.trim());
+        localStorage.setItem(STORAGE_KEYS.DISPLAY_NAME, displayName.trim());
         updateProfile({ lastDisplayName: displayName.trim() });
     }
   };
@@ -79,7 +79,7 @@ export function JoinRealmPage() {
     }
 
     // 3. Update Persistence
-    localStorage.setItem(STORAGE_KEYS.LAST_DISPLAY_NAME, nameToUse.trim());
+    localStorage.setItem(STORAGE_KEYS.DISPLAY_NAME, nameToUse.trim());
     updateProfile({ lastDisplayName: nameToUse.trim() });
 
     // 4. API Call

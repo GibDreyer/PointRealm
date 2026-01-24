@@ -40,7 +40,7 @@ export function IdentityCard({ currentName }: Props) {
             await hub.invoke("SetDisplayName", trimmed);
             
             // Persist locally too
-            localStorage.setItem(STORAGE_KEYS.LAST_DISPLAY_NAME, trimmed);
+            localStorage.setItem(STORAGE_KEYS.DISPLAY_NAME, trimmed);
             updateProfile({ lastDisplayName: trimmed });
             
             setIsEditing(false);
