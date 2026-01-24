@@ -12,13 +12,20 @@ builder.Services.AddOpenApi();
 
 builder.Services
     .AddApplication()
-    .AddInfrastructure(builder.Configuration.GetConnectionString("DefaultConnection") ?? 
-                       throw new InvalidOperationException("Connection string 'DefaultConnection' not found."));
+    .AddInfrastructure(builder.Configuration);
+
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<PointRealm.Server.Infrastructure.Persistence.PointRealmDbContext>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 var app = builder.Build();
+
+var dbPath = app.Configuration.GetValue<string>("POINTREALM_DB_PATH") ?? 
+                app.Configuration["Database:Path"] ?? 
+                "./data/pointrealm.db";
+Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -33,5 +40,6 @@ app.UseExceptionHandler();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();
