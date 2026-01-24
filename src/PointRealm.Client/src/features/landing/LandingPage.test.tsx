@@ -22,6 +22,20 @@ window.ResizeObserver = class ResizeObserver {
   disconnect() {}
 };
 
+window.matchMedia = window.matchMedia || ((query) => ({
+  matches: false,
+  media: query,
+  addEventListener: () => {},
+  removeEventListener: () => {},
+  addListener: () => {},
+  removeListener: () => {},
+  dispatchEvent: () => false,
+}));
+
+vi.mock('@/components/backgrounds/StarfieldBackground', () => ({
+  StarfieldBackground: () => null,
+}));
+
 describe('LandingPage', () => {
   it('navigates to create realm page when "Create Realm" is clicked', () => {
     render(
@@ -58,6 +72,6 @@ describe('LandingPage', () => {
     
     expect(screen.getByText('PointRealm')).toBeInTheDocument();
     expect(screen.getByText('Co-op estimation, RPG style.')).toBeInTheDocument();
-    expect(screen.getByText('Open source. Self-hosted. No nonsense.')).toBeInTheDocument();
+    expect(screen.getByText('Free, open source, self-host friendly.')).toBeInTheDocument();
   });
 });

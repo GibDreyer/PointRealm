@@ -1,0 +1,148 @@
+.wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+}
+
+.baseGradient {
+  background:
+    radial-gradient(1200px 680px at 50% 8%,
+      color-mix(in srgb, var(--pr-primary) 22%, transparent) 0%,
+      transparent 62%),
+    radial-gradient(1000px 700px at 50% 80%,
+      color-mix(in srgb, var(--pr-secondary) 14%, transparent) 0%,
+      transparent 68%),
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--pr-bg) 92%, black) 0%,
+      color-mix(in srgb, var(--pr-bg) 85%, black) 50%,
+      color-mix(in srgb, var(--pr-bg) 90%, black) 100%);
+}
+
+.backdrop {
+  background-image: url("../../../images/landing-background_default.jpeg");
+  background-size: cover;
+  background-position: center top;
+  opacity: 0.32;
+  filter: saturate(1.1) brightness(0.88) contrast(1.05);
+  mix-blend-mode: screen;
+}
+
+.stars {
+  position: absolute;
+  inset: 0;
+}
+
+.embers {
+  position: absolute;
+  inset: 0;
+  opacity: 0.7;
+  mix-blend-mode: screen;
+}
+
+.fog {
+  position: absolute;
+  inset: -10%;
+  filter: blur(60px);
+  opacity: 0.3;
+  mix-blend-mode: screen;
+}
+
+.fogOne {
+  background: radial-gradient(60% 60% at 20% 30%,
+      color-mix(in srgb, var(--pr-primary) 18%, transparent) 0%,
+      transparent 70%);
+  animation: fogDrift 12s ease-in-out infinite;
+}
+
+.fogTwo {
+  background: radial-gradient(55% 55% at 80% 40%,
+      color-mix(in srgb, var(--pr-secondary) 16%, transparent) 0%,
+      transparent 68%);
+  animation: fogDriftReverse 14s ease-in-out infinite;
+}
+
+.fogThree {
+  background: radial-gradient(50% 50% at 50% 70%,
+      color-mix(in srgb, var(--pr-text-muted) 14%, transparent) 0%,
+      transparent 72%);
+  animation: fogPulse 10s ease-in-out infinite;
+}
+
+.horizon {
+  position: absolute;
+  inset: auto 0 8% 0;
+  height: 35%;
+  background:
+    radial-gradient(60% 80% at 50% 10%,
+      color-mix(in srgb, var(--pr-secondary) 16%, transparent) 0%,
+      transparent 70%),
+    linear-gradient(180deg,
+      transparent 0%,
+      color-mix(in srgb, var(--pr-bg) 45%, transparent) 55%,
+      color-mix(in srgb, var(--pr-bg) 80%, black) 100%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.foreground {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 28%;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--pr-bg) 78%, black) 60%,
+    color-mix(in srgb, var(--pr-bg) 88%, black) 100%);
+}
+
+.noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(70% 70% at 50% 50%,
+      transparent 0%,
+      color-mix(in srgb, var(--pr-bg) 55%, black) 85%);
+}
+
+.wrapper[data-reduced-motion="true"] .fog {
+  animation: none;
+  opacity: 0.25;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fog {
+    animation: none;
+    opacity: 0.25;
+  }
+}
+
+@keyframes fogDrift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(2%, -3%, 0) scale(1.05); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes fogDriftReverse {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-2%, 2%, 0) scale(1.04); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes fogPulse {
+  0% { opacity: 0.28; transform: translate3d(0, 0, 0) scale(1); }
+  50% { opacity: 0.4; transform: translate3d(0, -2%, 0) scale(1.03); }
+  100% { opacity: 0.28; transform: translate3d(0, 0, 0) scale(1); }
+}
