@@ -152,7 +152,7 @@ export function CreateRealmPage() {
 
       await hub.connect(joinResponse.memberToken);
       setThemeKey(data.themeKey);
-      navigate(`/realm/${realmCode}/tavern`);
+      navigate(`/realm/${realmCode}/lobby`);
 
     } catch (err: any) {
       console.error(err);
