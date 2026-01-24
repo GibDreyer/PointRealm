@@ -1,6 +1,6 @@
 export const STORAGE_KEYS = {
-    CLIENT_ID: 'pointrealm:v1:clientId',
+    CLIENT_ID: 'pointrealm:clientId',
     PROFILE: 'pointrealm:v1:profile',
-    RECENT_REALMS: 'pointrealm:v1:recentRealms',
-    DISPLAY_NAME: 'pointrealm.displayName',
+    RECENT_REALMS: 'pointrealm:recentRealms',
+    LAST_DISPLAY_NAME: 'pointrealm:lastDisplayName',
 } as const;
