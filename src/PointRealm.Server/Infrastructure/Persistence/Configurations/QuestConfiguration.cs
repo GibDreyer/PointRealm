@@ -12,7 +12,10 @@ public sealed class QuestConfiguration : IEntityTypeConfiguration<Quest>
 
         builder.Property(x => x.Title).IsRequired().HasMaxLength(200);
         builder.Property(x => x.Description).HasMaxLength(2000);
+        builder.Property(x => x.ExternalId).HasMaxLength(100);
+        builder.Property(x => x.ExternalUrl).HasMaxLength(500);
 
         builder.HasIndex(x => new { x.RealmId, x.Order });
+        builder.HasIndex(x => new { x.RealmId, x.ExternalId });
     }
 }

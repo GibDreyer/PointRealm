@@ -10,6 +10,9 @@ public sealed class PartyMember : Entity
     public Guid RealmId { get; private set; }
     public string? UserId { get; private set; }
 
+    // Navigation property
+    public Realm Realm { get; private set; } = null!;
+
     private PartyMember(Guid realmId, string clientInstanceId, string name, bool isHost, string? userId) : base(Guid.NewGuid())
     {
         RealmId = realmId;

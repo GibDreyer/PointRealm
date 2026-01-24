@@ -16,6 +16,7 @@ public sealed class Realm : Entity
     public Guid? CurrentQuestId { get; private set; }
     public Guid? CurrentEncounterId { get; private set; }
     public string? CreatedByUserId { get; private set; }
+    public DateTime CreatedAt { get; private set; }
 
     public IReadOnlyCollection<Quest> Quests => _quests.AsReadOnly();
     public IReadOnlyCollection<Encounter> Encounters => _encounters.AsReadOnly();
@@ -27,6 +28,7 @@ public sealed class Realm : Entity
         Theme = theme;
         Settings = settings;
         CreatedByUserId = createdByUserId;
+        CreatedAt = DateTime.UtcNow;
     }
 
     private Realm() { } // EF Core
@@ -40,6 +42,12 @@ public sealed class Realm : Entity
 
         return new Realm(code, theme, settings, createdByUserId);
     }
+
+    public void UpdateSettings(RealmSettings newSettings)
+    {
+        Settings = newSettings;
+    }
+
 
     public void AddMember(PartyMember member)
     {

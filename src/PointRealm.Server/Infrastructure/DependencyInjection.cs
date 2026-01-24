@@ -78,6 +78,8 @@ public static class DependencyInjection
         services.Configure<MemberTokenSettings>(configuration.GetSection(MemberTokenSettings.SectionName));
         services.AddScoped<MemberTokenService>();
         services.AddScoped<RealmAuthorizationService>();
+        services.AddScoped<RealmCodeGenerator>();
+        services.AddScoped<QuestCsvService>();
 
         return services;
     }

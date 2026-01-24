@@ -12,6 +12,7 @@ public class RealmStateDto
 
 public class RealmSettingsDto
 {
+    public RuneDeckDto? Deck { get; set; }
     public bool AutoReveal { get; set; }
     public bool AllowAbstain { get; set; }
     public bool HideVoteCounts { get; set; }
