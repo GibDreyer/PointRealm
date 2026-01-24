@@ -5,11 +5,11 @@ import { LandingPage } from "@/features/landing/LandingPage";
 import { CreateRealmPage } from "@/features/createRealm/CreateRealmPage";
 import { JoinRealmPage } from "@/features/joinRealm/JoinRealmPage";
 import { TavernLobbyPage } from "@/features/realmLobby/LobbyPage";
-import { PlayPage } from "@/features/realmPlay/PlayPage";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { RegisterPage } from "@/features/auth/RegisterPage";
 import { ErrorPage } from "@/components/ErrorPage";
 import { NotFoundPage } from "@/components/NotFoundPage";
+import { RealmScreen } from "@/features/realmPlay/RealmScreen";
 
 export const router = createBrowserRouter([
   {
@@ -52,11 +52,17 @@ export const router = createBrowserRouter([
         path: "tavern",
         element: <TavernLobbyPage />,
       },
-      {
-        path: "play",
-        element: <PlayPage />,
-      },
     ],
+  },
+  {
+    path: "/realm/:code/play",
+    element: <RealmScreen />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/realms/:realmCode",
+    element: <RealmScreen />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "*",

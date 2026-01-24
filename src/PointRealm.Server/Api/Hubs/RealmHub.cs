@@ -98,6 +98,7 @@ public class RealmHub : Hub<IRealmClient>
 
         // Send snapshot to caller
         await SendRealmSnapshotToCallerAsync(realm, member);
+        await SendRealmStateToCallerAsync(realm.Id);
     }
 
     public async Task SetDisplayName(string name)
