@@ -125,6 +125,7 @@ export function RealmScreen() {
                             myVote={myVote || null}
                             onVote={handleVote}
                             onReroll={() => actions.reRollFates()}
+                            onReveal={() => actions.revealProphecy()}
                         />
                     </main>
 

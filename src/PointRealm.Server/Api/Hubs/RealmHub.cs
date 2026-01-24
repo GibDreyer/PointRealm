@@ -121,7 +121,25 @@ public class RealmHub : Hub<IRealmClient>
         var result = encounter.CastVote(member.Id, runeValue);
         if (result.IsFailure) throw new HubException(result.Error.Description);
 
-        await _dbContext.SaveChangesAsync();
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            // Reload and retry once in case the vote collection changed concurrently
+            _dbContext.ChangeTracker.Clear();
+            var (retryRealm, retryMember) = await GetCallerContextAsync();
+            if (retryRealm.CurrentEncounterId == null) throw new HubException("No active encounter.");
+            var retryEncounter = retryRealm.Encounters.FirstOrDefault(e => e.Id == retryRealm.CurrentEncounterId);
+            if (retryEncounter == null) throw new HubException("Encounter not found.");
+
+            var retryResult = retryEncounter.CastVote(retryMember.Id, runeValue);
+            if (retryResult.IsFailure) throw new HubException(retryResult.Error.Description);
+
+            await _dbContext.SaveChangesAsync();
+        }
+
         await SendRealmStateAsync(realm.Id); // Full snapshot on mutation
     }
 

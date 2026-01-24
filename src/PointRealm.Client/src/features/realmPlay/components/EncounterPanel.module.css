@@ -118,6 +118,36 @@
   color: color-mix(in srgb, var(--pr-text-muted) 70%, var(--pr-text));
 }
 
+.revealButton {
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--pr-primary) 55%, var(--pr-border));
+  background: color-mix(in srgb, var(--pr-primary) 10%, transparent);
+  color: color-mix(in srgb, var(--pr-primary) 85%, var(--pr-text));
+  padding: 0.6rem 1.4rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  transition: all 0.25s ease-out;
+}
+
+.revealButton:hover:not(:disabled) {
+  filter: brightness(1.06);
+  border-color: color-mix(in srgb, var(--pr-primary) 70%, var(--pr-border));
+}
+
+.revealButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.revealSubtitle {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: color-mix(in srgb, var(--pr-text-muted) 70%, var(--pr-text));
+}
+
 .seats {
   position: absolute;
   inset: 0;

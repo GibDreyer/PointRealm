@@ -24,8 +24,8 @@ public sealed class EncounterConfiguration : IEntityTypeConfiguration<Encounter>
             
             voteBuilder.ToTable("Votes");
             
-            voteBuilder.HasKey("Id"); // Shadow PK for Vote if it's an entity, or if it's owned it needs keys. 
-            // Vote is an Entity in Domain.
+            voteBuilder.HasKey(v => v.Id);
+            voteBuilder.Property(v => v.Id).ValueGeneratedNever();
             
             voteBuilder.Property(v => v.PartyMemberId);
             
@@ -35,6 +35,9 @@ public sealed class EncounterConfiguration : IEntityTypeConfiguration<Encounter>
                 valueBuilder.Property(val => val.Value).HasColumnName("ValueAmount");
             });
         });
+        
+        builder.Navigation(x => x.Votes)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
         
         // Relationship to Realm? In Realm.cs we have `_encounters` list.
         // If Encounter doesn't have RealmId property, we can use shadow property.

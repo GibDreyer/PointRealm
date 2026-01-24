@@ -17,9 +17,10 @@ interface EncounterPanelProps {
     myVote?: string | null;
     onVote: (value: string) => void;
     onReroll: () => void;
+    onReveal: () => void;
 }
 
-export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, canVote, myVote, onVote, onReroll }: EncounterPanelProps) {
+export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, canVote, myVote, onVote, onReroll, onReveal }: EncounterPanelProps) {
     if (!quest) {
         return (
             <div className={styles.noQuest}>
@@ -51,7 +52,9 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
     const visibleMembers = partyRoster.members.slice(0, 12);
     const seatCount = Math.max(3, visibleMembers.length);
     const hasVotes = partyRoster.members.some((member) => member.status === 'ready');
+    const readyCount = partyRoster.members.filter((member) => member.status === 'ready').length;
     const rerollDisabled = !hasVotes || !!encounter?.isRevealed;
+    const revealDisabled = !hasVotes || !!encounter?.isRevealed;
 
     return (
         <div className={styles.wrapper}>
@@ -108,6 +111,20 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                                         Re-roll the Fates
                                     </motion.button>
                                     <span className={styles.rerollSubtitle}>Clear votes and revote</span>
+                                    <motion.button
+                                        type="button"
+                                        whileHover={!revealDisabled ? { y: -2 } : {}}
+                                        whileTap={!revealDisabled ? { scale: 0.98 } : {}}
+                                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                                        onClick={onReveal}
+                                        disabled={revealDisabled}
+                                        className={styles.revealButton}
+                                    >
+                                        Reveal Prophecy
+                                    </motion.button>
+                                    <span className={styles.revealSubtitle}>
+                                        {settings.hideVoteCounts ? 'Votes are hidden' : `${readyCount} ready`}
+                                    </span>
                                 </div>
                             )}
                         </div>
