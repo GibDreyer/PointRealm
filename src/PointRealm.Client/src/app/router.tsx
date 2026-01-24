@@ -49,6 +49,10 @@ export const router = createBrowserRouter([
         element: <LobbyPage />,
       },
       {
+        path: "tavern",
+        element: <LobbyPage />,
+      },
+      {
         path: "play",
         element: <PlayPage />,
       },
