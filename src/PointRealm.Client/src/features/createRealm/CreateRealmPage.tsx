@@ -160,7 +160,7 @@ export function CreateRealmPage() {
       sessionStorage.setItem(`pointrealm:v1:realm:${realmCode}:memberId`, joinResponse.memberId);
 
       // 6. Connect SignalR
-      await hub.start();
+      await hub.connect(joinResponse.memberToken);
       
       // 7. Navigate
       // Set global theme to match created realm before navigating for smoothness

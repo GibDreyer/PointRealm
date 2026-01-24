@@ -6,7 +6,9 @@ import { useTheme } from "../../theme/ThemeProvider";
 import { getRecentRealms, addOrUpdateRecentRealm } from "../../lib/storage";
 
 export function RealmShell() {
-  const { realmCode } = useParams<{ realmCode: string }>();
+  const { code } = useParams<{ code: string }>();
+  // Alias it to realmCode if we want, or just use code
+  const realmCode = code;
   const { setThemeKey } = useTheme();
 
   const { data: realm } = useQuery({

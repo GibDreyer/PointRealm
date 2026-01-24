@@ -15,7 +15,7 @@ vi.mock('../../api/client', () => ({
 
 vi.mock('../../realtime/hub', () => ({
   hub: {
-    start: vi.fn().mockResolvedValue(undefined),
+    connect: vi.fn().mockResolvedValue(undefined),
   }
 }));
 
@@ -85,7 +85,7 @@ describe('CreateRealmPage', () => {
                     customDeckValues: ['1', '2', '3', '?']
                 })
             }));
-            expect(hub.start).toHaveBeenCalled();
+            expect(hub.connect).toHaveBeenCalled();
         });
     });
 
