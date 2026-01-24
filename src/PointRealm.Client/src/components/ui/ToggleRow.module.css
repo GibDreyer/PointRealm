@@ -1,0 +1,81 @@
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: var(--pr-radius-lg);
+  border: 1px solid color-mix(in srgb, var(--pr-border) 75%, transparent);
+  background: color-mix(in srgb, var(--pr-surface) 70%, transparent);
+  cursor: pointer;
+  transition: border-color var(--pr-motion-fast-ms) var(--pr-loop-easing);
+}
+
+.toggleRow:hover {
+  border-color: color-mix(in srgb, var(--pr-primary) 35%, var(--pr-border));
+}
+
+.toggleText {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.toggleLabel {
+  font-size: 0.9rem;
+  color: var(--pr-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toggleDescription {
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--pr-text-muted) 80%, var(--pr-text));
+}
+
+.toggleControl {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.toggleControl input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggleTrack {
+  width: 44px;
+  height: 22px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--pr-border) 70%, transparent);
+  background: color-mix(in srgb, var(--pr-bg) 80%, transparent);
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  transition: background var(--pr-motion-fast-ms) var(--pr-loop-easing), border-color var(--pr-motion-fast-ms) var(--pr-loop-easing);
+}
+
+.toggleThumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pr-text-muted) 60%, var(--pr-text));
+  transform: translateX(0);
+  transition: transform var(--pr-motion-fast-ms) var(--pr-loop-easing), background var(--pr-motion-fast-ms) var(--pr-loop-easing);
+}
+
+.toggleControl input:checked + .toggleTrack {
+  background: color-mix(in srgb, var(--pr-primary) 35%, transparent);
+  border-color: color-mix(in srgb, var(--pr-primary) 45%, var(--pr-border));
+}
+
+.toggleControl input:checked + .toggleTrack .toggleThumb {
+  transform: translateX(22px);
+  background: var(--pr-primary);
+}
+
+.toggleControl input:focus-visible + .toggleTrack {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--pr-primary) 30%, transparent);
+}

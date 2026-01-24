@@ -1,0 +1,66 @@
+.footer {
+  display: grid;
+  gap: 0.5rem;
+  align-items: center;
+  justify-items: center;
+}
+
+.microcopy {
+  margin: 0;
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--pr-text-muted) 75%, var(--pr-text));
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.microcopy::before,
+.microcopy::after {
+  content: "";
+  height: 1px;
+  width: clamp(36px, 7vw, 90px);
+  background: color-mix(in srgb, var(--pr-border) 70%, transparent);
+}
+
+.tip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--pr-text-muted) 70%, transparent);
+  text-decoration: none;
+}
+
+.tip::before,
+.tip::after {
+  content: "";
+  height: 1px;
+  width: clamp(24px, 6vw, 90px);
+  background: color-mix(in srgb, var(--pr-border) 70%, transparent);
+}
+
+.tip:hover {
+  color: var(--pr-secondary);
+}
+
+.tip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--pr-secondary) 35%, transparent);
+  border-radius: 999px;
+}
+
+.tipIcon {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 640px) {
+  .microcopy::before,
+  .microcopy::after,
+  .tip::before,
+  .tip::after {
+    width: 28px;
+  }
+}

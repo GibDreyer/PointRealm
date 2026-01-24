@@ -1,0 +1,131 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.center {
+  align-items: center;
+  text-align: center;
+}
+
+.left {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--pr-heading-font);
+  letter-spacing: 0.06em;
+  color: var(--pr-text);
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(0.6rem, 1.6vw, 1rem);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.titleText {
+  display: inline-block;
+}
+
+.ornament {
+  position: relative;
+  width: clamp(18px, 2.2vw, 26px);
+  height: clamp(18px, 2.2vw, 26px);
+  border: 1px solid color-mix(in srgb, var(--pr-primary) 55%, transparent);
+  transform: rotate(45deg);
+  background: color-mix(in srgb, var(--pr-primary) 12%, transparent);
+  flex: 0 0 auto;
+}
+
+.ornament::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 120%;
+  width: clamp(20px, 4vw, 50px);
+  height: 1px;
+  background: color-mix(in srgb, var(--pr-border) 70%, transparent);
+}
+
+.ornament:last-child::after {
+  left: 120%;
+  right: auto;
+}
+
+.subtitle {
+  margin: 0;
+  font-family: var(--pr-body-font);
+  color: color-mix(in srgb, var(--pr-text-muted) 75%, var(--pr-text));
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.subtitle::before,
+.subtitle::after {
+  content: "";
+  height: 1px;
+  width: clamp(36px, 8vw, 110px);
+  background: color-mix(in srgb, var(--pr-border) 65%, transparent);
+}
+
+.runeDivider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--pr-text-muted);
+  margin-top: 0.25rem;
+}
+
+.runeDivider::before,
+.runeDivider::after {
+  content: "";
+  height: 1px;
+  width: 72px;
+  background: color-mix(in srgb, var(--pr-border) 70%, transparent);
+}
+
+.runeGem {
+  width: 8px;
+  height: 8px;
+  border: 1px solid color-mix(in srgb, var(--pr-primary) 45%, transparent);
+  transform: rotate(45deg);
+}
+
+.hero .title {
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  text-shadow: 0 0 30px color-mix(in srgb, var(--pr-primary) 45%, transparent);
+}
+
+.hero .subtitle {
+  font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+}
+
+.panel .title {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+.panel .subtitle {
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+}
+
+@media (max-width: 640px) {
+  .ornament {
+    display: none;
+  }
+
+  .runeDivider::before,
+  .runeDivider::after {
+    width: 44px;
+  }
+
+  .subtitle::before,
+  .subtitle::after {
+    width: 28px;
+  }
+}

@@ -29,8 +29,8 @@
   background-image: url("../../../images/landing-background_default.jpeg");
   background-size: cover;
   background-position: center top;
-  opacity: 0.32;
-  filter: saturate(1.1) brightness(0.88) contrast(1.05);
+  opacity: 0.38;
+  filter: saturate(1.12) brightness(0.86) contrast(1.08);
   mix-blend-mode: screen;
 }
 
