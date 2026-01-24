@@ -8,19 +8,21 @@ public sealed class PartyMember : Entity
     public string Name { get; private set; }
     public bool IsHost { get; private set; }
     public Guid RealmId { get; private set; }
+    public string? UserId { get; private set; }
 
-    private PartyMember(Guid realmId, string clientInstanceId, string name, bool isHost) : base(Guid.NewGuid())
+    private PartyMember(Guid realmId, string clientInstanceId, string name, bool isHost, string? userId) : base(Guid.NewGuid())
     {
         RealmId = realmId;
         ClientInstanceId = clientInstanceId;
         Name = name;
         IsHost = isHost;
+        UserId = userId;
     }
 
     private PartyMember() { } // EF Core
 
-    public static PartyMember Create(Guid realmId, string clientInstanceId, string name, bool isHost)
+    public static PartyMember Create(Guid realmId, string clientInstanceId, string name, bool isHost, string? userId = null)
     {
-        return new PartyMember(realmId, clientInstanceId, name, isHost);
+        return new PartyMember(realmId, clientInstanceId, name, isHost, userId);
     }
 }

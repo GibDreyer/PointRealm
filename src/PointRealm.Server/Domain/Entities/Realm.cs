@@ -15,28 +15,30 @@ public sealed class Realm : Entity
     public RealmSettings Settings { get; private set; }
     public Guid? CurrentQuestId { get; private set; }
     public Guid? CurrentEncounterId { get; private set; }
+    public string? CreatedByUserId { get; private set; }
 
     public IReadOnlyCollection<Quest> Quests => _quests.AsReadOnly();
     public IReadOnlyCollection<Encounter> Encounters => _encounters.AsReadOnly();
     public IReadOnlyCollection<PartyMember> Members => _members.AsReadOnly();
 
-    private Realm(string code, string theme, RealmSettings settings) : base(Guid.NewGuid())
+    private Realm(string code, string theme, RealmSettings settings, string? createdByUserId) : base(Guid.NewGuid())
     {
         Code = code;
         Theme = theme;
         Settings = settings;
+        CreatedByUserId = createdByUserId;
     }
 
     private Realm() { } // EF Core
 
-    public static Result<Realm> Create(string code, string theme, RealmSettings settings)
+    public static Result<Realm> Create(string code, string theme, RealmSettings settings, string? createdByUserId = null)
     {
         if (string.IsNullOrWhiteSpace(code))
         {
             return Result.Failure<Realm>(new Error("Realm.EmptyCode", "Realm code cannot be empty."));
         }
 
-        return new Realm(code, theme, settings);
+        return new Realm(code, theme, settings, createdByUserId);
     }
 
     public void AddMember(PartyMember member)
