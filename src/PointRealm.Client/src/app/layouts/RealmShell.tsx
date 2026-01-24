@@ -1,13 +1,34 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { api } from "../../api/client";
+import { useTheme } from "../../theme/ThemeProvider";
 
 export function RealmShell() {
+  const { realmCode } = useParams<{ realmCode: string }>();
+  const { setThemeKey } = useTheme();
+
+  const { data: realm } = useQuery({
+    queryKey: ['realm', realmCode],
+    queryFn: () => api.get<{ themeKey: string, name: string }>(`/realms/${realmCode}`),
+    enabled: !!realmCode
+  });
+
+  useEffect(() => {
+    if (realm?.themeKey) {
+      setThemeKey(realm.themeKey);
+    }
+  }, [realm?.themeKey, setThemeKey]);
+
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans antialiased flex">
-      <aside className="w-64 border-r p-4 hidden md:block">
-        <h2 className="font-bold mb-4">Realm Menu</h2>
+    <div className="min-h-screen bg-[var(--pr-bg)] text-[var(--pr-text)] flex transition-colors duration-300">
+      <aside className="w-64 border-r border-[var(--pr-border)] p-4 hidden md:block bg-[var(--pr-surface)]">
+        <h2 className="font-bold mb-4 text-[var(--pr-primary)]" style={{ fontFamily: 'var(--pr-heading-font)' }}>
+            {realm?.name || 'Realm Menu'}
+        </h2>
         {/* Sidebar Placeholder */}
       </aside>
-      <main className="flex-1">
+      <main className="flex-1 overflow-auto">
         <Outlet />
       </main>
     </div>

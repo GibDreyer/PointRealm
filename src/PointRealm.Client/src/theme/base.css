@@ -1,0 +1,42 @@
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--pr-bg);
+  color: var(--pr-text);
+  font-family: var(--pr-body-font);
+  font-size: var(--pr-font-scale-base);
+  transition: background-color var(--pr-motion-base-ms) var(--pr-loop-easing),
+              color var(--pr-motion-base-ms) var(--pr-loop-easing);
+  margin: 0;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--pr-heading-font);
+  margin-top: 0;
+}
+
+code, pre {
+  font-family: var(--pr-mono-font);
+}
+
+/* Scrollbar styling for a consistent look */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--pr-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--pr-border);
+  border-radius: var(--pr-radius-md);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--pr-text-muted);
+}
