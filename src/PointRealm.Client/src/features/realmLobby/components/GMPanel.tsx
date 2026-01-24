@@ -1,20 +1,25 @@
 import { useState, useEffect } from 'react';
-import { Settings, Plus, Sword } from 'lucide-react';
+import { Crown, Plus } from 'lucide-react';
 import { hub } from '../../../realtime/hub';
 import { Panel } from '../../../components/ui/Panel';
 import { Button } from '../../../components/Button';
 import { SectionHeader } from '../../../components/ui/SectionHeader';
+import styles from '../lobby.module.css';
+import { cn } from '../../../lib/utils';
 
 interface Props {
     activeQuestId: string | undefined;
     quests: { id: string; title: string; }[];
     onManageSettings: () => void;
+    gmName: string;
+    className?: string;
 }
 
-export function GMPanel({ activeQuestId, quests, onManageSettings }: Props) {
+export function GMPanel({ activeQuestId, quests, onManageSettings, gmName, className }: Props) {
     const [selectedQuestId, setSelectedQuestId] = useState<string>(activeQuestId || "");
     const [isCreating, setIsCreating] = useState(false);
     const [newQuestTitle, setNewQuestTitle] = useState("");
+    const [isManaging, setIsManaging] = useState(false);
 
     useEffect(() => {
         if (activeQuestId) {
@@ -45,36 +50,60 @@ export function GMPanel({ activeQuestId, quests, onManageSettings }: Props) {
     const targetId = selectedQuestId || activeQuestId;
 
     return (
-        <Panel className="border-l-4 border-l-pr-primary relative overflow-hidden">
-            {/* Subtle GM texture or glow */}
-            <div className="absolute inset-0 bg-pr-primary/[0.02] pointer-events-none" />
-
-            <div className="flex justify-between items-start mb-4">
+        <Panel className={cn("relative overflow-hidden", className)}>
+            <div className={styles.panelHeader}>
                 <SectionHeader 
                     title="Game Master" 
-                    subtitle="Facilitator Controls" 
+                    subtitle="Facilitator" 
                     className="mb-0"
                 />
-                <button 
-                    onClick={onManageSettings}
-                    className="p-2 rounded-full border border-pr-border/30 text-pr-text-muted hover:text-pr-primary hover:border-pr-primary transition-all bg-pr-surface-2"
-                    title="Realm Settings"
-                >
-                    <Settings size={18} />
-                </button>
             </div>
 
-            <div className="space-y-4 relative z-10">
-                {/* Quest Selection */}
-                <div className="space-y-2">
-                    <label className="text-[10px] font-black text-pr-text-muted uppercase tracking-widest block mb-1">Active Quest</label>
+            <div className={styles.gmIdentity}>
+                <div className={styles.gmBadge}>
+                    <Crown size={28} />
+                </div>
+                <div className={styles.gmName}>{gmName}</div>
+                <div className={styles.gmRole}>Facilitator</div>
+            </div>
+
+            <div className={styles.gmActions}>
+                <Button
+                    onClick={handleBeginEncounter}
+                    disabled={!targetId}
+                    variant="secondary"
+                    fullWidth
+                    className="h-11 py-0 shadow-none disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                    Begin Quest
+                </Button>
+                <Button
+                    onClick={onManageSettings}
+                    variant="ghost"
+                    fullWidth
+                    className="h-11 py-0 border border-pr-secondary/40 text-pr-secondary hover:text-pr-secondary hover:bg-pr-secondary/10 shadow-none"
+                >
+                    Realm Settings
+                </Button>
+                <Button
+                    onClick={() => setIsManaging((prev) => !prev)}
+                    variant="ghost"
+                    fullWidth
+                    className="h-11 py-0 border border-pr-secondary/40 text-pr-secondary hover:text-pr-secondary hover:bg-pr-secondary/10 shadow-none"
+                >
+                    Quest Management
+                </Button>
+            </div>
+
+            {isManaging && (
+                <div className={styles.gmManage}>
+                    <label className="text-[10px] font-black text-pr-text-muted uppercase tracking-widest block">Active Quest</label>
                     
                     {quests.length > 0 ? (
                         <select 
                             value={targetId} 
                             onChange={(e) => setSelectedQuestId(e.target.value)}
-                            className="w-full p-2.5 rounded-[var(--pr-radius-md)] bg-pr-bg border border-pr-border text-pr-text text-sm focus:border-pr-primary outline-none transition-colors appearance-none"
-                            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
+                            className="w-full h-10 px-3 rounded-[var(--pr-radius-md)] bg-pr-bg border border-pr-border text-pr-text text-sm focus:border-pr-secondary outline-none transition-colors appearance-none"
                         >
                             <option value="" disabled>Choose a journey...</option>
                             {quests.map(q => (
@@ -90,7 +119,7 @@ export function GMPanel({ activeQuestId, quests, onManageSettings }: Props) {
                     {!isCreating ? (
                         <button 
                             onClick={() => setIsCreating(true)}
-                            className="text-[10px] text-pr-primary font-black uppercase tracking-wider hover:text-pr-primary-hover flex items-center gap-1 transition-colors"
+                            className="text-[10px] text-pr-secondary font-black uppercase tracking-wider hover:text-pr-secondary flex items-center gap-1 transition-colors"
                         >
                             <Plus size={12} strokeWidth={3} /> Ink New Quest
                         </button>
@@ -100,22 +129,22 @@ export function GMPanel({ activeQuestId, quests, onManageSettings }: Props) {
                                 value={newQuestTitle}
                                 onChange={(e) => setNewQuestTitle(e.target.value)}
                                 placeholder="E.g. The Spooky Crypt"
-                                className="w-full p-2 text-sm rounded-[var(--pr-radius-sm)] bg-pr-bg border border-pr-border text-pr-text focus:border-pr-primary outline-none"
+                                className="w-full p-2 text-sm rounded-[var(--pr-radius-sm)] bg-pr-bg border border-pr-border text-pr-text focus:border-pr-secondary outline-none"
                                 autoFocus
                                 onKeyDown={(e) => e.key === 'Enter' && handleCreateQuest()}
                             />
                             <div className="flex gap-2">
                                 <Button 
                                     onClick={handleCreateQuest}
-                                    variant="primary"
-                                    className="h-8 py-0 px-3 text-[10px]"
+                                    variant="secondary"
+                                    className="h-8 py-0 px-3 text-[10px] shadow-none"
                                 >
                                     Add Quest
                                 </Button>
                                 <Button 
                                     onClick={() => setIsCreating(false)}
-                                    variant="secondary"
-                                    className="h-8 py-0 px-3 text-[10px]"
+                                    variant="ghost"
+                                    className="h-8 py-0 px-3 text-[10px] border border-pr-secondary/40 text-pr-secondary hover:text-pr-secondary hover:bg-pr-secondary/10 shadow-none"
                                 >
                                     Cancel
                                 </Button>
@@ -123,20 +152,7 @@ export function GMPanel({ activeQuestId, quests, onManageSettings }: Props) {
                         </div>
                     )}
                 </div>
-
-                <div className="pt-2 border-t border-pr-border/30 mt-2">
-                    <Button
-                        onClick={handleBeginEncounter}
-                        disabled={!targetId}
-                        variant="primary"
-                        fullWidth
-                        className="py-6 text-base"
-                    >
-                        <Sword size={18} className="mr-2" />
-                        Initiate Encounter
-                    </Button>
-                </div>
-            </div>
+            )}
         </Panel>
     );
 }

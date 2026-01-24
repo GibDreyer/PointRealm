@@ -1,0 +1,129 @@
+.page {
+  min-height: 100svh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: clamp(1.5rem, 4vw, 3.25rem);
+  gap: clamp(1rem, 2.6vw, 2rem);
+  box-sizing: border-box;
+}
+
+.shell {
+  width: min(100%, 72rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.25rem, 2.4vw, 2rem);
+}
+
+.header {
+  align-self: center;
+}
+
+.panelGrid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  align-items: stretch;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.panelBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.memberList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.panelParty {
+  order: 2;
+}
+
+.panelPortal {
+  order: 1;
+}
+
+.panelGM {
+  order: 3;
+}
+
+.gmIdentity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0 0.75rem;
+  text-align: center;
+}
+
+.gmBadge {
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--pr-secondary) 45%, transparent);
+  background: color-mix(in srgb, var(--pr-secondary) 10%, transparent);
+  color: var(--pr-secondary);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pr-secondary) 20%, transparent);
+}
+
+.gmName {
+  font-family: var(--pr-heading-font);
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+  color: var(--pr-text);
+}
+
+.gmRole {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: color-mix(in srgb, var(--pr-text-muted) 75%, var(--pr-text));
+}
+
+.gmActions {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.gmManage {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--pr-border) 70%, transparent);
+  display: grid;
+  gap: 0.6rem;
+}
+
+@media (min-width: 1024px) {
+  .panelGrid {
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  }
+
+  .panelParty,
+  .panelPortal,
+  .panelGM {
+    order: 0;
+  }
+}

@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
-import { Users, Info } from 'lucide-react';
+import { AnimatePresence, useReducedMotion } from 'framer-motion';
+import { Info } from 'lucide-react';
 
 import { getClientId } from '../../lib/storage';
 import { useTheme } from '../../theme/ThemeProvider';
@@ -11,25 +11,24 @@ import { PartyMemberCard } from './components/PartyMemberCard';
 import { RealmPortalCard } from './components/RealmPortalCard';
 import { GMPanel } from './components/GMPanel';
 import { ConnectionBanner } from './components/ConnectionBanner';
-import { IdentityCard } from './components/IdentityCard';
 import { RealmSettingsDialog } from './components/RealmSettingsDialog';
-import { RealmShell } from '../../app/layouts/RealmShell';
+import { PageShell } from '../../components/shell/PageShell';
+import { PageHeader } from '../../components/ui/PageHeader';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Panel } from '../../components/ui/Panel';
+import styles from './lobby.module.css';
 
 function LobbySkeleton() {
     return (
-        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 animate-pulse">
-             <div className="space-y-6">
-                 <div className="h-12 w-64 bg-pr-surface-2 rounded-md" />
-                 <div className="space-y-3">
-                     {[1,2,3,4].map(i => <div key={i} className="h-20 bg-pr-surface-2 rounded-xl" />)}
-                 </div>
-             </div>
-             <div className="space-y-6">
-                 <div className="h-40 bg-pr-surface-2 rounded-xl" />
-                 <div className="h-32 bg-pr-surface-2 rounded-xl" />
-             </div>
+        <div className={styles.panelGrid}>
+            {[1, 2, 3].map((panel) => (
+                <div key={panel} className="space-y-4 animate-pulse">
+                    <div className="h-10 w-40 bg-pr-surface-2 rounded-md" />
+                    <div className="space-y-3">
+                        {[1, 2, 3].map(i => <div key={i} className="h-16 bg-pr-surface-2 rounded-xl" />)}
+                    </div>
+                </div>
+            ))}
         </div>
     );
 }
@@ -37,32 +36,33 @@ function LobbySkeleton() {
 export function TavernLobbyPage() {
     const params = useParams<{ code: string }>();
     const realmCode = params.code;
-    
+
     const navigate = useNavigate();
     const { setThemeKey } = useTheme();
+    const prefersReducedMotion = useReducedMotion() ?? false;
 
     const [snapshot, setSnapshot] = useState<LobbySnapshot | null>(null);
     const [status, setStatus] = useState<'connecting' | 'connected' | 'reconnecting' | 'disconnected'>('connecting');
     const [showSettings, setShowSettings] = useState(false);
 
     const connectToRealm = useCallback(async () => {
-         if (!realmCode) return;
-         const token = sessionStorage.getItem(`pointrealm:v1:realm:${realmCode}:token`);
-         if (!token) {
-             navigate(`/join?realmCode=${realmCode}`);
-             return;
-         }
+        if (!realmCode) return;
+        const token = sessionStorage.getItem(`pointrealm:v1:realm:${realmCode}:token`);
+        if (!token) {
+            navigate(`/join?realmCode=${realmCode}`);
+            return;
+        }
 
-         try {
-             setStatus('connecting');
-             const clientId = getClientId();
-             await hub.connect(token, clientId);
-             await hub.invoke('JoinRealm', realmCode);
-             setStatus('connected');
-         } catch (err) {
-             console.error("Lobby Connection Failed:", err);
-             setStatus('disconnected');
-         }
+        try {
+            setStatus('connecting');
+            const clientId = getClientId();
+            await hub.connect(token, clientId);
+            await hub.invoke('JoinRealm', realmCode);
+            setStatus('connected');
+        } catch (err) {
+            console.error("Lobby Connection Failed:", err);
+            setStatus('disconnected');
+        }
     }, [realmCode, navigate]);
 
     useEffect(() => {
@@ -72,25 +72,25 @@ export function TavernLobbyPage() {
         }
 
         const onSnapshot = (data: LobbySnapshot) => {
-             setSnapshot(data);
-             if (data.realm.themeKey) {
-                 setThemeKey(data.realm.themeKey);
-             }
-             if (data.activeEncounterId) {
-                 navigate(`/realm/${realmCode}`);
-             }
+            setSnapshot(data);
+            if (data.realm.themeKey) {
+                setThemeKey(data.realm.themeKey);
+            }
+            if (data.activeEncounterId) {
+                navigate(`/realm/${realmCode}`);
+            }
         };
 
         const onStateUpdated = (state: any) => {
-             if (state.encounter) {
-                 navigate(`/realm/${realmCode}`);
-             }
+            if (state.encounter) {
+                navigate(`/realm/${realmCode}`);
+            }
         };
 
         const onReconnecting = () => setStatus('reconnecting');
         const onReconnected = () => {
-             hub.invoke('JoinRealm', realmCode).catch(console.error);
-             setStatus('connected');
+            hub.invoke('JoinRealm', realmCode).catch(console.error);
+            setStatus('connected');
         };
         const onClose = () => setStatus('disconnected');
 
@@ -110,13 +110,23 @@ export function TavernLobbyPage() {
             hub.off('close', onClose);
         };
     }, [realmCode, connectToRealm, setThemeKey, navigate]);
-    
+
     if (!snapshot) {
         return (
-            <RealmShell>
-                <div className="w-full pt-12">
-                    <ConnectionBanner isConnecting={status !== 'disconnected'} onRetry={connectToRealm} />
-                    <div className="mt-8">
+            <PageShell
+                backgroundDensity="medium"
+                reducedMotion={prefersReducedMotion}
+                contentClassName={styles.page}
+            >
+                <ConnectionBanner isConnecting={status !== 'disconnected'} onRetry={connectToRealm} />
+                <div className={styles.shell}>
+                    <PageHeader
+                        title="Tavern"
+                        subtitle="Realm Lobby"
+                        size="panel"
+                        className={styles.header}
+                    />
+                    <div className="mt-2">
                         {status === 'disconnected' ? (
                             <Panel className="max-w-md mx-auto text-center py-12">
                                 <h2 className="text-xl font-bold text-pr-danger mb-2">Connection Lost</h2>
@@ -130,17 +140,20 @@ export function TavernLobbyPage() {
                         )}
                     </div>
                 </div>
-            </RealmShell>
+            </PageShell>
         );
     }
 
     const me = snapshot.me;
     const isGM = me.role === 'GM';
-    const onlineCount = snapshot.party.filter(p => p.presence === 'Online').length;
+    const gmName = snapshot.party.find(member => member.isGM)?.displayName || me.displayName;
 
     return (
-        <RealmShell>
-            {/* Connection Banner */}
+        <PageShell
+            backgroundDensity="medium"
+            reducedMotion={prefersReducedMotion}
+            contentClassName={styles.page}
+        >
             {status !== 'connected' && (
                 <ConnectionBanner 
                     isConnecting={status === 'connecting' || status === 'reconnecting'} 
@@ -148,58 +161,59 @@ export function TavernLobbyPage() {
                 />
             )}
 
-            <div className="w-full max-w-6xl mx-auto pt-6 flex flex-col gap-8">
-                {/* 3-Panel Balanced Layout */}
-                <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
-                    
-                    {/* Main Area: Party Roster */}
-                    <div className="space-y-6">
-                        <header className="flex items-end justify-between px-2">
+            <div className={styles.shell}>
+                <PageHeader
+                    title="Tavern"
+                    subtitle="Realm Lobby"
+                    size="panel"
+                    className={styles.header}
+                />
+
+                <div className={styles.panelGrid}>
+                    <Panel className={`${styles.panel} ${styles.panelParty}`}>
+                        <div className={styles.panelHeader}>
                             <SectionHeader 
-                                title="Tavern Lobby" 
-                                subtitle={`${snapshot.realm.name} — ${onlineCount} active member${onlineCount !== 1 ? 's' : ''}`}
+                                title="Party" 
+                                subtitle="Members"
                                 className="mb-0"
                             />
-                            <div className="flex items-center gap-2 text-pr-text-muted bg-pr-surface-2 px-3 py-1.5 rounded-full border border-pr-border/30 mb-1">
-                                <Users size={14} className="text-pr-primary" />
-                                <span className="text-[10px] uppercase font-black tracking-widest">{onlineCount} / {snapshot.party.length}</span>
-                            </div>
-                        </header>
-
-                        <div className="grid gap-3">
-                            <AnimatePresence mode="popLayout" initial={false}>
-                                {snapshot.party.map((member) => (
-                                    <PartyMemberCard key={member.memberId} member={member} />
-                                ))}
-                            </AnimatePresence>
-                             
-                            {snapshot.party.length === 0 && (
-                                 <Panel variant="subtle" className="py-16 text-center italic text-pr-text-muted">
-                                     <Info size={32} className="mx-auto mb-3 opacity-20" />
-                                     <p>The tavern is empty. Only whispers of previous quests remain...</p>
-                                 </Panel>
-                            )}
                         </div>
-                    </div>
 
-                    {/* Sidebar Area: Controls & Info */}
-                    <aside className="space-y-6">
-                         <IdentityCard currentName={me.displayName} />
+                        <div className={styles.panelBody}>
+                            <div className={styles.memberList}>
+                                <AnimatePresence mode="popLayout" initial={false}>
+                                    {snapshot.party.map((member) => (
+                                        <PartyMemberCard key={member.memberId} member={member} />
+                                    ))}
+                                </AnimatePresence>
 
-                         {isGM && (
-                             <GMPanel 
-                                activeQuestId={snapshot.questLogSummary.activeQuestId}
-                                quests={snapshot.questLogSummary.quests || []}
-                                onManageSettings={() => setShowSettings(true)}
-                             />
-                         )}
+                                {snapshot.party.length === 0 && (
+                                    <Panel variant="subtle" className="py-12 text-center italic text-pr-text-muted">
+                                        <Info size={32} className="mx-auto mb-3 opacity-20" />
+                                        <p>The tavern is empty. Only whispers of previous quests remain...</p>
+                                    </Panel>
+                                )}
+                            </div>
+                        </div>
+                    </Panel>
 
-                         <RealmPortalCard joinUrl={snapshot.portal.joinUrl} />
-                    </aside>
+                    <RealmPortalCard
+                        joinUrl={snapshot.portal.joinUrl}
+                        className={`${styles.panel} ${styles.panelPortal}`}
+                    />
+
+                    {isGM && (
+                        <GMPanel 
+                            activeQuestId={snapshot.questLogSummary.activeQuestId}
+                            quests={snapshot.questLogSummary.quests || []}
+                            onManageSettings={() => setShowSettings(true)}
+                            gmName={gmName}
+                            className={`${styles.panel} ${styles.panelGM}`}
+                        />
+                    )}
                 </div>
             </div>
 
-            {/* Dialogs */}
             {showSettings && isGM && (
                 <RealmSettingsDialog 
                     realmCode={snapshot.realm.code}
@@ -209,6 +223,6 @@ export function TavernLobbyPage() {
                     onClose={() => setShowSettings(false)}
                 />
             )}
-        </RealmShell>
+        </PageShell>
     );
 }

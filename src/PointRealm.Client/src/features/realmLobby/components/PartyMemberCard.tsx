@@ -20,32 +20,35 @@ const getIcon = (key?: string) => {
 export function PartyMemberCard({ member }: Props) {
     const isOffline = member.presence === 'Offline';
     
-    let statusText = "In Tavern";
-    let statusClasses = "text-pr-text-muted border-pr-border/30 bg-pr-surface-2";
+    let statusText = "Ready";
+    let statusClasses = "text-pr-success";
+    let statusDot = "bg-pr-primary/50";
 
     if (isOffline) {
         statusText = "Disconnected";
-        statusClasses = "text-pr-text-muted/50 border-pr-border/10 bg-pr-bg opacity-50";
+        statusClasses = "text-pr-text-muted/60";
+        statusDot = "bg-pr-border/60";
     } else {
-        if (member.voteState === 'LockedIn') {
-            statusText = "Ready";
-            statusClasses = "text-pr-success border-pr-success/30 bg-pr-success/10 shadow-[0_0_10px_-2px_rgba(34,197,94,0.2)]";
-        } else if (member.voteState === 'Choosing') {
+        if (member.voteState === 'Choosing') {
             statusText = "Choosing rune";
-            statusClasses = "text-pr-primary border-pr-primary/30 bg-pr-primary/10 animate-pulse";
+            statusClasses = "text-pr-primary";
+        } else if (member.voteState !== 'LockedIn') {
+            statusText = "Ready";
+            statusClasses = "text-pr-text-muted";
         }
     }
 
     return (
         <motion.div
             layout
-            initial={{ opacity: 0, x: -10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ 
                 opacity: isOffline ? 0.5 : 1, 
-                x: 0,
+                y: 0,
                 scale: isOffline ? 0.98 : 1
             }}
-            exit={{ opacity: 0, scale: 0.95 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             className="group"
         >
             <Panel 
@@ -53,7 +56,7 @@ export function PartyMemberCard({ member }: Props) {
                 noPadding
                 className={cn(
                     "flex items-center gap-4 p-3 transition-all",
-                    !isOffline && "group-hover:translate-x-1 group-hover:border-pr-primary/30",
+                    !isOffline && "group-hover:-translate-y-0.5 group-hover:border-pr-border/60",
                     isOffline && "grayscale"
                 )}
             >
@@ -62,9 +65,9 @@ export function PartyMemberCard({ member }: Props) {
                     "w-10 h-10 rounded-full flex items-center justify-center border transition-all shrink-0",
                     isOffline 
                         ? "bg-pr-bg border-pr-border/20 text-pr-text-muted/40" 
-                        : "bg-pr-bg border-pr-primary/20 text-pr-primary group-hover:border-pr-primary group-hover:shadow-[0_0_15px_-5px_rgba(6,182,212,0.5)]"
+                        : "bg-pr-bg border-pr-border/40 text-pr-text-muted/80"
                 )}>
-                    {member.isGM ? <Crown size={20} className="text-pr-secondary" /> : getIcon(member.classBadgeKey)}
+                    {member.isGM ? <Crown size={20} className="text-pr-text-muted/80" /> : getIcon(member.classBadgeKey)}
                 </div>
                 
                 {/* Name */}
@@ -77,18 +80,20 @@ export function PartyMemberCard({ member }: Props) {
                             {member.displayName}
                         </span>
                         {member.isGM && (
-                           <span className="text-[9px] font-black tracking-tighter uppercase bg-pr-secondary text-pr-bg px-1 rounded-sm">GM</span>
+                           <span className="text-[9px] font-black tracking-tighter uppercase border border-pr-secondary/40 text-pr-secondary px-1 rounded-sm">GM</span>
                         )}
                     </div>
-                    {isOffline && <span className="text-[10px] text-pr-text-muted/40 uppercase tracking-widest font-bold">Spectral Presence</span>}
+                    <span className={cn(
+                        "text-xs uppercase tracking-widest font-semibold transition-colors",
+                        statusClasses
+                    )}>
+                        {statusText}
+                    </span>
                 </div>
 
                 {/* Status Pill */}
-                <div className={cn(
-                    "px-3 py-1 rounded border text-[10px] font-black uppercase tracking-wider whitespace-nowrap transition-all",
-                    statusClasses
-                )}>
-                    {statusText}
+                <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-pr-text-muted">
+                    <span className={cn("w-2 h-2 rounded-full", statusDot)} />
                 </div>
             </Panel>
         </motion.div>
