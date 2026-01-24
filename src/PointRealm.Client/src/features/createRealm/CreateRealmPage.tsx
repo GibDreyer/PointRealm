@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-image import { ArrowLeft, Eye, EyeOff, Loader2, UserX } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Loader2, UserX } from "lucide-react";
 
 import { useTheme } from "@/theme/ThemeProvider";
 import { ThemePicker } from "./components/ThemePicker";

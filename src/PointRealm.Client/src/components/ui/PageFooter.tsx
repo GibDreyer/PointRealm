@@ -7,6 +7,9 @@ interface PageFooterProps {
   tipIsExternal?: boolean;
   microcopy?: string;
   className?: string;
+  backLinkLabel?: string;
+  backLinkHref?: string;
+  onBackClick?: () => void;
 }
 
 export const PageFooter: React.FC<PageFooterProps> = ({
@@ -14,9 +17,23 @@ export const PageFooter: React.FC<PageFooterProps> = ({
   tipIsExternal,
   microcopy = "Free, open source, self-host friendly.",
   className,
+  backLinkLabel,
+  backLinkHref,
+  onBackClick,
 }) => {
   return (
     <footer className={[styles.footer, className].filter(Boolean).join(" ")}>
+      {backLinkLabel && (
+        backLinkHref ? (
+          <a className={styles.backLink} href={backLinkHref}>
+            {backLinkLabel}
+          </a>
+        ) : (
+          <button type="button" className={styles.backLink} onClick={onBackClick}>
+            {backLinkLabel}
+          </button>
+        )
+      )}
       <p className={styles.microcopy}>{microcopy}</p>
       <a
         className={styles.tip}

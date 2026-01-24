@@ -5,6 +5,31 @@
   justify-items: center;
 }
 
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: none;
+  color: color-mix(in srgb, var(--pr-text-muted) 75%, var(--pr-text));
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  cursor: pointer;
+  padding: 0.25rem 0.4rem;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  color: var(--pr-text);
+}
+
+.backLink:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--pr-primary) 35%, transparent);
+  border-radius: 999px;
+}
+
 .microcopy {
   margin: 0;
   font-size: 0.9rem;
