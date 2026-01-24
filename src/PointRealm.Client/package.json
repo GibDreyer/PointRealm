@@ -6,17 +6,37 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "dependencies": {
+    "@microsoft/signalr": "^10.0.0",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@tanstack/react-query": "^5.90.20",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.29.0",
+    "lucide-react": "^0.563.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.13.0",
+    "tailwind-merge": "^3.4.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^25.0.10",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.23",
+    "jsdom": "^27.4.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
     "typescript": "^5.6.3",
-    "vite": "^5.4.10"
+    "vite": "^5.4.10",
+    "vitest": "^4.0.18"
   }
 }
