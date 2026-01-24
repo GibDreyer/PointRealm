@@ -20,11 +20,11 @@ vi.mock('../../realtime/hub', () => ({
 }));
 
 // Mock ResizeObserver for RealmBackground/Canvas
-vi.stubGlobal('ResizeObserver', vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-})));
+vi.stubGlobal('ResizeObserver', class {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+});
 
 describe('CreateRealmPage', () => {
   beforeEach(() => {

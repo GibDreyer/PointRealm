@@ -339,7 +339,7 @@ export function CreateRealmPage() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="animate-spin mr-2" />
-                    Summoning...
+                    Creating Realm...
                   </>
                 ) : (
                   "Create Realm"

@@ -7,6 +7,7 @@ type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   fullWidth?: boolean;
+  "aria-label"?: string;
 }
 
 type MotionButtonProps = Omit<HTMLMotionProps<"button">, "className" | "style"> & ButtonProps;
@@ -20,55 +21,123 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
 }, ref) => {
   const { style, whileHover, whileTap, transition, ...filteredProps } = props;
 
-  const variants = {
-    primary: [
-      "bg-[linear-gradient(180deg,#1a2a3a,rgba(6,182,212,0.2))]", // Deep blue/cyan gradient
-      "text-pr-primary border border-pr-primary/80",
-      "shadow-[inset_0_0_15px_rgba(6,182,212,0.3),0_0_15px_rgba(0,0,0,0.5)]",
-      "hover:bg-[linear-gradient(180deg,#2a3a4a,rgba(6,182,212,0.3))]",
-      "hover:border-pr-primary hover:shadow-[inset_0_0_20px_rgba(6,182,212,0.4),0_0_20px_rgba(6,182,212,0.3)]",
-    ].join(" "),
-    secondary: [
-      "bg-[linear-gradient(180deg,#2a2215,rgba(230,176,78,0.2))]", // Deep bronze/gold gradient
-      "text-pr-secondary border border-pr-secondary/80",
-      "shadow-[inset_0_0_15px_rgba(230,176,78,0.3),0_0_15px_rgba(0,0,0,0.5)]",
-      "hover:bg-[linear-gradient(180deg,#3a3225,rgba(230,176,78,0.3))]",
-      "hover:border-pr-secondary hover:shadow-[inset_0_0_20px_rgba(230,176,78,0.4),0_0_20px_rgba(230,176,78,0.3)]",
-    ].join(" "),
-    danger: "bg-pr-danger/10 text-pr-danger border-pr-danger/30 hover:bg-pr-danger/20 hover:border-pr-danger/50",
-    ghost: "bg-transparent text-pr-text-muted hover:text-pr-text hover:bg-white/5 border border-transparent hover:border-white/10",
+  const themes = {
+    primary: {
+      base: "rgba(2, 6, 23, 0.5)", // Even more translucent
+      accent: "#38bdf8", // Sky blue/Cyan
+      hoverFill: "rgba(14, 165, 233, 0.6)", 
+      text: "#38bdf8",
+      hoverText: "#ffffff",
+      glow: "0 0 25px rgba(56, 189, 248, 0.4)",
+    },
+    secondary: {
+      base: "rgba(12, 10, 9, 0.5)", 
+      accent: "#f59e0b", // Amber/Gold
+      hoverFill: "rgba(217, 119, 6, 0.6)",
+      text: "#f59e0b",
+      hoverText: "#0c0a09",
+      glow: "0 0 25px rgba(245, 158, 11, 0.4)",
+    },
+    danger: {
+      base: "rgba(24, 8, 8, 0.5)",
+      accent: "#ef4444",
+      hoverFill: "rgba(220, 38, 38, 0.6)",
+      text: "#ef4444",
+      hoverText: "#ffffff",
+      glow: "0 0 20px rgba(239, 68, 68, 0.4)",
+    },
+    ghost: {
+      base: "transparent",
+      accent: "rgba(255,255,255,0.2)",
+      hoverFill: "rgba(255,255,255,0.1)",
+      text: "var(--pr-text-muted)",
+      hoverText: "#ffffff",
+      glow: "",
+    }
   };
+
+  const currentTheme = themes[variant];
 
   return (
     <motion.button 
       ref={ref}
-      whileHover={whileHover ?? { y: -2, scale: 1.02 }}
-      whileTap={whileTap ?? { y: 1, scale: 0.98 }}
-      transition={transition ?? { duration: 0.2, ease: "easeInOut" }}
+      whileHover="hover"
+      whileTap="tap"
+      initial="initial"
       className={cn(
-        "relative inline-flex items-center justify-center font-cinzel font-bold tracking-[0.1em] transition-all duration-300",
-        "px-10 py-3 text-lg min-h-[58px] overflow-hidden",
-        "clip-path-bevel", 
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pr-primary focus-visible:ring-offset-2 focus-visible:ring-offset-pr-bg",
+        "group relative inline-flex items-center justify-center font-heading font-black tracking-[0.05em] transition-all duration-200",
+        "px-12 py-5 min-h-[64px] text-xl select-none overflow-hidden",
+        "bg-transparent border-none shadow-lg", 
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:ring-primary",
         fullWidth ? "w-full" : "w-auto",
-        variants[variant],
         className
       )}
-      style={style as any}
+      style={{
+        ...style as any,
+        backgroundColor: currentTheme.base,
+        color: currentTheme.text,
+      }}
       {...filteredProps}
     >
-      {/* Glossy top highlight */}
-      <span className="absolute inset-0 pointer-events-none bg-[linear-gradient(180deg,rgba(255,255,255,0.1),transparent_50%)]" />
-
-      {/* Decorative stars/diamonds on sides for primary/secondary */}
-      {(variant === 'primary' || variant === 'secondary') && (
-        <>
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 w-2 h-2 rotate-45 bg-current shadow-[0_0_8px_currentColor]" />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2 rotate-45 bg-current shadow-[0_0_8px_currentColor]" />
-        </>
-      )}
+      {/* 1. Subtle Inner Frame Outline */}
+      <span className="absolute inset-0 z-0 border border-white/10 pointer-events-none" />
       
-      <span className="relative z-10">{children}</span>
+      {/* 2. Heavy Texture Overlay */}
+      <span className="absolute inset-0 z-0 opacity-10 pointer-events-none mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/brushed-alum.png')]" />
+
+      {/* 3. Aggressive Slashing Fill */}
+      <motion.span 
+        className="absolute z-0 pointer-events-none block origin-center"
+        variants={{
+          initial: { 
+            top: "50%", 
+            left: "50%", 
+            width: "2px", 
+            height: "800%", 
+            backgroundColor: currentTheme.accent,
+            rotate: -70,
+            x: "-50%",
+            y: "-50%",
+            opacity: 0.1
+          },
+          hover: { 
+            width: "120%", 
+            rotate: -90, 
+            opacity: 1,
+            backgroundColor: currentTheme.hoverFill,
+            transition: { duration: 0.25, ease: [0.16, 1, 0.3, 1] } 
+          },
+          tap: {
+            scale: 1.05,
+            filter: "brightness(1.2)"
+          }
+        }}
+      />
+
+      {/* 4. Text Content */}
+      <motion.span 
+        className="relative z-10 flex items-center gap-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+        variants={{
+          initial: { color: currentTheme.text, scale: 1 },
+          hover: { color: currentTheme.hoverText, scale: 1.05 }
+        }}
+        transition={{ duration: 0.2 }}
+      >
+        {children}
+      </motion.span>
+
+      {/* 5. Hover Glow Explosion */}
+      <span className={cn(
+        "absolute inset-0 z-[-1] opacity-0 group-hover:opacity-100 transition-opacity duration-300",
+      )} 
+      style={{ boxShadow: currentTheme.glow }}
+      />
+      
+      {/* 6. Corner Decorative Dots */}
+      <span className="absolute top-1.5 left-1.5 w-1 h-1 bg-current opacity-40" />
+      <span className="absolute top-1.5 right-1.5 w-1 h-1 bg-current opacity-40" />
+      <span className="absolute bottom-1.5 left-1.5 w-1 h-1 bg-current opacity-40" />
+      <span className="absolute bottom-1.5 right-1.5 w-1 h-1 bg-current opacity-40" />
     </motion.button>
   );
 });
