@@ -25,6 +25,44 @@ public static class DependencyInjection
             .AddEntityFrameworkStores<PointRealmDbContext>()
             .AddDefaultTokenProviders();
 
+        services.AddAuthentication(options =>
+            {
+                // Default to cookies for Identity (existing) but allow JWT for SignalR/API
+                options.DefaultScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                var memberTokenSettings = configuration.GetSection(MemberTokenSettings.SectionName).Get<MemberTokenSettings>();
+                var key = System.Text.Encoding.ASCII.GetBytes(memberTokenSettings!.Key);
+
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true
+                };
+
+                // SignalR sends access token in query string
+                options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/realm"))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+            
+        services.AddSignalR();
+
         services.Configure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme, options =>
         {
             options.Cookie.HttpOnly = true;
@@ -37,6 +75,8 @@ public static class DependencyInjection
             };
         });
         
+        services.Configure<MemberTokenSettings>(configuration.GetSection(MemberTokenSettings.SectionName));
+        services.AddScoped<MemberTokenService>();
         services.AddScoped<RealmAuthorizationService>();
 
         return services;

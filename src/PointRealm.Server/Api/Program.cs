@@ -1,4 +1,5 @@
 using PointRealm.Server.Api.Infrastructure;
+using PointRealm.Server.Api.Hubs;
 using PointRealm.Server.Application;
 using PointRealm.Server.Infrastructure;
 
@@ -40,6 +41,7 @@ app.UseExceptionHandler();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<RealmHub>("/hubs/realm");
 app.MapHealthChecks("/health");
 
 app.Run();

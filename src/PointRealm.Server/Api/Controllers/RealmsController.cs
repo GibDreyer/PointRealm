@@ -11,7 +11,7 @@ namespace PointRealm.Server.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class RealmsController(PointRealmDbContext dbContext, RealmAuthorizationService authService) : ControllerBase
+public class RealmsController(PointRealmDbContext dbContext, RealmAuthorizationService authService, MemberTokenService tokenService) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateRealmRequest request)
@@ -58,6 +58,51 @@ public class RealmsController(PointRealmDbContext dbContext, RealmAuthorizationS
         return Ok(realms);
     }
 
+    [HttpPost("{code}/join")]
+    public async Task<IActionResult> Join(string code, [FromBody] JoinRealmRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(code)) return BadRequest("Realm code is required.");
+        
+        var clientId = Request.Headers["X-PointRealm-ClientId"].ToString();
+        if (string.IsNullOrWhiteSpace(clientId))
+        {
+            return BadRequest("X-PointRealm-ClientId header is required.");
+        }
+
+        var realm = await dbContext.Realms
+            .Include(r => r.Members)
+            .FirstOrDefaultAsync(r => r.Code == code);
+
+        if (realm is null)
+        {
+            return NotFound("Realm not found.");
+        }
+
+        PartyMember? member;
+        var existingMember = realm.Members.FirstOrDefault(m => m.ClientInstanceId == clientId);
+
+        if (existingMember is not null)
+        {
+            member = existingMember;
+        }
+        else
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // Default role logic: if first member (?) or just Participant. 
+            // Usually creator is Host. Joiners are Participants.
+            // Request can ask for Observer.
+            
+            member = PartyMember.Create(realm.Id, clientId, request.DisplayName ?? "Anonymous", false, userId);
+            realm.AddMember(member);
+            await dbContext.SaveChangesAsync();
+        }
+
+        var role = member.IsHost ? "Host" : "Participant"; // Simple role mapping for now
+        var token = tokenService.GenerateToken(member.Id, realm.Id, role);
+
+        return Ok(new JoinRealmResponse(token, member.Id, realm.Id, role));
+    }
+
     [HttpPost("{id}/gm-action")]
     public async Task<IActionResult> GmAction(Guid id)
     {
@@ -89,3 +134,5 @@ public class RealmsController(PointRealmDbContext dbContext, RealmAuthorizationS
 }
 
 public record CreateRealmRequest(string Code, string Theme, string? ClientInstanceId);
+public record JoinRealmRequest(string? DisplayName);
+public record JoinRealmResponse(string MemberToken, Guid MemberId, Guid RealmId, string Role);
