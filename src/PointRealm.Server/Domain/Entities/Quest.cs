@@ -13,14 +13,16 @@ public sealed class Quest : Entity
 {
     public string Title { get; private set; }
     public string Description { get; private set; }
+    public int Order { get; private set; }
     public QuestStatus Status { get; private set; }
     public Guid RealmId { get; private set; }
 
-    internal Quest(Guid realmId, string title, string description) : base(Guid.NewGuid())
+    internal Quest(Guid realmId, string title, string description, int order) : base(Guid.NewGuid())
     {
         RealmId = realmId;
         Title = title;
         Description = description;
+        Order = order;
         Status = QuestStatus.Pending;
     }
 

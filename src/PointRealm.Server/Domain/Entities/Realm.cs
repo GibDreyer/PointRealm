@@ -51,7 +51,7 @@ public sealed class Realm : Entity
 
     public Result AddQuest(string title, string description)
     {
-        var quest = new Quest(Id, title, description);
+        var quest = new Quest(Id, title, description, _quests.Count + 1);
         _quests.Add(quest);
         
         if (CurrentQuestId is null)
