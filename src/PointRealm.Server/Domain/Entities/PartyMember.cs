@@ -25,4 +25,9 @@ public sealed class PartyMember : Entity
     {
         return new PartyMember(realmId, clientInstanceId, name, isHost, userId);
     }
+
+    public void UpdateName(string name)
+    {
+        Name = name;
+    }
 }

@@ -18,6 +18,8 @@ public sealed class Encounter : Entity
     public EncounterStatus Status { get; private set; }
     public IReadOnlyCollection<Vote> Votes => _votes.AsReadOnly();
     
+    public int? Outcome { get; private set; }
+
     internal Encounter(Guid questId) : base(Guid.NewGuid())
     {
         QuestId = questId;
@@ -52,6 +54,29 @@ public sealed class Encounter : Entity
         }
 
         Status = EncounterStatus.Revealed;
+        return Result.Success();
+    }
+
+    public Result ResetVotes()
+    {
+        _votes.Clear();
+        Status = EncounterStatus.Voting;
+        Outcome = null; // Reset outcome if any
+        return Result.Success();
+    }
+
+    public Result Seal(int outcome)
+    {
+        if (Status != EncounterStatus.Revealed)
+        {
+             // Optionally enforce that it must be revealed first, or auto-reveal. 
+             // Requirement says "SealOutcome(finalValue)". Let's assume it can seal from any state or just revealed.
+             // Usually seal outcome happens after reveal.
+             Status = EncounterStatus.Revealed;
+        }
+
+        Outcome = outcome;
+        // Logic to maybe store this outcome permanently or move to next stage could go here.
         return Result.Success();
     }
 }

@@ -81,4 +81,61 @@ public sealed class Realm : Entity
 
         return Result.Success();
     }
+
+    public Result UpdateQuest(Guid questId, string title, string description)
+    {
+        var quest = _quests.FirstOrDefault(q => q.Id == questId);
+        if (quest is null)
+        {
+            return Result.Failure(new Error("Realm.QuestNotFound", "The specified quest was not found in this realm."));
+        }
+
+        // We need to expose a method on Quest to update it, but for now assuming we can't directly set private setters.
+        // Let's modify Quest to allow updates or use reflection/internal if strictly needed, 
+        // but adding a method to Quest is cleaner. 
+        // Since I can't edit Quest in this same tool call, I will add the method to Realm and then go update Quest.
+        // Wait, I can only rely on what's available. 
+        // I will assume I will add `UpdateDetails` to Quest.
+        quest.UpdateDetails(title, description);
+        
+        return Result.Success();
+    }
+
+    public Result DeleteQuest(Guid questId)
+    {
+        var quest = _quests.FirstOrDefault(q => q.Id == questId);
+        if (quest is null)
+        {
+            return Result.Failure(new Error("Realm.QuestNotFound", "The specified quest was not found in this realm."));
+        }
+
+        _quests.Remove(quest);
+        
+        // If the deleted quest was determining the current quest, we might need to handle that.
+        if (CurrentQuestId == questId)
+        {
+            CurrentQuestId = null;
+        }
+
+        return Result.Success();
+    }
+
+    public Result ReorderQuests(List<Guid> newOrder)
+    {
+        // Simple reordering logic
+        // Verify all IDs exist
+        if (newOrder.Count != _quests.Count || !newOrder.All(id => _quests.Any(q => q.Id == id)))
+        {
+             return Result.Failure(new Error("Realm.InvalidQuestOrder", "The provided quest order is invalid."));
+        }
+
+        // We need a way to set Order on Quest. assuming `SetOrder` method.
+        for (int i = 0; i < newOrder.Count; i++)
+        {
+            var quest = _quests.First(q => q.Id == newOrder[i]);
+            quest.SetOrder(i + 1);
+        }
+
+        return Result.Success();
+    }
 }

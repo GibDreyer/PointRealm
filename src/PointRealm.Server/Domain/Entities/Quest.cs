@@ -37,4 +37,15 @@ public sealed class Quest : Entity
     {
         Status = QuestStatus.Completed;
     }
+
+    internal void UpdateDetails(string title, string description)
+    {
+        Title = title;
+        Description = description;
+    }
+
+    internal void SetOrder(int order)
+    {
+        Order = order;
+    }
 }
