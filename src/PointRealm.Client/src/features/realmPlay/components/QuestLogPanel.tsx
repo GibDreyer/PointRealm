@@ -1,4 +1,5 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Quest } from '../../../types/realm';
 import { Scroll, Plus, GripVertical, CheckCircle2 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
@@ -17,39 +18,48 @@ interface QuestLogPanelProps {
 }
 
 export function QuestLogPanel({ quests, activeQuestId, isGM, onAddQuest, onSelectQuest }: QuestLogPanelProps) {
+    const [isEditing, setIsEditing] = useState(false);
+
     return (
-        <div className="flex flex-col h-full bg-pr-surface-dim/30 backdrop-blur-md">
-            <header className="p-6 border-b border-pr-border/20 flex items-center justify-between sticky top-0 bg-pr-bg/60 backdrop-blur-xl z-20">
-                <SectionHeader 
-                    title="Quest Log" 
-                    subtitle="Chronicles of Journey" 
-                    className="mb-0 [&_h2]:text-xl"
+        <div className="flex flex-col h-full">
+            <header className="p-5 border-b border-pr-border/20 flex items-center justify-between bg-pr-surface/40">
+                <SectionHeader
+                    title="Quest Log"
+                    subtitle="Issues"
+                    className="mb-0 [&_h2]:text-lg"
                 />
                 {isGM && (
-                    <button 
-                        onClick={onAddQuest}
-                        className="p-2.5 bg-pr-primary/5 hover:bg-pr-primary/15 rounded-lg text-pr-primary/60 hover:text-pr-primary transition-all border border-pr-primary/10 hover:border-pr-primary/40 group"
-                        title="Inscribe New Quest"
-                    >
-                        <Plus size={18} className="group-hover:rotate-90 transition-transform duration-500" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        {isEditing && (
+                            <button
+                                onClick={onAddQuest}
+                                className="p-2 rounded-full border border-pr-border/40 text-pr-text-muted hover:text-pr-text hover:border-pr-primary/40 transition-all"
+                                title="Add quest"
+                            >
+                                <Plus size={16} />
+                            </button>
+                        )}
+                        <button
+                            onClick={() => setIsEditing((prev) => !prev)}
+                            className="px-3 py-1 rounded-full border border-pr-border/40 text-[10px] uppercase tracking-[0.3em] text-pr-text-muted hover:text-pr-text hover:border-pr-primary/40 transition-all"
+                        >
+                            {isEditing ? 'Done' : 'Edit'}
+                        </button>
+                    </div>
                 )}
             </header>
             
-            <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar">
                 {quests.length === 0 ? (
-                    <div className="text-center py-20 text-pr-text-muted/40 italic flex flex-col items-center gap-4">
-                        <div className="relative">
-                            <div className="absolute inset-0 bg-pr-primary/5 rounded-full blur-2xl" />
-                            <Scroll size={40} className="relative z-10 opacity-20" />
-                        </div>
-                        <p className="text-[10px] uppercase tracking-[0.4em] font-black">The chronicles are empty</p>
-                        {isGM && (
-                            <button 
-                                onClick={onAddQuest} 
-                                className="text-[10px] text-pr-primary/60 hover:text-pr-primary transition-colors font-black uppercase tracking-[0.2em] border-b border-pr-primary/20 pb-0.5"
+                    <div className="text-center py-16 text-pr-text-muted/50 flex flex-col items-center gap-3">
+                        <Scroll size={32} className="opacity-30" />
+                        <p className="text-[10px] uppercase tracking-[0.3em] font-bold">No active quests</p>
+                        {isGM && isEditing && (
+                            <button
+                                onClick={onAddQuest}
+                                className="text-[10px] text-pr-primary/70 hover:text-pr-primary transition-colors font-bold uppercase tracking-[0.2em]"
                             >
-                                Begin Entry
+                                Add quest
                             </button>
                         )}
                     </div>
@@ -70,22 +80,14 @@ export function QuestLogPanel({ quests, activeQuestId, isGM, onAddQuest, onSelec
                                     variant={isActive ? 'default' : 'subtle'}
                                     noPadding
                                     className={cn(
-                                        "relative transition-all duration-300 border-pr-border/20 overflow-hidden",
-                                        isActive ? "border-pr-primary/40 shadow-glow-primary/10  z-10" : "hover:border-pr-primary/20",
+                                        "relative transition-all duration-300 border-pr-border/30 overflow-hidden",
+                                        isActive ? "border-pr-primary/40 z-10" : "hover:border-pr-primary/20",
                                         isSealed && "opacity-60"
                                     )}
                                 >
-                                    {/* Active Item Indicator */}
-                                    <AnimatePresence>
-                                        {isActive && (
-                                            <motion.div 
-                                                layoutId="active-quest-indicator"
-                                                className="absolute inset-y-0 left-0 w-1 bg-pr-primary shadow-glow-primary"
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                            />
-                                        )}
-                                    </AnimatePresence>
+                                    {isActive && (
+                                        <div className="absolute inset-y-0 left-0 w-1 bg-pr-primary" />
+                                    )}
                                         <div className="p-3 flex items-start gap-3">
                                             {/* Status Indicator */}
                                             <div className="mt-1.5 shrink-0">
@@ -94,7 +96,7 @@ export function QuestLogPanel({ quests, activeQuestId, isGM, onAddQuest, onSelec
                                                 ) : (
                                                     <div className={cn(
                                                         "w-2 h-2 rounded-full",
-                                                        isActive ? "bg-pr-primary shadow-[0_0_8px_rgba(6,182,212,0.8)] animate-pulse" : "bg-pr-text-muted/20"
+                                                        isActive ? "bg-pr-primary" : "bg-pr-text-muted/20"
                                                     )} />
                                                 )}
                                             </div>
@@ -123,8 +125,8 @@ export function QuestLogPanel({ quests, activeQuestId, isGM, onAddQuest, onSelec
                                                 </div>
                                             </div>
 
-                                            {isGM && !isSealed && (
-                                                <div className="opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                                            {isGM && !isSealed && isEditing && (
+                                                <div className="opacity-60 group-hover:opacity-100 transition-opacity p-1">
                                                     <GripVertical size={14} className="text-pr-text-muted/30 cursor-grab" />
                                                 </div>
                                             )}

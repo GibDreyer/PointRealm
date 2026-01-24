@@ -4,10 +4,12 @@ import { useRealm } from '../../hooks/useRealm';
 import { QuestLogPanel } from './components/QuestLogPanel';
 import { PartyRosterPanel } from './components/PartyRosterPanel';
 import { EncounterPanel } from './components/EncounterPanel';
-import { RealmShell } from '../../app/layouts/RealmShell';
 import { QuestDialog } from './components/QuestDialog';
 import { ConnectionBanner } from '../realmLobby/components/ConnectionBanner';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { PageShell } from '../../components/shell/PageShell';
+import { Users } from 'lucide-react';
+import styles from './realmScreen.module.css';
 
 export function RealmScreen() {
     const { code } = useParams<{ code: string }>();
@@ -15,6 +17,9 @@ export function RealmScreen() {
     // We use the 'code' from params for hook
     const { state, loading, error, isConnected, actions, connect } = useRealm(code);
     const [isQuestModalOpen, setQuestModalOpen] = useState(false);
+    const [isQuestOpen, setQuestOpen] = useState(false);
+    const [isPartyOpen, setPartyOpen] = useState(false);
+    const prefersReducedMotion = useReducedMotion() ?? false;
 
     useEffect(() => {
         if (error) {
@@ -25,7 +30,12 @@ export function RealmScreen() {
     // Handle initial loading or missing state
     if (loading || !state) {
         return (
-            <RealmShell className="items-center justify-center">
+            <PageShell
+                backgroundDensity="low"
+                backgroundVariant="realm"
+                reducedMotion={prefersReducedMotion}
+                contentClassName={styles.page}
+            >
                 <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -39,7 +49,7 @@ export function RealmScreen() {
                         Entering the Realm
                     </div>
                 </motion.div>
-            </RealmShell>
+            </PageShell>
         );
     }
 
@@ -59,65 +69,166 @@ export function RealmScreen() {
     };
 
     const myVote = encounter?.votes && myMemberId ? encounter.votes[myMemberId] : null;
+    const readyCount = partyRoster.members.filter(m => m.status === 'ready').length;
 
     return (
-        <RealmShell className="overflow-hidden p-0 max-w-none">
-            {/* Focal Glow (Centered on Encounter) */}
-            <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-pr-primary/[0.04] rounded-full blur-[140px] pointer-events-none z-0" />
+        <PageShell
+            backgroundDensity="low"
+            backgroundVariant="realm"
+            reducedMotion={prefersReducedMotion}
+            contentClassName={styles.page}
+        >
 
             {/* Reconnection Banner */}
              {!isConnected && (
                   <ConnectionBanner isConnecting={loading} onRetry={() => connect(code || "")} />
              )}
             
-            <div className="flex-1 flex overflow-hidden relative w-full h-full z-10">
-                
-                {/* Left Panel: Quest Log (25% on LG+) */}
-                <motion.aside 
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    className="hidden md:flex w-[280px] lg:w-[25%] shrink-0 flex-col h-full border-r border-pr-border/20 bg-pr-surface/20 backdrop-blur-sm"
-                >
-                    <QuestLogPanel 
-                        quests={questLog.quests}
-                        activeQuestId={encounter?.questId || undefined}
-                        isGM={!!isGM}
-                        onAddQuest={() => setQuestModalOpen(true)} 
-                        onSelectQuest={(id) => {
-                             if(isGM) actions.startEncounter(id);
-                        }}
-                    />
-                </motion.aside>
+            <div className={styles.shell}>
+                <div className={styles.mobileControls}>
+                    <button type="button" className={styles.mobileButton} onClick={() => setQuestOpen(true)}>
+                        Quest Log
+                    </button>
+                    <button type="button" className={styles.mobileButton} onClick={() => setPartyOpen(true)}>
+                        Party
+                    </button>
+                </div>
 
-                {/* Center Panel: Encounter (50% on LG+) */}
-                <main className="flex-1 min-w-0 flex flex-col h-full overflow-hidden relative">
-                    <EncounterPanel 
-                        quest={activeQuest || null} 
-                        encounter={encounter}
-                        settings={settings}
-                        partyRoster={partyRoster}
-                        isGM={!!isGM}
-                        canVote={!!me && me.role !== "GM" && !encounter?.isRevealed} 
-                        myVote={myVote || null}
-                        onVote={handleVote}
-                        onStartEncounter={(id) => actions.startEncounter(id)}
-                    />
-                </main>
+                <div className={styles.layout}>
+                    {/* Left Panel: Quest Log */}
+                    <motion.aside
+                        initial={{ x: -16, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.25, ease: "easeOut" }}
+                        className={`${styles.questPanel} ${styles.panelSurface}`}
+                    >
+                        <QuestLogPanel
+                            quests={questLog.quests}
+                            activeQuestId={encounter?.questId || undefined}
+                            isGM={!!isGM}
+                            onAddQuest={() => setQuestModalOpen(true)}
+                            onSelectQuest={(id) => {
+                                 if(isGM) actions.startEncounter(id);
+                            }}
+                        />
+                    </motion.aside>
 
-                {/* Right Panel: Party Roster (25% on LG+) */}
-                <motion.aside 
-                    initial={{ x: 20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    className="hidden lg:flex w-[25%] shrink-0 flex-col h-full border-l border-pr-border/20 bg-pr-surface/20 backdrop-blur-sm"
-                >
-                    <PartyRosterPanel 
-                        members={partyRoster.members}
-                        currentMemberId={myMemberId || ""}
-                        hideVoteCounts={settings.hideVoteCounts}
-                        encounterStatus={encounter?.isRevealed ? 'revealed' : (encounter ? 'voting' : 'idle')}
-                    />
-                </motion.aside>
+                    {/* Center Panel: Encounter */}
+                    <main className={styles.center}>
+                        <EncounterPanel 
+                            quest={activeQuest || null} 
+                            encounter={encounter}
+                            settings={settings}
+                            partyRoster={partyRoster}
+                            isGM={!!isGM}
+                            canVote={!!me && me.role !== "GM" && !encounter?.isRevealed} 
+                            myVote={myVote || null}
+                            onVote={handleVote}
+                            onReroll={() => actions.reRollFates()}
+                        />
+                    </main>
+
+                    {/* Right Panel: Party Dock + Panel */}
+                    <div className={styles.rightColumn}>
+                        <div className={styles.partyDock}>
+                            <button
+                                type="button"
+                                className={styles.partyDockButton}
+                                onClick={() => setPartyOpen((prev) => !prev)}
+                                aria-label="Open party panel"
+                            >
+                                <Users size={18} />
+                            </button>
+                            <div className={styles.partyDockStat}>
+                                {settings.hideVoteCounts ? '??' : `${readyCount}/${partyRoster.members.length}`}
+                            </div>
+                            <div className={styles.partyDockStat}>
+                                {encounter ? (encounter.isRevealed ? 'Seal' : 'Vote') : 'Idle'}
+                            </div>
+                        </div>
+
+                        <AnimatePresence>
+                            {isPartyOpen && (
+                                <motion.aside
+                                    initial={{ x: 24, opacity: 0 }}
+                                    animate={{ x: 0, opacity: 1 }}
+                                    exit={{ x: 24, opacity: 0 }}
+                                    transition={{ duration: 0.25, ease: "easeOut" }}
+                                    className={`${styles.partyPanel} ${styles.panelSurface}`}
+                                >
+                                    <PartyRosterPanel 
+                                        members={partyRoster.members}
+                                        currentMemberId={myMemberId || ""}
+                                        hideVoteCounts={settings.hideVoteCounts}
+                                        encounterStatus={encounter?.isRevealed ? 'revealed' : (encounter ? 'voting' : 'idle')}
+                                    />
+                                </motion.aside>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                </div>
             </div>
+
+            <AnimatePresence>
+                {isQuestOpen && (
+                    <motion.div
+                        className={styles.drawerOverlay}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        onClick={() => setQuestOpen(false)}
+                    >
+                        <motion.div
+                            className={styles.drawer}
+                            initial={{ y: 30, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 30, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: "easeOut" }}
+                            onClick={(event) => event.stopPropagation()}
+                        >
+                            <QuestLogPanel
+                                quests={questLog.quests}
+                                activeQuestId={encounter?.questId || undefined}
+                                isGM={!!isGM}
+                                onAddQuest={() => setQuestModalOpen(true)}
+                                onSelectQuest={(id) => {
+                                     if(isGM) actions.startEncounter(id);
+                                }}
+                            />
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+                {isPartyOpen && (
+                    <motion.div
+                        className={styles.drawerOverlay}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        onClick={() => setPartyOpen(false)}
+                    >
+                        <motion.div
+                            className={styles.drawer}
+                            initial={{ y: 30, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 30, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: "easeOut" }}
+                            onClick={(event) => event.stopPropagation()}
+                        >
+                            <PartyRosterPanel 
+                                members={partyRoster.members}
+                                currentMemberId={myMemberId || ""}
+                                hideVoteCounts={settings.hideVoteCounts}
+                                encounterStatus={encounter?.isRevealed ? 'revealed' : (encounter ? 'voting' : 'idle')}
+                            />
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Modals */}
             <QuestDialog 
@@ -128,6 +239,6 @@ export function RealmScreen() {
                 }}
                 mode="add"
             />
-        </RealmShell>
+        </PageShell>
     );
 }

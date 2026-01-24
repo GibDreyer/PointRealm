@@ -11,6 +11,7 @@ type Density = 'low' | 'medium' | 'high';
 interface StarfieldBackgroundProps {
   density?: Density;
   reducedMotion?: boolean;
+  variant?: 'default' | 'realm';
 }
 
 interface ThemeTokens {
@@ -101,6 +102,7 @@ export const getStarfieldOptions = (
 export const StarfieldBackground: React.FC<StarfieldBackgroundProps> = ({
   density = 'medium',
   reducedMotion,
+  variant = 'default',
 }) => {
   const prefersReducedMotion = useReducedMotion() ?? false;
   const shouldReduceMotion = reducedMotion ?? prefersReducedMotion;
@@ -135,22 +137,30 @@ export const StarfieldBackground: React.FC<StarfieldBackgroundProps> = ({
     () => getStarfieldOptions(themeTokens, shouldReduceMotion, density, isMobile, 'embers'),
     [themeTokens, shouldReduceMotion, density, isMobile]
   );
+  const showParticles = variant === 'default';
+  const showEmbers = variant === 'default';
+  const showBackdrop = variant === 'default';
+  const showHorizon = variant === 'default';
+  const showForeground = variant === 'default';
+  const showRunes = variant === 'realm';
 
   return (
     <div
       className={styles.wrapper}
       aria-hidden="true"
       data-reduced-motion={shouldReduceMotion ? 'true' : 'false'}
+      data-variant={variant}
     >
       <div className={`${styles.layer} ${styles.baseGradient}`} />
-      <div className={`${styles.layer} ${styles.backdrop}`} />
-      <Particles className={styles.stars} init={particlesInit} options={starsOptions} />
-      <Particles className={styles.embers} init={particlesInit} options={embersOptions} />
+      {showBackdrop && <div className={`${styles.layer} ${styles.backdrop}`} />}
+      {showParticles && <Particles className={styles.stars} init={particlesInit} options={starsOptions} />}
+      {showEmbers && <Particles className={styles.embers} init={particlesInit} options={embersOptions} />}
       <div className={`${styles.fog} ${styles.fogOne}`} />
       <div className={`${styles.fog} ${styles.fogTwo}`} />
       <div className={`${styles.fog} ${styles.fogThree}`} />
-      <div className={styles.horizon} />
-      <div className={styles.foreground} />
+      {showHorizon && <div className={styles.horizon} />}
+      {showForeground && <div className={styles.foreground} />}
+      {showRunes && <div className={styles.runeShimmer} />}
       <div className={styles.vignette} />
       <div className={styles.noise} />
     </div>

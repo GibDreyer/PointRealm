@@ -87,13 +87,14 @@ export const DevComponentsPage: React.FC = () => {
                                     value={val}
                                     isSelected={selectedRune === val}
                                     onClick={() => setSelectedRune(val === selectedRune ? null : val)}
+                                    className="w-full"
                                 />
                             ))}
                         </div>
                         
                         <div className="flex flex-col items-center gap-4">
                             <div className="flex gap-4">
-                                <RuneCard value="Disabled" disabled />
+                                <RuneCard value="Disabled" disabled className="w-full" />
                                 <button 
                                     className="px-6 py-3 bg-pr-secondary text-pr-bg font-black uppercase tracking-widest rounded-lg shadow-lg hover:shadow-pr-secondary/20 transition-all active:scale-95"
                                     onClick={() => setSelectedRune('REVEAL_DEMO')}

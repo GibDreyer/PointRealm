@@ -117,6 +117,26 @@
       color-mix(in srgb, var(--pr-bg) 55%, black) 85%);
 }
 
+.runeShimmer {
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(120px 120px at 12% 18%,
+      color-mix(in srgb, var(--pr-primary) 25%, transparent) 0%,
+      transparent 70%),
+    radial-gradient(140px 140px at 88% 16%,
+      color-mix(in srgb, var(--pr-primary) 18%, transparent) 0%,
+      transparent 72%),
+    radial-gradient(160px 160px at 10% 88%,
+      color-mix(in srgb, var(--pr-secondary) 12%, transparent) 0%,
+      transparent 75%),
+    radial-gradient(180px 180px at 90% 85%,
+      color-mix(in srgb, var(--pr-secondary) 10%, transparent) 0%,
+      transparent 78%);
+}
+
 .wrapper[data-reduced-motion="true"] .fog {
   animation: none;
   opacity: 0.25;
@@ -127,6 +147,37 @@
     animation: none;
     opacity: 0.25;
   }
+}
+
+.wrapper[data-variant="realm"] .baseGradient {
+  background: linear-gradient(180deg,
+      color-mix(in srgb, var(--pr-bg) 94%, #05070b) 0%,
+      color-mix(in srgb, var(--pr-bg) 88%, #070a10) 55%,
+      color-mix(in srgb, var(--pr-bg) 92%, #040607) 100%);
+}
+
+.wrapper[data-variant="realm"] .backdrop,
+.wrapper[data-variant="realm"] .embers,
+.wrapper[data-variant="realm"] .horizon,
+.wrapper[data-variant="realm"] .foreground {
+  display: none;
+}
+
+.wrapper[data-variant="realm"] .fog {
+  opacity: 0.22;
+  filter: blur(70px);
+}
+
+.wrapper[data-variant="realm"] .fogOne {
+  animation-duration: 36s;
+}
+
+.wrapper[data-variant="realm"] .fogTwo {
+  animation-duration: 40s;
+}
+
+.wrapper[data-variant="realm"] .fogThree {
+  animation-duration: 34s;
 }
 
 @keyframes fogDrift {

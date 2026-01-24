@@ -1,0 +1,274 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.2rem, 2.5vw, 2rem);
+  flex: 1;
+  min-height: 0;
+}
+
+.header {
+  text-align: center;
+  display: grid;
+  gap: 0.4rem;
+  padding-top: 0.4rem;
+}
+
+.headerLabel {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  color: color-mix(in srgb, var(--pr-text-muted) 75%, var(--pr-text));
+}
+
+.headerTitle {
+  font-size: clamp(1.4rem, 2.6vw, 2.4rem);
+  font-family: var(--pr-heading-font);
+  color: var(--pr-text);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.headerSubtitle {
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--pr-text-muted) 75%, var(--pr-text));
+}
+
+.tableArea {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: clamp(320px, 50vh, 520px);
+}
+
+.tableWrap {
+  position: relative;
+  width: min(100%, 560px);
+  aspect-ratio: 1 / 1;
+}
+
+.tableSurface {
+  position: absolute;
+  inset: 10%;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--pr-border) 70%, transparent);
+  background:
+    radial-gradient(circle at 40% 35%,
+      color-mix(in srgb, var(--pr-surface) 80%, transparent) 0%,
+      color-mix(in srgb, var(--pr-bg) 85%, transparent) 65%),
+    var(--pr-texture-surface-texture);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.4);
+}
+
+.tableRuneRing {
+  position: absolute;
+  inset: 18%;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--pr-primary) 30%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pr-border) 80%, transparent);
+}
+
+.tableGlow {
+  position: absolute;
+  inset: 44%;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--pr-primary) 18%, transparent) 0%, transparent 70%);
+  box-shadow: 0 0 40px color-mix(in srgb, var(--pr-primary) 18%, transparent);
+}
+
+.centerCluster {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  gap: 0.4rem;
+  text-align: center;
+  z-index: 2;
+}
+
+.rerollButton {
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--pr-secondary) 60%, var(--pr-border));
+  background: color-mix(in srgb, var(--pr-secondary) 10%, transparent);
+  color: color-mix(in srgb, var(--pr-secondary) 85%, var(--pr-text));
+  padding: 0.65rem 1.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  transition: all 0.25s ease-out;
+}
+
+.rerollButton:hover:not(:disabled) {
+  filter: brightness(1.05);
+  border-color: color-mix(in srgb, var(--pr-secondary) 75%, var(--pr-border));
+}
+
+.rerollButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rerollSubtitle {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: color-mix(in srgb, var(--pr-text-muted) 70%, var(--pr-text));
+}
+
+.seats {
+  position: absolute;
+  inset: 0;
+  --radius: clamp(180px, 30vw, 240px);
+}
+
+.seat {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 110px;
+  text-align: center;
+  transform:
+    rotate(calc(360deg / var(--count) * var(--index)))
+    translateY(calc(-1 * var(--radius)))
+    rotate(calc(-360deg / var(--count) * var(--index)));
+}
+
+.seatBadge {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--pr-border) 75%, transparent);
+  background: color-mix(in srgb, var(--pr-surface) 75%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: color-mix(in srgb, var(--pr-text-muted) 65%, var(--pr-text));
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.seatVoted {
+  border-color: color-mix(in srgb, var(--pr-primary) 70%, transparent);
+  color: color-mix(in srgb, var(--pr-primary) 80%, var(--pr-text));
+  box-shadow: 0 0 14px color-mix(in srgb, var(--pr-primary) 25%, transparent);
+  animation: seatPulse 0.35s ease-out 1;
+}
+
+.seatDisconnected {
+  border-style: dashed;
+  opacity: 0.5;
+  color: color-mix(in srgb, var(--pr-text-muted) 60%, var(--pr-text));
+}
+
+.seatName {
+  margin-top: 0.5rem;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: color-mix(in srgb, var(--pr-text-muted) 80%, var(--pr-text));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.voteTray {
+  position: sticky;
+  bottom: 0;
+  padding: 1rem clamp(1rem, 2vw, 1.6rem);
+  border-radius: var(--pr-radius-xl);
+  border: 1px solid color-mix(in srgb, var(--pr-border) 70%, transparent);
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--pr-surface) 85%, transparent) 0%,
+      color-mix(in srgb, var(--pr-surface) 92%, transparent) 100%),
+    var(--pr-texture-surface-texture);
+  box-shadow: 0 -16px 30px -24px rgba(0, 0, 0, 0.6);
+}
+
+.voteHeader {
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+
+.voteScroller {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.3rem;
+  scroll-snap-type: x mandatory;
+}
+
+.voteCard {
+  width: clamp(56px, 7vw, 72px);
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+.noQuest {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes seatPulse {
+  0% { transform: scale(0.98); }
+  60% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+@media (max-width: 960px) {
+  .tableWrap {
+    width: min(100%, 480px);
+  }
+
+  .seat {
+    width: 96px;
+  }
+
+  .seatBadge {
+    width: 48px;
+    height: 48px;
+  }
+
+  .seats {
+    --radius: clamp(170px, 32vw, 220px);
+  }
+}
+
+@media (max-width: 640px) {
+  .tableWrap {
+    width: min(100%, 380px);
+  }
+
+  .seat {
+    width: 88px;
+  }
+
+  .seatBadge {
+    width: 44px;
+    height: 44px;
+  }
+
+  .seats {
+    --radius: clamp(150px, 40vw, 200px);
+  }
+
+  .voteTray {
+    padding: 0.85rem 0.85rem 0.95rem;
+  }
+
+  .voteScroller {
+    gap: 0.55rem;
+  }
+
+  .voteCard {
+    width: clamp(52px, 16vw, 64px);
+  }
+}
