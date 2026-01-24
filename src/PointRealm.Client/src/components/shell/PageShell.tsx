@@ -28,10 +28,14 @@ export const PageShell: React.FC<PageShellProps> = ({
   return (
     <div className={cn("relative min-h-screen w-full overflow-hidden bg-pr-bg text-pr-text", className)}>
       {showBackground && (
-        <FantasySky3D 
-          variant={backgroundVariant} 
-          reducedMotion={shouldReduceMotion} 
-        />
+        <>
+          <FantasySky3D 
+            variant={backgroundVariant} 
+            reducedMotion={shouldReduceMotion} 
+          />
+          <div className="vignette-focus" />
+          <div className="magical-border" />
+        </>
       )}
       <main className={cn("relative z-10 min-h-screen w-full", contentClassName)}>
         {children}
