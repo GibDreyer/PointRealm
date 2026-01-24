@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PointRealm.Server.Domain.Entities;
@@ -214,6 +216,7 @@ public class RealmsController(
     /// <response code="403">If user is not authorized as GM</response>
     /// <response code="404">If the realm is not found</response>
     [HttpPatch("{code}/settings")]
+    [Authorize(AuthenticationSchemes = "Identity.Application,Bearer")]
     [ProducesResponseType(typeof(RealmSettingsDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
@@ -245,16 +248,7 @@ public class RealmsController(
         }
 
         // Check GM authorization
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        
-        // Allow if user is owner OR is a host member
-        var isGm = false;
-        if (userId is not null)
-        {
-            isGm = await authService.IsGm(realm.Id, userId);
-        }
-
-        if (!isGm)
+        if (!await CheckIsGmAsync(realm.Id))
         {
             return Problem(
                 statusCode: StatusCodes.Status403Forbidden,
@@ -509,6 +503,7 @@ public class RealmsController(
     /// <response code="403">If user is not authorized as GM</response>
     /// <response code="404">If the realm is not found</response>
     [HttpPost("{code}/quests/import/csv")]
+    [Authorize(AuthenticationSchemes = "Identity.Application,Bearer")]
     [ProducesResponseType(typeof(CsvImportResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
@@ -561,14 +556,7 @@ public class RealmsController(
         }
 
         // Check GM authorization
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var isGm = false;
-        if (userId is not null)
-        {
-            isGm = await authService.IsGm(realm.Id, userId);
-        }
-
-        if (!isGm)
+        if (!await CheckIsGmAsync(realm.Id))
         {
             return Problem(
                 statusCode: StatusCodes.Status403Forbidden,
@@ -744,6 +732,28 @@ public class RealmsController(
         var fileName = $"quests-{code}-{DateTime.UtcNow:yyyyMMdd-HHmmss}.csv";
 
         return File(csvBytes, "text/csv", fileName);
+    }
+
+    private async Task<bool> CheckIsGmAsync(Guid realmId)
+    {
+        // 1. Check IdentityUser (authenticated via Cookies or default Bearer)
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId != null && await authService.IsGm(realmId, userId))
+        {
+            return true;
+        }
+
+        // 2. Check MemberToken (authenticated via custom Bearer)
+        var memberIdValue = User.FindFirstValue("memberId");
+        if (memberIdValue != null && Guid.TryParse(memberIdValue, out var memberId))
+        {
+            if (await authService.IsMemberGm(realmId, memberId))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     #endregion

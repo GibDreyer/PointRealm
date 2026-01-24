@@ -60,4 +60,10 @@ public class RealmAuthorizationService(PointRealmDbContext dbContext)
             
         return isHost;
     }
+
+    public async Task<bool> IsMemberGm(Guid realmId, Guid memberId)
+    {
+        return await dbContext.PartyMembers
+            .AnyAsync(pm => pm.Id == memberId && pm.RealmId == realmId && pm.IsHost);
+    }
 }

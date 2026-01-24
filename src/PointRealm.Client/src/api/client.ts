@@ -13,9 +13,23 @@ export class ApiError extends Error {
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
   
+  // Check for realm-specific token in session storage
+  // Endpoints typically look like /realms/{code}/...
+  const realmMatch = endpoint.match(/\/realms\/([^\/]+)/);
+  let authHeader = {};
+  
+  if (realmMatch && realmMatch[1]) {
+    const code = realmMatch[1];
+    const token = sessionStorage.getItem(`pointrealm:v1:realm:${code}:token`);
+    if (token) {
+      authHeader = { 'Authorization': `Bearer ${token}` };
+    }
+  }
+
   const headers = {
     'Content-Type': 'application/json',
     'X-PointRealm-ClientId': getClientId(),
+    ...authHeader,
     ...options.headers,
   };
 
