@@ -126,6 +126,12 @@ export function RealmScreen() {
                             onVote={handleVote}
                             onReroll={() => actions.reRollFates()}
                             onReveal={() => actions.revealProphecy()}
+                            onSealOutcome={async (val) => {
+                                const numeric = Number(val);
+                                if (Number.isFinite(numeric)) {
+                                    await actions.sealOutcome(numeric);
+                                }
+                            }}
                         />
                     </main>
 

@@ -1,0 +1,39 @@
+﻿.container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rerollButton {
+  border: 1px solid color-mix(in srgb, var(--pr-secondary) 55%, var(--pr-border));
+  background: transparent;
+  color: color-mix(in srgb, var(--pr-secondary) 80%, var(--pr-text));
+}
+
+.rerollButton:hover:not(:disabled) {
+  filter: brightness(1.05);
+  border-color: color-mix(in srgb, var(--pr-secondary) 75%, var(--pr-border));
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.loadingChip {
+  opacity: 0.7;
+}
+
+.disabledChip {
+  opacity: 0.35;
+  cursor: not-allowed;
+}

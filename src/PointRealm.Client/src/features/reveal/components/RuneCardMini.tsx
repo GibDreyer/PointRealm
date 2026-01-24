@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface RuneCardMiniProps {
@@ -18,14 +18,17 @@ export const RuneCardMini: React.FC<RuneCardMiniProps> = ({
   delay = 0
 }) => {
   const displayValue = value === null ? '?' : value;
+  const prefersReducedMotion = useReducedMotion() ?? false;
+  const shouldFlip = revealed && !isCensored && !prefersReducedMotion;
 
   return (
     <div className={cn("relative w-10 h-14 perspective-500", className)}>
       <motion.div
         className="w-full h-full relative preserve-3d"
         initial={false}
-        animate={{ rotateY: revealed && !isCensored ? 180 : 0 }}
-        transition={{ duration: 0.5, delay: delay, ease: [0.23, 1, 0.32, 1] }}
+        animate={shouldFlip ? { rotateY: 180 } : { rotateY: 0, opacity: revealed ? 1 : 0.95 }}
+        transition={{ duration: 0.3, delay: delay, ease: "easeOut" }}
+        data-flip={shouldFlip ? 'true' : 'false'}
       >
         {/* Card Back - The Unrevealed State */}
         <div 

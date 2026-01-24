@@ -1,0 +1,104 @@
+﻿.wrapper {
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2vw, 1.75rem);
+}
+
+.panel {
+  border-radius: var(--pr-radius-xl);
+  border: 1px solid color-mix(in srgb, var(--pr-border) 75%, transparent);
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--pr-surface) 84%, transparent) 0%,
+      color-mix(in srgb, var(--pr-surface) 92%, transparent) 100%),
+    var(--pr-texture-surface-texture);
+  box-shadow: var(--pr-shadow-soft);
+  overflow: hidden;
+}
+
+.header {
+  text-align: center;
+  padding: clamp(1.2rem, 2vw, 1.8rem) clamp(1.2rem, 2vw, 1.6rem) 0;
+}
+
+.banner {
+  margin: clamp(0.8rem, 1.5vw, 1.2rem) clamp(1.2rem, 2vw, 1.6rem) 0;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--pr-border) 70%, transparent);
+  background: color-mix(in srgb, var(--pr-bg) 80%, transparent);
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.28em;
+  color: color-mix(in srgb, var(--pr-text-muted) 75%, var(--pr-text));
+}
+
+.banner strong {
+  color: var(--pr-text);
+  font-weight: 700;
+}
+
+.bannerId {
+  border-left: 1px solid color-mix(in srgb, var(--pr-border) 60%, transparent);
+  padding-left: 0.6rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--pr-text-muted) 70%, var(--pr-text));
+}
+
+.stamp {
+  margin-left: 0.75rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--pr-secondary) 55%, transparent);
+  color: color-mix(in srgb, var(--pr-secondary) 80%, var(--pr-text));
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: clamp(1rem, 2vw, 1.6rem);
+  padding: clamp(1.2rem, 2vw, 1.6rem);
+}
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2vw, 1.4rem);
+}
+
+.mobileStack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2vw, 1.4rem);
+}
+
+.actionsRow {
+  padding: 0 clamp(1.2rem, 2vw, 1.6rem) clamp(1.2rem, 2vw, 1.6rem);
+}
+
+.vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  background: radial-gradient(circle at center,
+      color-mix(in srgb, var(--pr-primary) 12%, transparent) 0%,
+      transparent 60%);
+  mix-blend-mode: screen;
+}
+
+@media (max-width: 960px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

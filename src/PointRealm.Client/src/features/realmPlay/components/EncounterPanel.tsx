@@ -18,9 +18,10 @@ interface EncounterPanelProps {
     onVote: (value: string) => void;
     onReroll: () => void;
     onReveal: () => void;
+    onSealOutcome: (value: string) => Promise<void>;
 }
 
-export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, canVote, myVote, onVote, onReroll, onReveal }: EncounterPanelProps) {
+export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, canVote, myVote, onVote, onReroll, onReveal, onSealOutcome }: EncounterPanelProps) {
     if (!quest) {
         return (
             <div className={styles.noQuest}>
@@ -86,9 +87,9 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                             partyRoster={partyRoster.members}
                             isGM={isGM}
                             deckValues={deckValues}
-                            onSealOutcome={async (val) => {
-                                console.log("Sealing outcome:", val);
-                            }}
+                            quest={quest}
+                            onSealOutcome={onSealOutcome}
+                            onReroll={onReroll}
                             hideVoteCounts={settings.hideVoteCounts}
                         />
                     </motion.div>

@@ -1,0 +1,22 @@
+﻿.panel {
+  display: grid;
+  gap: 1rem;
+  text-align: center;
+}
+
+.chipWrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.glow {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--pr-primary) 30%, transparent);
+}
+
+.helper {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--pr-text-muted) 70%, var(--pr-text));
+}

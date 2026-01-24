@@ -1,0 +1,41 @@
+﻿.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.bar {
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pr-surface-2, var(--pr-surface)) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--pr-border) 60%, transparent);
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  background: color-mix(in srgb, var(--pr-primary) 40%, transparent);
+}
+
+.count {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--pr-text-muted) 70%, var(--pr-text));
+}
+
+.empty {
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--pr-text-muted) 70%, var(--pr-text));
+}

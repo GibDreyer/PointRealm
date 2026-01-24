@@ -1,0 +1,110 @@
+﻿.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.sortButton {
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--pr-border) 70%, transparent);
+  background: color-mix(in srgb, var(--pr-surface) 80%, transparent);
+  color: color-mix(in srgb, var(--pr-text-muted) 75%, var(--pr-text));
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.7rem;
+}
+
+.list {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.8rem;
+}
+
+.rowBadge {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--pr-border) 70%, transparent);
+  background: color-mix(in srgb, var(--pr-surface) 80%, transparent);
+  color: color-mix(in srgb, var(--pr-text-muted) 70%, var(--pr-text));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--pr-text) 80%, var(--pr-text-muted));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.valueChip {
+  min-width: 48px;
+  justify-content: center;
+}
+
+.rowMin {
+  border-color: color-mix(in srgb, var(--pr-primary) 45%, transparent) !important;
+}
+
+.rowMax {
+  border-color: color-mix(in srgb, var(--pr-secondary) 45%, transparent) !important;
+}
+
+.totalLabel {
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--pr-text-muted) 70%, var(--pr-text));
+}
+
+.flipWrap {
+  width: 58px;
+  height: 32px;
+  perspective: 800px;
+}
+
+.flipInner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.flipFace {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flipBack {
+  transform: rotateY(180deg);
+}
