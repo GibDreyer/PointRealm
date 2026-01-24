@@ -22,10 +22,9 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       'text-left': align === 'left',
     }, className)}>
       <motion.h2 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="text-2xl font-bold font-heading text-pr-text tracking-tight"
-        style={{ fontFamily: 'var(--pr-heading-font)' }}
+        initial={{ opacity: 0, x: -5 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="text-2xl font-black font-heading text-pr-text tracking-widest uppercase"
       >
         {title}
       </motion.h2>
@@ -33,17 +32,19 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
         <motion.p 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          className="text-sm text-pr-text-muted uppercase tracking-widest mt-1 font-semibold"
+          transition={{ delay: 0.15 }}
+          className="text-[10px] text-pr-text-muted uppercase tracking-[0.2em] mt-1 font-bold italic"
         >
           {subtitle}
         </motion.p>
       )}
       
-      {/* Decorative divider if center aligned */}
-      {align === 'center' && (
-        <div className="h-px w-24 bg-gradient-to-r from-transparent via-pr-primary to-transparent mx-auto mt-4 opacity-50" />
-      )}
+      {/* Subtle Glowing Divider */}
+      <div className={cn(
+          "h-px w-full max-w-[60px] bg-gradient-to-r from-pr-primary/50 to-transparent mt-3",
+          align === 'center' && "mx-auto bg-gradient-to-r from-transparent via-pr-primary/50 to-transparent",
+          align === 'right' && "ml-auto bg-gradient-to-l from-pr-primary/50 to-transparent"
+      )} />
     </div>
   );
 };

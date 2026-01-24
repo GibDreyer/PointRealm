@@ -56,17 +56,17 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
 const ToastItem: React.FC<{ toast: Toast; onClose: (id: string) => void }> = ({ toast, onClose }) => {
   const icons = {
-    info: <Info className="w-5 h-5 text-pr-primary" />,
-    success: <CheckCircle className="w-5 h-5 text-pr-success" />,
-    warning: <AlertTriangle className="w-5 h-5 text-pr-secondary" />,
-    error: <AlertTriangle className="w-5 h-5 text-pr-danger" />,
+    info: <Info className="w-4 h-4 text-pr-primary" />,
+    success: <CheckCircle className="w-4 h-4 text-pr-success" />,
+    warning: <AlertTriangle className="w-4 h-4 text-pr-secondary" />,
+    error: <AlertTriangle className="w-4 h-4 text-pr-danger" />,
   };
 
-  const borders = {
-    info: "border-pr-primary/50",
-    success: "border-pr-success/50",
-    warning: "border-pr-secondary/50",
-    error: "border-pr-danger/50",
+  const accents = {
+    info: "bg-pr-primary/20",
+    success: "bg-pr-success/20",
+    warning: "bg-pr-secondary/20",
+    error: "bg-pr-danger/20",
   };
 
   return (
@@ -76,26 +76,35 @@ const ToastItem: React.FC<{ toast: Toast; onClose: (id: string) => void }> = ({ 
       exit={{ opacity: 0, x: 50, scale: 0.9 }}
       layout
       className={cn(
-        "pointer-events-auto flex items-start gap-3 p-4 rounded-[var(--pr-radius-md)] shadow-lg border",
-        "bg-[#1e1e24] text-pr-text relative overflow-hidden", // Fallback bg if pr-surface not resolved, but should be pr-surface
-        "bg-pr-surface",
-        borders[toast.type]
+        "pointer-events-auto flex items-center gap-3 py-3 px-4 rounded-lg shadow-2xl border border-pr-border/50",
+        "bg-pr-surface relative overflow-hidden min-w-[280px]"
       )}
     >
-        {/* Parchment texture overlay */}
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] pointer-events-none mix-blend-overlay" />
+        {/* Parchment/Stone Texture Overlay */}
+        <div 
+          className="absolute inset-0 opacity-[0.04] pointer-events-none mix-blend-overlay" 
+          style={{ backgroundImage: 'var(--pr-texture-noise-overlay)' }}
+        />
+        
+        {/* Bevel effect */}
+        <div className="absolute inset-0 pointer-events-none rounded-lg ring-1 ring-white/5 ring-inset" />
+
+        {/* Status Indicator */}
+        <div className={cn("w-1 h-8 rounded-full shrink-0", accents[toast.type])} />
         
         <div className="mt-0.5 relative z-10 shrink-0">
           {icons[toast.type]}
         </div>
-        <div className="flex-1 relative z-10 pt-0.5">
-           <p className="text-sm font-medium leading-tight">{toast.message}</p>
+
+        <div className="flex-1 relative z-10">
+           <p className="text-[11px] font-black uppercase tracking-wider leading-none text-pr-text/90">{toast.message}</p>
         </div>
+
         <button 
             onClick={() => onClose(toast.id)}
-            className="text-pr-text-muted hover:text-pr-text transition-colors relative z-10"
+            className="p-1 text-pr-text-muted hover:text-pr-text transition-colors relative z-10 hover:bg-white/5 rounded"
         >
-            <X className="w-4 h-4" />
+            <X className="w-3.5 h-3.5" />
         </button>
     </motion.div>
   );

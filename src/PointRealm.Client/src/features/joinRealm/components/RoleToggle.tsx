@@ -1,6 +1,6 @@
 import { Eye, User } from 'lucide-react';
 
-export type RealmRole = 'participant' | 'observer';
+export type RealmRole = 'participant' | 'observer' | 'gm';
 
 interface RoleToggleProps {
     value: RealmRole;

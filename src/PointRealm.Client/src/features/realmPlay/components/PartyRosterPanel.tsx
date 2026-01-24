@@ -24,35 +24,37 @@ export function PartyRosterPanel({ members, currentMemberId, hideVoteCounts, enc
     const readyCount = members.filter(m => m.status === 'ready').length;
     
     return (
-        <div className="flex flex-col h-full bg-pr-bg/20 backdrop-blur-sm">
-            <header className="p-4 border-b border-pr-border/30 sticky top-0 bg-pr-bg/40 z-10">
+        <div className="flex flex-col h-full bg-pr-surface-dim/30 backdrop-blur-md">
+            <header className="p-6 border-b border-pr-border/20 sticky top-0 bg-pr-bg/60 backdrop-blur-xl z-20">
                 <SectionHeader 
-                    title="Travelers" 
-                    subtitle={`${members.length} in party`} 
-                    className="mb-0"
+                    title="Party" 
+                    subtitle={`${members.length} Souls present`} 
+                    className="mb-0 [&_h2]:text-xl"
                 />
             </header>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
                  {/* Vote Status Summary */}
                  {encounterStatus === 'voting' && (
                     <motion.div 
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mb-6"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="mb-8"
                     >
-                        <Panel variant="subtle" className="text-center p-3 border-pr-primary/20 bg-pr-primary/[0.03]">
+                        <Panel variant="subtle" className="text-center p-4 border-pr-primary/10 bg-pr-primary/[0.02] relative overflow-hidden group">
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-pr-primary/5 to-transparent -translate-x-full animate-[shimmer_3s_infinite]" />
+                            
                             {hideVoteCounts ? (
-                                 <p className="text-[10px] uppercase font-black tracking-widest text-pr-primary animate-pulse">Waiting for Consensus...</p>
+                                 <p className="text-[10px] uppercase font-black tracking-[0.3em] text-pr-primary/60 italic">Waiting for Consensus...</p>
                             ) : (
-                                 <div className="flex flex-col gap-1">
+                                 <div className="flex flex-col gap-3 relative z-10">
                                     <div className="flex items-center justify-center gap-2">
-                                        <span className="text-lg font-black text-pr-text">{readyCount}</span>
-                                        <span className="text-[10px] uppercase font-black text-pr-text-muted mt-1">/ {members.length} Ready</span>
+                                        <span className="text-2xl font-black text-pr-text tracking-tighter shadow-glow-primary/20">{readyCount}</span>
+                                        <span className="text-[10px] uppercase font-black text-pr-text-muted/60 mt-2 tracking-widest italic">/ {members.length} Inscribed</span>
                                     </div>
-                                    <div className="w-full h-1 bg-pr-surface-2 rounded-full overflow-hidden">
+                                    <div className="w-full h-1 bg-pr-bg rounded-full overflow-hidden border border-pr-border/10">
                                         <motion.div 
-                                            className="h-full bg-pr-primary"
+                                            className="h-full bg-pr-primary shadow-glow-primary"
                                             initial={{ width: 0 }}
                                             animate={{ width: `${(readyCount / members.length) * 100}%` }}
                                         />
@@ -74,22 +76,22 @@ export function PartyRosterPanel({ members, currentMemberId, hideVoteCounts, enc
                                 <motion.div 
                                     key={member.id}
                                     layout
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: isOnline ? 1 : 0.5, x: 0 }}
+                                    initial={{ opacity: 0, x: 10 }}
+                                    animate={{ opacity: isOnline ? 1 : 0.4, x: 0 }}
                                     className="group"
                                 >
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-4">
                                         <div className="relative">
                                             <div className={cn(
-                                                "w-10 h-10 rounded-full flex items-center justify-center border transition-all",
-                                                isGM ? "bg-pr-secondary/10 border-pr-secondary/30 text-pr-secondary" : 
-                                                isSelf ? "bg-pr-primary/10 border-pr-primary/30 text-pr-primary" : 
-                                                "bg-pr-surface-2 border-pr-border/20 text-pr-text-muted"
+                                                "w-12 h-12 rounded-lg flex items-center justify-center border-2 transition-all duration-300",
+                                                isGM ? "bg-pr-secondary/5 border-pr-secondary/40 text-pr-secondary shadow-[0_0_15px_-5px_rgba(251,191,36,0.3)]" : 
+                                                isSelf ? "bg-pr-primary/5 border-pr-primary/40 text-pr-primary shadow-[0_0_15px_-5px_rgba(6,182,212,0.3)]" : 
+                                                "bg-pr-surface-2/40 border-pr-border/30 text-pr-text-muted/60"
                                             )}>
-                                                <span className="text-xs font-black">{member.name.substring(0, 2).toUpperCase()}</span>
+                                                <span className="text-xs font-black tracking-tighter uppercase">{member.name.substring(0, 2)}</span>
                                             </div>
                                             {isGM && (
-                                                <div className="absolute -top-1 -right-1 text-pr-secondary bg-pr-bg rounded-full border border-pr-border/20 p-0.5 shadow-sm">
+                                                <div className="absolute -top-1.5 -right-1.5 text-pr-secondary bg-pr-bg rounded-full border border-pr-secondary/40 p-1 shadow-glow-secondary/20">
                                                     <Crown size={10} fill="currentColor" />
                                                 </div>
                                             )}
@@ -98,29 +100,31 @@ export function PartyRosterPanel({ members, currentMemberId, hideVoteCounts, enc
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2">
                                                 <span className={cn(
-                                                    "font-bold truncate text-sm transition-colors",
-                                                    isSelf ? "text-pr-primary" : isOnline ? "text-pr-text" : "text-pr-text-muted"
+                                                    "font-black text-sm transition-colors uppercase tracking-widest truncate",
+                                                    isSelf ? "text-pr-primary/80" : isOnline ? "text-pr-text/80" : "text-pr-text-muted/50"
                                                 )}>
                                                     {member.name}
                                                 </span>
-                                                {isSelf && <span className="text-[8px] font-black uppercase tracking-tighter text-pr-primary/50">You</span>}
+                                                {isSelf && <span className="text-[8px] font-black uppercase tracking-[0.2em] text-pr-primary/40 italic">Self</span>}
                                             </div>
                                             
-                                            <div className="flex items-center gap-2 mt-0.5">
+                                            <div className="flex items-center gap-2 mt-1">
                                                 {!isOnline ? (
-                                                    <span className="text-[9px] text-pr-danger/50 font-bold uppercase tracking-tighter flex items-center gap-1">
+                                                    <span className="text-[9px] text-pr-danger/40 font-black uppercase tracking-[0.2em] flex items-center gap-1.5 italic">
                                                         <WifiOff size={10} /> Lost in Void
                                                     </span>
                                                 ) : member.status === 'ready' ? (
-                                                    <span className="text-[9px] text-pr-success font-black uppercase tracking-tighter flex items-center gap-1">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-pr-success shadow-[0_0_5px_rgba(34,197,94,0.5)]" />
+                                                    <span className="text-[9px] text-pr-success/70 font-black uppercase tracking-[0.2em] flex items-center gap-1.5 italic">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-pr-success shadow-glow-success animate-pulse" />
                                                         Ready
                                                     </span>
                                                 ) : member.status === 'choosing' ? (
-                                                    <span className="text-[9px] text-pr-primary/70 font-bold italic lowercase tracking-tight">Inscribing rune...</span>
+                                                    <span className="text-[9px] text-pr-primary/60 font-black uppercase tracking-[0.3em] flex items-center gap-1.5 animate-pulse italic">
+                                                         Inscribing...
+                                                    </span>
                                                 ) : (
-                                                    <span className="text-[9px] text-pr-text-muted font-bold uppercase tracking-tighter flex items-center gap-1">
-                                                        <MapPin size={10} /> Resting
+                                                    <span className="text-[9px] text-pr-text-muted/40 font-black uppercase tracking-[0.2em] flex items-center gap-1.5 italic">
+                                                        <MapPin size={10} className="opacity-40" /> Resting
                                                     </span>
                                                 )}
                                             </div>

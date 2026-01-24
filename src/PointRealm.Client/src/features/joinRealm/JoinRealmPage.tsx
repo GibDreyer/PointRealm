@@ -157,31 +157,34 @@ export function JoinRealmPage() {
   };
 
   return (
-    <RealmShell className="justify-center">
+    <RealmShell className="justify-center overflow-hidden">
+       {/* Focal Glow */}
+       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-pr-primary/[0.05] rounded-full blur-[100px] pointer-events-none z-0" />
+
        <motion.div 
-         initial={{ opacity: 0, y: 10 }}
-         animate={{ opacity: 1, y: 0 }}
-         className="w-full max-w-lg mx-auto"
+         initial={{ opacity: 0, scale: 0.98 }}
+         animate={{ opacity: 1, scale: 1 }}
+         className="w-full max-w-lg mx-auto relative z-10 py-8"
        >
           <Panel className="relative">
               {/* Header */}
-              <header className="mb-8 text-center relative">
-                  <Link to="/" className="absolute left-0 top-1 text-pr-text-muted hover:text-pr-primary transition-colors" title="Back to Home">
-                      <ArrowLeft size={20} />
+              <header className="mb-10 text-center relative">
+                  <Link to="/" className="absolute left-0 top-1.5 text-pr-text-muted/60 hover:text-pr-primary transition-all duration-300 hover:-translate-x-1" title="Back to Home">
+                      <ArrowLeft size={18} />
                   </Link>
                   <SectionHeader 
-                    title="Enter the Realm" 
-                    subtitle="Join a session" 
+                    title="Enter Realm" 
+                    subtitle="Cross the Threshold" 
                     align="center"
                     className="mb-0"
                   />
               </header>
 
-              <div className="space-y-6">
+              <div className="space-y-8">
                   {/* Realm Input */}
-                  <div className="space-y-2">
-                      <label className="text-sm font-medium text-pr-text-muted flex items-center gap-2">
-                          <Globe size={16} /> Realm Code or Link
+                  <div className="space-y-2.5">
+                      <label className="text-[10px] font-black text-pr-primary/70 uppercase tracking-[0.2em] flex items-center gap-2">
+                          <Globe size={14} className="opacity-70" /> Sigil or Gateway Link
                       </label>
                       <input 
                           value={realmInput}
@@ -192,16 +195,16 @@ export function JoinRealmPage() {
                           onPaste={handlePaste}
                           onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleJoin()}
                           placeholder="CODE or LINK"
-                          className="w-full p-4 rounded-[var(--pr-radius-md)] bg-pr-bg border border-pr-border focus:border-pr-primary focus:ring-1 focus:ring-pr-primary text-pr-text transition-colors text-lg font-mono placeholder:font-sans uppercase"
+                          className="w-full p-4 rounded-lg bg-pr-bg border border-pr-border/60 focus:border-pr-primary/50 focus:ring-1 focus:ring-pr-primary/30 text-pr-text transition-all duration-300 text-lg font-mono placeholder:font-sans placeholder:text-xs placeholder:tracking-[0.1em] uppercase shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"
                           disabled={isLoading}
                       />
-                      {inputError && <p className="text-xs text-pr-danger font-medium mt-1">{inputError}</p>}
+                      {inputError && <p className="text-[10px] font-bold uppercase tracking-widest text-pr-danger mt-1.5">{inputError}</p>}
                   </div>
 
                   {/* Display Name */}
-                  <div className="space-y-2">
-                      <label className="text-sm font-medium text-pr-text-muted flex items-center gap-2">
-                          <User size={16} /> Display Name
+                  <div className="space-y-2.5">
+                      <label className="text-[10px] font-black text-pr-primary/70 uppercase tracking-[0.2em] flex items-center gap-2">
+                          <User size={14} className="opacity-70" /> Identity Inscription
                       </label>
                       <input 
                           value={displayName}
@@ -209,7 +212,7 @@ export function JoinRealmPage() {
                           onBlur={handleNameBlur}
                           onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleJoin()}
                           placeholder="Name your adventurer" 
-                          className="w-full p-4 rounded-[var(--pr-radius-md)] bg-pr-bg border border-pr-border focus:border-pr-primary focus:ring-1 focus:ring-pr-primary text-pr-text transition-colors text-lg"
+                          className="w-full p-4 rounded-lg bg-pr-bg border border-pr-border/60 focus:border-pr-primary/50 focus:ring-1 focus:ring-pr-primary/30 text-pr-text transition-all duration-300 text-lg placeholder:text-xs placeholder:tracking-[0.1em] shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"
                           disabled={isLoading}
                       />
                   </div>
@@ -221,9 +224,12 @@ export function JoinRealmPage() {
                   />
 
                   {error && (
-                      <div className="p-4 rounded-[var(--pr-radius-md)] bg-pr-danger/10 border border-pr-danger text-pr-danger text-sm flex items-start gap-3">
-                          <AlertTriangle className="w-5 h-5 shrink-0" />
-                          <span>{error}</span>
+                      <div className="p-5 rounded-lg bg-pr-danger/10 border border-pr-danger/30 text-pr-danger text-sm flex items-start gap-4 shadow-lg">
+                          <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5 opacity-80" />
+                          <div>
+                              <strong className="block text-xs uppercase tracking-[0.2em] font-black pb-1">The portal resists</strong>
+                              <span className="text-[11px] font-bold italic opacity-70 leading-relaxed">{error}</span>
+                          </div>
                       </div>
                   )}
 
@@ -232,16 +238,17 @@ export function JoinRealmPage() {
                       disabled={isLoading || !realmInput.trim() || !displayName.trim()}
                       fullWidth
                       variant="primary"
-                      className="py-4 text-lg"
+                      className="py-8 shadow-glow-primary group"
                   >
                       {isLoading ? (
                           <>
-                              <Loader2 className="animate-spin mr-2" size={20} />
-                              Opening Portal...
+                              <Loader2 className="animate-spin mr-3 opacity-80" size={20} />
+                              <span className="tracking-[0.2em] font-black uppercase">Opening Portal...</span>
                           </>
                       ) : (
                           <>
-                              Enter the Realm <ArrowRight className="ml-2" size={20} />
+                              <span className="tracking-[0.2em] font-black uppercase">Enter the Realm</span>
+                              <ArrowRight className="ml-3 transition-transform group-hover:translate-x-1.5 duration-300 opacity-80" size={20} />
                           </>
                       )}
                   </Button>

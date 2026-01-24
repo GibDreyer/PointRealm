@@ -62,18 +62,21 @@ export function RealmScreen() {
 
     return (
         <RealmShell className="overflow-hidden p-0 max-w-none">
+            {/* Focal Glow (Centered on Encounter) */}
+            <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-pr-primary/[0.04] rounded-full blur-[140px] pointer-events-none z-0" />
+
             {/* Reconnection Banner */}
              {!isConnected && (
                   <ConnectionBanner isConnecting={loading} onRetry={() => connect(code || "")} />
              )}
             
-            <div className="flex-1 flex overflow-hidden relative w-full h-full">
+            <div className="flex-1 flex overflow-hidden relative w-full h-full z-10">
                 
-                {/* Left Panel: Quest Log (Sidebar) */}
+                {/* Left Panel: Quest Log (25% on LG+) */}
                 <motion.aside 
-                    initial={{ x: -100, opacity: 0 }}
+                    initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
-                    className="hidden md:flex w-[260px] lg:w-[320px] flex-col h-full border-r border-pr-border/20 z-20"
+                    className="hidden md:flex w-[280px] lg:w-[25%] shrink-0 flex-col h-full border-r border-pr-border/20 bg-pr-surface/20 backdrop-blur-sm"
                 >
                     <QuestLogPanel 
                         quests={questLog.quests}
@@ -86,8 +89,8 @@ export function RealmScreen() {
                     />
                 </motion.aside>
 
-                {/* Center Panel: Encounter (Main Stage) */}
-                <main className="flex-1 flex flex-col h-full overflow-hidden relative z-10">
+                {/* Center Panel: Encounter (50% on LG+) */}
+                <main className="flex-1 min-w-0 flex flex-col h-full overflow-hidden relative">
                     <EncounterPanel 
                         quest={activeQuest || null} 
                         encounter={encounter}
@@ -101,11 +104,11 @@ export function RealmScreen() {
                     />
                 </main>
 
-                {/* Right Panel: Party Roster (Sidebar) */}
+                {/* Right Panel: Party Roster (25% on LG+) */}
                 <motion.aside 
-                    initial={{ x: 100, opacity: 0 }}
+                    initial={{ x: 20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
-                    className="hidden lg:flex w-[240px] xl:w-[280px] flex-col h-full border-l border-pr-border/20 z-20"
+                    className="hidden lg:flex w-[25%] shrink-0 flex-col h-full border-l border-pr-border/20 bg-pr-surface/20 backdrop-blur-sm"
                 >
                     <PartyRosterPanel 
                         members={partyRoster.members}

@@ -38,76 +38,80 @@ export function RecentRealmsList({ realms, onSelect, onForget, onClearAll }: Rec
             animate={{ opacity: 1, scale: 1 }}
             className="w-full max-w-lg mx-auto"
         >
-            <div className="flex items-center justify-between mb-4 px-2">
-                <h2 className="text-xs uppercase tracking-wider font-bold text-pr-text-muted flex items-center gap-2">
-                    <History size={14} className="text-pr-primary" /> Recent Realms
+            <div className="flex items-center justify-between mb-6 px-4">
+                <h2 className="text-[10px] uppercase tracking-[0.3em] font-black text-pr-primary/60 flex items-center gap-2 italic">
+                    <History size={14} className="text-pr-primary/50" /> Past Ventures
                 </h2>
                 <button 
                   onClick={onClearAll}
-                  className="text-[10px] uppercase tracking-tighter text-pr-text-muted hover:text-pr-danger transition-colors flex items-center gap-1 opacity-60 hover:opacity-100"
+                  className="text-[9px] uppercase tracking-[0.2em] text-pr-text-muted/40 hover:text-pr-danger transition-all font-black flex items-center gap-1.5 group"
                 >
-                    <Trash2 size={10} /> Wipe Slate
+                    <Trash2 size={10} className="group-hover:rotate-12 transition-transform" /> Wipe Slate
                 </button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
                 <AnimatePresence mode="popLayout">
                     {realms.map((realm) => (
                         <motion.div 
                           key={realm.realmCode}
                           layout
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95 }}
-                          whileHover={{ y: -2 }}
+                          whileHover={{ y: -3 }}
+                          transition={{ duration: 0.3 }}
                           className="group relative cursor-pointer"
                           onClick={() => onSelect(realm)}
                         >
                             <Panel 
                                 variant="subtle" 
                                 noPadding 
-                                className="border-pr-border/40 group-hover:border-pr-primary/40 group-hover:shadow-[0_0_20px_-5px_rgba(6,182,212,0.1)] transition-all overflow-hidden"
+                                className="border-pr-border/30 bg-pr-surface/40 group-hover:bg-pr-surface/60 group-hover:border-pr-primary/30 group-hover:shadow-[0_0_30px_-10px_rgba(6,182,212,0.2)] transition-all duration-300 overflow-hidden"
                             >
-                                {/* Inset Parchment Effect */}
-                                <div className="absolute inset-1 rounded-[calc(var(--pr-radius-lg)-4px)] bg-[#1e1e24] opacity-40 z-0 pointer-events-none group-hover:opacity-60 transition-opacity" />
-                                
-                                <div className="relative z-10 p-4 flex items-center justify-between">
-                                    <div className="flex-1 flex flex-col gap-0.5">
-                                        <div className="flex items-center gap-3">
-                                            <span className="font-mono text-lg font-black text-pr-primary tracking-tighter">
+                                {/* Inset Accent Line */}
+                                <div className="absolute top-0 bottom-0 left-0 w-1 bg-gradient-to-b from-transparent via-pr-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                                <div className="relative z-10 p-5 flex items-center justify-between">
+                                    <div className="flex-1 flex flex-col gap-1.5">
+                                        <div className="flex items-center gap-4">
+                                            <span className="font-mono text-xl font-black text-pr-primary tracking-tighter shadow-glow-primary/20">
                                                 {realm.realmCode}
                                             </span>
                                             {realm.realmName && (
-                                                <span className="text-sm font-semibold text-pr-text truncate max-w-[180px]">
+                                                <span className="text-xs font-black text-pr-text/80 tracking-widest uppercase truncate max-w-[160px]">
                                                     {realm.realmName}
                                                 </span>
                                             )}
                                         </div>
-                                        <div className="text-[10px] text-pr-text-muted flex items-center gap-2">
-                                            <span className="bg-pr-surface-2 px-1.5 py-0.5 rounded border border-pr-border/30 text-pr-text/70">{timeAgo(realm.lastVisitedAt)}</span>
-                                            <span className="flex items-center gap-1">
-                                                as <span className="text-pr-secondary font-bold">{realm.displayNameUsed}</span>
+                                        <div className="text-[9px] text-pr-text-muted/60 flex items-center gap-3 font-bold uppercase tracking-widest">
+                                            <span className="flex items-center gap-1.5 border-r border-pr-border/30 pr-3 italic">
+                                                {timeAgo(realm.lastVisitedAt)}
                                             </span>
-                                            {realm.role === 'observer' && (
-                                                <span className="text-[9px] uppercase font-bold text-pr-text-muted border border-pr-border/30 px-1 rounded">Observer</span>
+                                            <span className="flex items-center gap-1.5 border-r border-pr-border/30 pr-3 italic">
+                                                as <span className="text-pr-secondary/80 font-black">{realm.displayNameUsed}</span>
+                                            </span>
+                                            {realm.role === 'gm' ? (
+                                                <span className="text-[8px] font-black text-pr-secondary border border-pr-secondary/30 bg-pr-secondary/5 px-2 py-0.5 rounded leading-none">GM</span>
+                                            ) : (
+                                                <span className="text-[8px] font-black text-pr-primary/70 border border-pr-primary/30 bg-pr-primary/5 px-2 py-0.5 rounded leading-none uppercase">Party</span>
                                             )}
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-1 bg-pr-bg/30 p-1 rounded-full border border-pr-border/20">
+                                    <div className="flex items-center gap-2">
                                         <button
                                           onClick={(e) => {
                                               e.stopPropagation();
                                               onForget(realm.realmCode);
                                           }}
-                                          className="p-1.5 text-pr-text-muted hover:text-pr-danger hover:bg-pr-danger/10 rounded-full transition-colors"
+                                          className="p-2 text-pr-text-muted/40 hover:text-pr-danger hover:bg-pr-danger/10 rounded-lg transition-all"
                                           title="Forget"
                                         >
                                             <X size={14} />
                                         </button>
-                                        <div className="w-px h-4 bg-pr-border/20 mx-0.5" />
-                                        <div className="p-1.5 text-pr-primary group-hover:translate-x-0.5 transition-transform">
-                                            <ArrowRight size={16} />
+                                        <div className="p-2 text-pr-primary/60 group-hover:text-pr-primary group-hover:translate-x-1 transition-all">
+                                            <ArrowRight size={18} />
                                         </div>
                                     </div>
                                 </div>

@@ -14,7 +14,7 @@ export const RecentRealmItemSchema = z.object({
   realmName: z.string().optional(),
   joinUrl: z.string().optional(),
   themeKey: z.string().optional(),
-  role: z.enum(['participant', 'observer']).optional(),
+  role: z.enum(['participant', 'observer', 'gm']).optional(),
   displayNameUsed: z.string(),
   lastVisitedAt: z.string().datetime(),
 });

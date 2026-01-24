@@ -20,33 +20,30 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
   className,
   ...props 
 }, ref) => {
-  
+  const { style, ...filteredProps } = props;
+
   const variants = {
-    primary: "bg-pr-primary text-black border-pr-primary shadow-[0_0_10px_var(--pr-primary)] hover:brightness-110",
-    secondary: "bg-transparent text-pr-primary border-pr-primary hover:bg-pr-primary/10",
-    danger: "bg-pr-danger/20 text-pr-danger border-pr-danger hover:bg-pr-danger/30 hover:shadow-[0_0_10px_var(--pr-danger)]",
-    ghost: "bg-transparent text-pr-text-muted hover:text-pr-text",
+    primary: "bg-pr-primary text-black border-pr-primary/50 shadow-[0_0_15px_-5px_rgba(6,182,212,0.5)] hover:shadow-[0_0_20px_-2px_rgba(6,182,212,0.6)] hover:brightness-110",
+    secondary: "bg-pr-secondary text-black border-pr-secondary/50 shadow-[0_0_15px_-5px_rgba(251,191,36,0.4)] hover:shadow-[0_0_20px_-2px_rgba(251,191,36,0.5)] hover:brightness-110",
+    danger: "bg-pr-danger/10 text-pr-danger border-pr-danger/30 hover:bg-pr-danger/20 hover:border-pr-danger/50 hover:shadow-[0_0_15px_-5px_rgba(244,63,94,0.4)]",
+    ghost: "bg-transparent text-pr-text-muted hover:text-pr-text hover:bg-white/5",
   };
 
   return (
     <motion.button 
       ref={ref}
-      whileHover={{ scale: 1.02, y: -2 }}
+      whileHover={{ scale: 1.01, y: -1 }}
       whileTap={{ scale: 0.98, y: 0 }}
       className={cn(
-        "inline-flex items-center justify-center font-semibold transition-colors duration-200",
-        "px-6 py-3 rounded-[var(--pr-radius-md)] border",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pr-primary",
+        "inline-flex items-center justify-center font-bold uppercase tracking-widest transition-all duration-300",
+        "px-6 py-3 rounded-[var(--pr-radius-md)] border text-xs",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pr-primary focus-visible:ring-offset-2 focus-visible:ring-offset-pr-bg",
         fullWidth ? "w-full" : "w-auto",
         variants[variant],
         className
       )}
-      style={{
-        fontFamily: 'var(--pr-body-font)',
-        fontSize: 'var(--pr-font-scale-base)',
-        ...props.style as any
-      }}
-      {...props}
+      style={style as any}
+      {...filteredProps}
     >
       {children}
     </motion.button>

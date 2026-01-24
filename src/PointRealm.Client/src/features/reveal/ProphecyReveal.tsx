@@ -7,6 +7,7 @@ import { RuneDistribution } from './components/RuneDistribution';
 import { SuggestedOathPanel } from './components/SuggestedOathPanel';
 import { useSound } from '@/hooks/useSound';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Panel } from '@/components/ui/Panel';
 
 interface ProphecyRevealProps {
   encounter: Encounter;
@@ -112,17 +113,20 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
         
         {/* Left/Main Column: Party Votes */}
-        <div className="md:col-span-7 lg:col-span-8 space-y-6">
-             <div className="flex items-end justify-between border-b border-pr-border/20 pb-3">
-                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-pr-text-muted">Traveler Intent</h3>
+        <div className="lg:col-span-7 xl:col-span-8 space-y-8">
+             <div className="flex items-center justify-between border-b border-pr-border/20 pb-4">
+                 <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-pr-primary/60 italic flex items-center gap-3">
+                     <span className="w-1 h-1 rounded-full bg-pr-primary/40" />
+                     Traveler Intent
+                 </h3>
                  {!hideVoteCounts && (
-                     <span className="text-[10px] text-pr-text-muted font-black uppercase tracking-widest opacity-60">
-                        {Object.keys(encounter.votes).length} Rune{Object.keys(encounter.votes).length !== 1 ? 's' : ''} Cast
+                     <span className="text-[9px] text-pr-text-muted/40 font-black uppercase tracking-[0.2em] italic">
+                        {Object.keys(encounter.votes).length} Sigils Manifested
                      </span>
                  )}
              </div>
              
-             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                  {voteList.map((member, idx) => {
                      const isNum = !isNaN(parseFloat(member.voteValue || ''));
                      const isMax = isNum && parseFloat(member.voteValue!) === maxVote;
@@ -131,37 +135,48 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
                      return (
                          <motion.div
                             key={member.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: idx * 0.04 + 0.1 }}
-                            className={cn(
-                                "flex items-center justify-between p-3 rounded-xl bg-pr-surface/40 border transition-all",
-                                isMax ? "border-pr-secondary/30 bg-pr-secondary/5" : 
-                                isMin ? "border-pr-primary/30 bg-pr-primary/5" :
-                                "border-pr-border/10 hover:border-pr-border/30"
-                            )}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: idx * 0.05 + 0.1, duration: 0.5 }}
+                            className="group"
                          >
-                            <div className="flex items-center gap-3 min-w-0">
-                                <div className={cn(
-                                    "w-8 h-8 rounded-full bg-pr-bg border border-pr-border/20 flex items-center justify-center text-[10px] font-black shrink-0",
-                                    isMax ? "text-pr-secondary border-pr-secondary/20" : isMin ? "text-pr-primary border-pr-primary/20" : "text-pr-text-muted/60"
-                                )}>
-                                   {member.name.substring(0,2).toUpperCase()}
+                            <Panel 
+                                variant="subtle" 
+                                noPadding
+                                className={cn(
+                                    "flex items-center justify-between p-4 transition-all duration-500 border-pr-border/20",
+                                    isMax ? "border-pr-secondary/30 bg-pr-secondary/[0.02] shadow-glow-secondary/5" : 
+                                    isMin ? "border-pr-primary/30 bg-pr-primary/[0.02] shadow-glow-primary/5" :
+                                    "bg-pr-surface/40 hover:border-pr-border/40 hover:bg-pr-surface/60"
+                                )}
+                            >
+                                <div className="flex items-center gap-4 min-w-0">
+                                    <div className={cn(
+                                        "w-10 h-10 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0 transition-all duration-500 border",
+                                        isMax ? "bg-pr-secondary/5 border-pr-secondary/40 text-pr-secondary" : 
+                                        isMin ? "bg-pr-primary/5 border-pr-primary/40 text-pr-primary" : 
+                                        "bg-pr-bg border-pr-border/30 text-pr-text-muted/60"
+                                    )}>
+                                       {member.name.substring(0,2).toUpperCase()}
+                                    </div>
+                                    <div className="flex flex-col min-w-0">
+                                        <span className={cn(
+                                            "text-xs font-black uppercase tracking-widest truncate transition-colors duration-500", 
+                                            !member.voteValue ? "text-pr-text-muted/30 italic" : "text-pr-text/80"
+                                        )}>
+                                            {member.name}
+                                        </span>
+                                        {isMax ? <span className="text-[8px] font-black uppercase text-pr-secondary/60 tracking-widest italic mt-0.5">Peak Value</span> :
+                                         isMin ? <span className="text-[8px] font-black uppercase text-pr-primary/60 tracking-widest italic mt-0.5">Anchor Value</span> : null}
+                                    </div>
                                 </div>
-                                <div className="flex flex-col min-w-0">
-                                    <span className={cn("text-xs font-bold truncate", !member.voteValue ? "text-pr-text-muted italic opacity-50" : "text-pr-text")}>
-                                        {member.name}
-                                    </span>
-                                    {isMax ? <span className="text-[8px] font-black uppercase text-pr-secondary tracking-tighter">Peak Value</span> :
-                                     isMin ? <span className="text-[8px] font-black uppercase text-pr-primary tracking-tighter">Anchor Value</span> : null}
-                                </div>
-                            </div>
-                            
-                            <RuneCardMini 
-                                value={member.voteValue} 
-                                revealed={encounter.isRevealed} 
-                                delay={idx * 0.04 + 0.2} 
-                            />
+                                
+                                <RuneCardMini 
+                                    value={member.voteValue} 
+                                    revealed={encounter.isRevealed} 
+                                    delay={idx * 0.05 + 0.3} 
+                                />
+                            </Panel>
                          </motion.div>
                      );
                  })}

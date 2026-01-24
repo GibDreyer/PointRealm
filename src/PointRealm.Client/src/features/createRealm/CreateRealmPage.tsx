@@ -162,72 +162,81 @@ export function CreateRealmPage() {
     }
   };
 
-  const inputClasses = "w-full p-3 rounded-[var(--pr-radius-md)] bg-pr-bg border border-pr-border focus:border-pr-primary focus:ring-1 focus:ring-pr-primary outline-none transition-all";
-  const labelClasses = "text-sm font-medium text-pr-text mb-1.5 block";
+  const inputClasses = "w-full p-4 rounded-lg bg-pr-bg border border-pr-border/60 focus:border-pr-primary/50 focus:ring-1 focus:ring-pr-primary/30 outline-none transition-all duration-300 text-pr-text placeholder:text-pr-text-muted/30 shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]";
+  const labelClasses = "text-[10px] font-black text-pr-primary/70 mb-1.5 block uppercase tracking-[0.2em]";
 
   return (
     <RealmShell className="justify-center">
        <motion.div 
-         initial={{ opacity: 0, y: 10 }}
-         animate={{ opacity: 1, y: 0 }}
-         className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
+         initial={{ opacity: 0, scale: 0.98 }}
+         animate={{ opacity: 1, scale: 1 }}
+         className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-12 items-start py-8"
        >
           {/* Main Form Panel */}
           <div className="lg:col-span-7">
-              <Panel>
-                  {/* Radial Glow (Summoning Circle effect) */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-pr-primary opacity-[0.02] rounded-full blur-3xl pointer-events-none" />
+              <Panel className="relative">
+                  {/* Local Focal Glow (Summoning Circle effect) */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] bg-pr-primary/[0.03] rounded-full blur-[100px] pointer-events-none" />
 
-                  <header className="mb-6 relative z-10">
+                  <header className="mb-10 relative z-10">
                       <SectionHeader 
-                        title="Create Realm" 
-                        subtitle="Summon a new session"
+                        title="Draft Realm" 
+                        subtitle="Identity & Mechanics"
                       />
                   </header>
 
                   {serverError && (
-                      <div className="mb-6 p-4 rounded-[var(--pr-radius-md)] bg-pr-danger/10 border border-pr-danger text-pr-danger flex items-start gap-3 relative z-10">
-                          <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
+                      <div className="mb-10 p-5 rounded-lg bg-pr-danger/10 border border-pr-danger/30 text-pr-danger flex items-start gap-4 relative z-10 shadow-lg">
+                          <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5 opacity-80" />
                           <div>
-                              <strong className="block font-bold">The spell fizzled.</strong>
-                              <span className="text-sm opacity-90">{serverError}</span>
+                              <strong className="block text-xs uppercase tracking-[0.2em] font-black pb-1">The spell fizzled</strong>
+                              <span className="text-[11px] font-bold italic opacity-70 leading-relaxed">{serverError}</span>
                           </div>
                       </div>
                   )}
 
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 relative z-10">
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-10 relative z-10">
                       
                       {/* Identity */}
-                      <div className="space-y-4">
-                          <h3 className="text-xs uppercase tracking-wider font-bold text-pr-text-muted border-b border-pr-border pb-2">Identity</h3>
+                      <div className="space-y-6">
+                          <div className="flex items-center gap-4 mb-2">
+                             <div className="h-px flex-1 bg-gradient-to-r from-transparent to-pr-border/40" />
+                             <h3 className="text-[10px] uppercase tracking-[0.3em] font-black text-pr-text-muted/60 italic">Sacred Identity</h3>
+                             <div className="h-px flex-1 bg-gradient-to-l from-transparent to-pr-border/40" />
+                          </div>
                           
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label className={labelClasses}>Realm Name <span className="text-pr-text-muted font-normal">(Optional)</span></label>
+                                <label className={labelClasses}>Realm Label</label>
                                 <input
                                     {...form.register("realmName")}
                                     className={inputClasses}
-                                    placeholder="e.g. The Sprint Retrospective"
+                                    placeholder="e.g. Core System Forge"
                                     disabled={isSubmitting}
                                 />
-                                {errors.realmName && <p className="text-xs text-pr-danger mt-1">{errors.realmName.message}</p>}
+                                {errors.realmName && <p className="text-[10px] font-bold uppercase tracking-widest text-pr-danger mt-1.5">{errors.realmName.message}</p>}
                             </div>
 
                             <div>
-                                <label className={labelClasses}>Your Display Name</label>
+                                <label className={labelClasses}>Your Inscription</label>
                                 <input
                                     {...form.register("displayName")}
                                     className={inputClasses}
-                                    placeholder="e.g. Gandalf"
+                                    placeholder="e.g. Archmage"
                                     disabled={isSubmitting}
                                 />
-                                {errors.displayName && <p className="text-xs text-pr-danger mt-1">{errors.displayName.message}</p>}
+                                {errors.displayName && <p className="text-[10px] font-bold uppercase tracking-widest text-pr-danger mt-1.5">{errors.displayName.message}</p>}
                             </div>
                           </div>
                       </div>
 
                       {/* Theme */}
                       <div>
+                           <div className="flex items-center gap-4 mb-6">
+                              <div className="h-px flex-1 bg-gradient-to-r from-transparent to-pr-border/40" />
+                              <h3 className="text-[10px] uppercase tracking-[0.3em] font-black text-pr-text-muted/60 italic">Aesthetic Veil</h3>
+                              <div className="h-px flex-1 bg-gradient-to-l from-transparent to-pr-border/40" />
+                           </div>
                            <Controller
                                control={control}
                                name="themeKey"
@@ -241,13 +250,17 @@ export function CreateRealmPage() {
                       </div>
 
                       {/* Mechanics */}
-                      <div className="space-y-4">
-                          <h3 className="text-xs uppercase tracking-wider font-bold text-pr-text-muted border-b border-pr-border pb-2">Rite & Rules</h3>
+                      <div className="space-y-6">
+                          <div className="flex items-center gap-4 mb-2">
+                              <div className="h-px flex-1 bg-gradient-to-r from-transparent to-pr-border/40" />
+                              <h3 className="text-[10px] uppercase tracking-[0.3em] font-black text-pr-text-muted/60 italic">Rite of Numbers</h3>
+                              <div className="h-px flex-1 bg-gradient-to-l from-transparent to-pr-border/40" />
+                          </div>
                           
-                          <div className="space-y-4">
+                          <div className="space-y-6">
                               <div>
-                                  <label className={labelClasses}>Rune Set (Deck)</label>
-                                  <div className="flex flex-wrap gap-2">
+                                  <label className={labelClasses}>Rune Manifestation (Deck)</label>
+                                  <div className="flex flex-wrap gap-3">
                                       {(["FIBONACCI", "SHORT_FIBONACCI", "TSHIRT", "CUSTOM"] as const).map(type => (
                                           <RuneChip
                                               key={type}
@@ -262,17 +275,21 @@ export function CreateRealmPage() {
                               </div>
 
                               {selectedDeckType === "CUSTOM" && (
-                                  <div>
-                                      <label className={labelClasses}>Custom Values</label>
+                                  <motion.div 
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    className="overflow-hidden"
+                                  >
+                                      <label className={labelClasses}>Custom Lexicon</label>
                                       <input
                                           {...form.register("customDeckValuesInput")}
-                                          className={`${inputClasses} font-mono text-sm`}
-                                          placeholder="0, 1, 2, 3, 5, 8, 13, ?, ☕"
+                                          className={`${inputClasses} font-mono text-xs`}
+                                          placeholder="0, 1, 2, 3, 5, 8, ?, ☕"
                                           disabled={isSubmitting}
                                       />
-                                      <p className="text-xs text-pr-text-muted mt-1">Comma separated. Max 24 values.</p>
-                                      {errors.customDeckValuesInput && <p className="text-xs text-pr-danger mt-1">{errors.customDeckValuesInput.message}</p>}
-                                  </div>
+                                      <p className="text-[10px] text-pr-text-muted mt-2 font-bold italic opacity-60">Comma separated runes. Max 24.</p>
+                                      {errors.customDeckValuesInput && <p className="text-[10px] font-bold uppercase tracking-widest text-pr-danger mt-1.5">{errors.customDeckValuesInput.message}</p>}
+                                  </motion.div>
                               )}
                           </div>
                       </div>
@@ -302,23 +319,49 @@ export function CreateRealmPage() {
                            />
                       </div>
 
-                      <div className="pt-4">
+                      {/* Toggles */}
+                      <div className="space-y-4 p-6 bg-pr-surface/40 rounded-xl border border-pr-border/30 shadow-inner">
+                           <ToggleField 
+                               id="autoReveal" 
+                               description="Instant Revelation"
+                               label="Prophecy reveals when all have inscribed their vote" 
+                               icon={<Eye className="w-4 h-4 text-pr-primary" />}
+                               register={form.register("autoReveal")} 
+                            />
+                           <ToggleField 
+                               id="allowAbstain" 
+                               description="Permit Uncertainty"
+                               label="Allow members to cast the '?' rune" 
+                               icon={<UserX className="w-4 h-4 text-pr-primary" />}
+                               register={form.register("allowAbstain")} 
+                            />
+                           <ToggleField 
+                               id="hideVoteCounts" 
+                               description="Veiled Tally"
+                               label="Hide vote counts during estimation" 
+                               icon={<EyeOff className="w-4 h-4 text-pr-primary" />}
+                               register={form.register("hideVoteCounts")} 
+                            />
+                      </div>
+
+                      <div className="pt-6">
                            <Button
                                 type="submit"
                                 fullWidth
                                 disabled={isSubmitting}
                                 variant="primary"
-                                className="text-lg py-6"
+                                className="py-8 shadow-glow-primary group relative overflow-hidden"
                            >
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                                 {isSubmitting ? (
                                     <>
-                                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                                        Casting Spell...
+                                        <Loader2 className="w-5 h-5 animate-spin mr-3 opacity-80" />
+                                        <span className="tracking-[0.2em] font-black uppercase">Casting Spell...</span>
                                     </>
                                 ) : (
                                     <>
-                                        <Dice5 className="w-5 h-5 mr-2" />
-                                        Summon Realm
+                                        <Dice5 className="w-5 h-5 mr-3 transition-transform group-hover:rotate-180 duration-700 opacity-80" />
+                                        <span className="tracking-[0.2em] font-black uppercase">Summon Realm</span>
                                     </>
                                 )}
                            </Button>
@@ -349,20 +392,20 @@ export function CreateRealmPage() {
 
 // Helper for toggles
 const ToggleField = ({ id, label, description, icon, register }: any) => (
-  <div className="flex items-start gap-3">
-        <div className="flex items-center h-5">
+  <div className="flex items-start gap-4 group cursor-pointer">
+        <div className="flex items-center h-6">
             <input
                 id={id}
                 type="checkbox"
                 {...register}
-                className="w-4 h-4 rounded border-pr-border bg-pr-bg text-pr-primary focus:ring-pr-primary"
+                className="w-4 h-4 rounded border-pr-border/60 bg-pr-bg text-pr-primary focus:ring-pr-primary/50 transition-colors shadow-inner"
             />
         </div>
-        <div>
-            <label htmlFor={id} className="text-sm font-medium text-pr-text flex items-center gap-2">
+        <div className="flex-1">
+            <label htmlFor={id} className="text-[10px] font-black tracking-[0.2em] text-pr-text/90 flex items-center gap-2 uppercase group-hover:text-pr-primary transition-colors">
                 {icon} {description}
             </label>
-            <p className="text-xs text-pr-text-muted">{label}</p>
+            <p className="text-[10px] text-pr-text-muted mt-1 font-bold italic opacity-60 leading-relaxed">{label}</p>
         </div>
    </div>
 );

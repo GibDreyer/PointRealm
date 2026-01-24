@@ -18,14 +18,14 @@ export const RuneChip: React.FC<RuneChipProps> = ({
 
   return (
     <motion.button
-      whileHover={{ scale: 1.05, boxShadow: "0 0 10px var(--pr-primary)" }}
+      whileHover={{ scale: 1.05, y: -2 }}
       whileTap={{ scale: 0.95 }}
       className={cn(
-        "inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider transition-colors",
-        "border border-pr-border",
+        "inline-flex items-center justify-center px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300",
+        "border",
         active 
-          ? "bg-pr-primary text-black border-pr-primary shadow-[0_0_10px_var(--pr-primary)]" 
-          : "bg-pr-surface text-pr-text-muted hover:text-pr-text hover:border-pr-primary/50",
+          ? "bg-pr-primary text-black border-pr-primary shadow-[0_0_20px_-5px_var(--pr-primary)] z-10" 
+          : "bg-pr-surface/60 text-pr-text-muted border-pr-border/50 hover:text-pr-text hover:border-pr-primary/40 hover:bg-pr-surface/80",
         className
       )}
       style={style as any}
