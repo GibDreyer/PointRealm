@@ -80,12 +80,14 @@ export function RealmScreen() {
                         quest={activeQuest || null} 
                         encounter={encounter}
                         settings={settings}
+                        partyRoster={partyRoster}
                         isGM={!!isGM}
                         canVote={!!me && me.role !== "GM"} 
                         myVote={myVote || null}
                         onVote={handleVote}
                         onStartEncounter={(id) => actions.startEncounter(id)}
                     />
+
                 </main>
 
                 {/* Right Panel: Party Roster */}

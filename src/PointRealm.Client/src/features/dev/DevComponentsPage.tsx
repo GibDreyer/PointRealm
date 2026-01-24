@@ -5,6 +5,7 @@ import { QuestLog } from '../realmPlay/components/QuestLog';
 import { PartyRoster } from '../realmPlay/components/PartyRoster';
 import { GMControls } from '../realmPlay/components/GMControls';
 import { useToast } from '../ui/ToastContext';
+import { ProphecyReveal } from '../reveal/ProphecyReveal';
 
 export const DevComponentsPage: React.FC = () => {
   // State for components
@@ -69,23 +70,57 @@ export const DevComponentsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Column 2: Voting Area */}
+      {/* Column 2: Voting & Reveal Area */}
       <div className="lg:col-span-6 flex flex-col items-center justify-center min-h-[400px]">
-        <div className="flex flex-wrap justify-center gap-4">
-          {['1', '2', '3', '5', '8', '13', '?', '☕'].map((val) => (
-            <RuneCard
-              key={val}
-              value={val}
-              selected={selectedRune === val}
-              onSelect={(v) => setSelectedRune(v === selectedRune ? null : v)}
-            />
-          ))}
-        </div>
-        
-        <div className="mt-8 flex gap-4">
-           <RuneCard value="Disabled" disabled onSelect={() => {}} />
-             <RuneCard value="Selected" selected onSelect={() => {}} />
-        </div>
+        {selectedRune === 'REVEAL_DEMO' ? (
+             <div className="w-full h-[600px] border border-border/50 rounded-xl overflow-hidden bg-bg">
+                 <ProphecyReveal 
+                    encounter={{
+                        id: 'dev-enc',
+                        questId: '1',
+                        status: 'Active',
+                        isRevealed: true,
+                        votes: {
+                            '1': '5',
+                            '2': '8',
+                            '3': '5',
+                            '4': '3',
+                            '5': null 
+                        },
+                        distribution: [], // letting component calc for now or mock if needed
+                        suggestedOath: { kind: 'median', value: '5' }
+                    } as any}
+                    partyRoster={members}
+                    isGM={true}
+                    deckValues={['1','2','3','5','8','13','?']}
+                    onSealOutcome={async (val) => addToast(`Sealed: ${val}`, 'success')}
+                    hideVoteCounts={hideVotes}
+                 />
+             </div>
+        ) : (
+            <>
+                <div className="flex flex-wrap justify-center gap-4">
+                  {['1', '2', '3', '5', '8', '13', '?', '☕'].map((val) => (
+                    <RuneCard
+                      key={val}
+                      value={val}
+                      selected={selectedRune === val}
+                      onSelect={(v) => setSelectedRune(v === selectedRune ? null : v)}
+                    />
+                  ))}
+                </div>
+                
+                <div className="mt-8 flex gap-4">
+                   <RuneCard value="Disabled" disabled onSelect={() => {}} />
+                   <button 
+                       className="px-4 py-2 bg-secondary text-black font-bold rounded"
+                       onClick={() => setSelectedRune('REVEAL_DEMO')}
+                   >
+                       Test Reveal Animation
+                   </button>
+                </div>
+            </>
+        )}
       </div>
 
       {/* Column 3: Party Roster */}
