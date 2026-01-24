@@ -118,9 +118,9 @@ export function JoinRealmPage() {
     } catch (err: any) {
         console.error(err);
         
-        // Error Mapping
+        // Error Mapping - ApiError has status directly on the error object
         let msg = "The portal refused to open. Unknown error.";
-        const status = err.response?.status; // Axios style
+        const status = err.status; // ApiError style (from our fetch-based client)
 
         if (status === 404) {
             msg = "That Realm doesn’t exist.";
@@ -128,13 +128,13 @@ export function JoinRealmPage() {
             msg = "That portal has faded. Ask the GM for a new link.";
         } else if (status === 429) {
             msg = "Too many attempts. Try again shortly.";
-        } else if (!status || err.message === 'Network Error') {
+        } else if (!status && (err.message === 'Failed to fetch' || err.message === 'Network Error')) {
             msg = "The portal is unstable. Check your connection.";
-        } else if (typeof err.response?.data === 'string') {
-             // Sometimes server returns text
-             msg = err.response.data;
-        } else if (err.response?.data?.message) {
-             msg = err.response.data.message;
+        } else if (err.data?.detail) {
+            // ProblemDetails format from ASP.NET
+            msg = err.data.detail;
+        } else if (err.message) {
+            msg = err.message;
         }
 
         setError(msg);

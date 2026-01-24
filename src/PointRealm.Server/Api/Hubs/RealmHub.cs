@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +10,7 @@ using PointRealm.Shared.V1.Realtime;
 
 namespace PointRealm.Server.Api.Hubs;
 
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class RealmHub : Hub<IRealmClient>
 {
     private readonly PointRealmDbContext _dbContext;
@@ -21,19 +22,57 @@ public class RealmHub : Hub<IRealmClient>
 
     public override async Task OnConnectedAsync()
     {
-        // Reconnect logic: on hub connect, send full snapshot if user has realm context
+        // On connect, the user is already authenticated via JWT
+        // Extract claims and auto-join their realm group
+        var memberIdStr = Context.User?.FindFirst("memberId")?.Value;
         var realmIdStr = Context.User?.FindFirst("realmId")?.Value;
+        
         if (!string.IsNullOrEmpty(realmIdStr) && Guid.TryParse(realmIdStr, out var realmId))
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, realmIdStr);
-            await SendRealmStateToCallerAsync(realmId);
+            
+            // Store in context for later use
+            Context.Items["RealmId"] = realmIdStr;
+            Context.Items["MemberId"] = memberIdStr;
+            
+            // Send initial state
+            if (!string.IsNullOrEmpty(memberIdStr) && Guid.TryParse(memberIdStr, out var memberId))
+            {
+                var realm = await _dbContext.Realms
+                    .Include(r => r.Members)
+                    .Include(r => r.Quests)
+                    .Include(r => r.Encounters).ThenInclude(e => e.Votes)
+                    .FirstOrDefaultAsync(r => r.Id == realmId);
+
+                if (realm != null)
+                {
+                    var member = realm.Members.FirstOrDefault(m => m.Id == memberId);
+                    if (member != null)
+                    {
+                        await SendRealmSnapshotToCallerAsync(realm, member);
+                    }
+                }
+            }
         }
 
         await base.OnConnectedAsync();
     }
 
-    public async Task JoinRealm(string realmCode, Guid memberToken)
+    /// <summary>
+    /// Explicit join for clients that want to join a specific realm.
+    /// With JWT auth, the realmId is already in claims, so this mainly validates and sends snapshot.
+    /// </summary>
+    public async Task JoinRealm(string realmCode)
     {
+        // Get identity from JWT claims
+        var memberIdStr = Context.User?.FindFirst("memberId")?.Value;
+        var realmIdFromToken = Context.User?.FindFirst("realmId")?.Value;
+        
+        if (string.IsNullOrEmpty(memberIdStr) || !Guid.TryParse(memberIdStr, out var memberId))
+        {
+            throw new HubException("Invalid member identity in token.");
+        }
+
         var realm = await _dbContext.Realms
             .Include(r => r.Members)
             .Include(r => r.Quests)
@@ -42,16 +81,23 @@ public class RealmHub : Hub<IRealmClient>
 
         if (realm == null) throw new HubException("Realm not found.");
 
-        var member = realm.Members.FirstOrDefault(m => m.Id == memberToken);
-        if (member == null) throw new HubException("Member not found.");
+        // Verify the token's realmId matches
+        if (!Guid.TryParse(realmIdFromToken, out var tokenRealmId) || tokenRealmId != realm.Id)
+        {
+            throw new HubException("Token not valid for this realm.");
+        }
 
+        var member = realm.Members.FirstOrDefault(m => m.Id == memberId);
+        if (member == null) throw new HubException("Member not found in realm.");
+
+        // Store in context and join group
         Context.Items["RealmId"] = realm.Id.ToString();
         Context.Items["MemberId"] = member.Id.ToString();
 
         await Groups.AddToGroupAsync(Context.ConnectionId, realm.Id.ToString());
 
-        // On any mutation, broadcast updated snapshot to the realm group
-        await SendRealmStateAsync(realm.Id);
+        // Send snapshot to caller
+        await SendRealmSnapshotToCallerAsync(realm, member);
     }
 
     public async Task SetDisplayName(string name)
@@ -274,6 +320,91 @@ public class RealmHub : Hub<IRealmClient>
             var dto = MapToRealmStateDto(realm);
             await Clients.Caller.RealmStateUpdated(dto);
         }
+    }
+
+    private async Task SendRealmSnapshotToCallerAsync(Realm realm, PartyMember currentMember)
+    {
+        var snapshot = MapToLobbySnapshot(realm, currentMember);
+        await Clients.Caller.RealmSnapshot(snapshot);
+    }
+
+    private async Task SendRealmSnapshotToGroupAsync(Guid realmId, Guid currentMemberId)
+    {
+        var realm = await _dbContext.Realms
+            .Include(r => r.Members)
+            .Include(r => r.Quests)
+            .Include(r => r.Encounters).ThenInclude(e => e.Votes)
+            .FirstOrDefaultAsync(r => r.Id == realmId);
+
+        if (realm == null) return;
+        
+        // For each connected client in the group, send a personalized snapshot
+        // For now, we send a generic snapshot (me will be derived client-side or we need connection tracking)
+        var currentMember = realm.Members.FirstOrDefault(m => m.Id == currentMemberId);
+        if (currentMember != null)
+        {
+            var snapshot = MapToLobbySnapshot(realm, currentMember);
+            await Clients.Caller.RealmSnapshot(snapshot);
+        }
+    }
+
+    private LobbySnapshotDto MapToLobbySnapshot(Realm realm, PartyMember currentMember)
+    {
+        var activeQuest = realm.CurrentQuestId.HasValue 
+            ? realm.Quests.FirstOrDefault(q => q.Id == realm.CurrentQuestId) 
+            : null;
+
+        return new LobbySnapshotDto
+        {
+            Realm = new RealmInfoDto
+            {
+                Code = realm.Code,
+                Name = realm.Name,
+                ThemeKey = realm.Theme,
+                Settings = new LobbyRealmSettingsDto
+                {
+                    DeckType = realm.Settings.Deck.Name,
+                    AutoReveal = realm.Settings.AutoReveal,
+                    AllowAbstain = realm.Settings.AllowAbstain,
+                    HideVoteCounts = realm.Settings.HideVoteCounts
+                }
+            },
+            Me = new MyInfoDto
+            {
+                MemberId = currentMember.Id.ToString(),
+                DisplayName = currentMember.Name,
+                Role = currentMember.IsHost ? "GM" : "Participant"
+            },
+            Party = realm.Members.Select(m => new PartyMemberSnapshotDto
+            {
+                MemberId = m.Id.ToString(),
+                DisplayName = m.Name,
+                Presence = "Online", // Simplified - would need connection tracking
+                VoteState = GetVoteState(m, realm),
+                IsGM = m.IsHost
+            }).ToList(),
+            Portal = new PortalInfoDto
+            {
+                JoinUrl = $"/realm/{realm.Code}"
+            },
+            QuestLogSummary = new QuestLogSummaryDto
+            {
+                TotalQuests = realm.Quests.Count,
+                ActiveQuestId = activeQuest?.Id.ToString(),
+                ActiveQuestTitle = activeQuest?.Title
+            }
+        };
+    }
+
+    private string GetVoteState(PartyMember member, Realm realm)
+    {
+        if (realm.CurrentEncounterId == null) return "NotVoting";
+        
+        var encounter = realm.Encounters.FirstOrDefault(e => e.Id == realm.CurrentEncounterId);
+        if (encounter == null || encounter.Status != EncounterStatus.Voting) return "NotVoting";
+        
+        var hasVoted = encounter.Votes.Any(v => v.PartyMemberId == member.Id);
+        return hasVoted ? "LockedIn" : "Choosing";
     }
 
     private RealmStateDto MapToRealmStateDto(Realm realm)

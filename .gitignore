@@ -33,6 +33,11 @@ pnpm-debug.log*
 # Vite
 /dist/
 
+# SQLite Database Files
+*.db
+*.db-shm
+*.db-wal
+
 # OS
 .DS_Store
 Thumbs.db

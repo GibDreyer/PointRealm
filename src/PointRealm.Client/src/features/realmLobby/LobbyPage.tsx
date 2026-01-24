@@ -59,6 +59,7 @@ export function LobbyPage() {
          if (!realmCode) return;
 
          const token = sessionStorage.getItem(`pointrealm:v1:realm:${realmCode}:token`);
+         
          if (!token) {
              navigate(`/join?realmCode=${realmCode}`);
              return;
@@ -66,11 +67,11 @@ export function LobbyPage() {
 
          try {
              setStatus('connecting');
+             // Token contains memberId and realmId claims - passed via accessTokenFactory
              await hub.connect(token);
              
-             // After connect, join the specific realm group/context
-             // Prompt: "Call JoinRealm(realmCode, memberToken) after connect."
-             await hub.invoke('JoinRealm', realmCode, token);
+             // JoinRealm now only needs the realm code - identity comes from JWT claims
+             await hub.invoke('JoinRealm', realmCode);
              
              setStatus('connected');
          } catch (err) {
@@ -98,11 +99,8 @@ export function LobbyPage() {
         
         hub.on('reconnected', () => {
              console.log("Reconnected - rejoining realm...");
-             // Re-invoke JoinRealm to ensure server state is fresh/subscribed
-             const token = sessionStorage.getItem(`pointrealm:v1:realm:${realmCode}:token`);
-             if (token) {
-                hub.invoke('JoinRealm', realmCode, token).catch(console.error);
-             }
+             // Re-invoke JoinRealm - identity comes from token
+             hub.invoke('JoinRealm', realmCode).catch(console.error);
              setStatus('connected');
         });
 

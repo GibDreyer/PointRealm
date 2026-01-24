@@ -10,6 +10,7 @@ public sealed class Realm : Entity
     private readonly List<Encounter> _encounters = new();
     private readonly List<PartyMember> _members = new();
 
+    public string? Name { get; private set; }
     public string Code { get; private set; }
     public string Theme { get; private set; }
     public RealmSettings Settings { get; private set; }
@@ -22,9 +23,10 @@ public sealed class Realm : Entity
     public IReadOnlyCollection<Encounter> Encounters => _encounters.AsReadOnly();
     public IReadOnlyCollection<PartyMember> Members => _members.AsReadOnly();
 
-    private Realm(string code, string theme, RealmSettings settings, string? createdByUserId) : base(Guid.NewGuid())
+    private Realm(string code, string? name, string theme, RealmSettings settings, string? createdByUserId) : base(Guid.NewGuid())
     {
         Code = code;
+        Name = name;
         Theme = theme;
         Settings = settings;
         CreatedByUserId = createdByUserId;
@@ -33,14 +35,14 @@ public sealed class Realm : Entity
 
     private Realm() { } // EF Core
 
-    public static Result<Realm> Create(string code, string theme, RealmSettings settings, string? createdByUserId = null)
+    public static Result<Realm> Create(string code, string? name, string theme, RealmSettings settings, string? createdByUserId = null)
     {
         if (string.IsNullOrWhiteSpace(code))
         {
             return Result.Failure<Realm>(new Error("Realm.EmptyCode", "Realm code cannot be empty."));
         }
 
-        return new Realm(code, theme, settings, createdByUserId);
+        return new Realm(code, name, theme, settings, createdByUserId);
     }
 
     public void UpdateSettings(RealmSettings newSettings)

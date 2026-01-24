@@ -24,7 +24,9 @@ public class GlobalExceptionHandler : IExceptionHandler
             Status = StatusCodes.Status500InternalServerError,
             Title = "Server Error",
             Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
-            Detail = "An error occurred while processing the request."
+            Detail = httpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment() 
+                ? $"{exception.Message} | {exception.StackTrace}"
+                : "An error occurred while processing the request."
         };
 
         httpContext.Response.StatusCode = problemDetails.Status.Value;

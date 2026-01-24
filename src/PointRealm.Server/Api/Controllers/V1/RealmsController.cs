@@ -19,9 +19,10 @@ public class RealmsController(
     PointRealmDbContext dbContext,
     RealmCodeGenerator codeGenerator,
     RealmAuthorizationService authService,
-    QuestCsvService csvService) : ControllerBase
+    QuestCsvService csvService,
+    MemberTokenService tokenService) : ControllerBase
 {
-    private const string DefaultTheme = "default";
+    private const string DefaultTheme = "dark-fantasy-arcane";
 
     /// <summary>
     /// Creates a new realm (anonymous or authenticated).
@@ -33,7 +34,7 @@ public class RealmsController(
     [ProducesResponseType(typeof(CreateRealmResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<CreateRealmResponse>> CreateRealm(
-        [FromBody] Shared.V1.Api.CreateRealmRequest request,
+        [FromBody] CreateRealmRequest request,
         CancellationToken cancellationToken = default)
     {
         // Generate unique realm code
@@ -51,7 +52,7 @@ public class RealmsController(
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         // Create realm
-        var result = Realm.Create(code, theme, settings, userId);
+        var result = Realm.Create(code, request.RealmName, theme, settings, userId);
         
         if (result.IsFailure)
         {
@@ -65,24 +66,13 @@ public class RealmsController(
         var realm = result.Value;
         dbContext.Realms.Add(realm);
 
-        // If authenticated, add creator as host member
-        if (userId is not null)
-        {
-            var hostMember = PartyMember.Create(
-                realm.Id,
-                $"web-{Guid.NewGuid():N}",
-                "GM",
-                isHost: true,
-                userId);
-            realm.AddMember(hostMember);
-        }
-
         await dbContext.SaveChangesAsync(cancellationToken);
 
         // Build response
         var response = new CreateRealmResponse
         {
-            RealmCode = realm.Code,
+            Code = realm.Code,
+            Name = realm.Name,
             JoinUrl = $"/realm/{realm.Code}",
             ThemeKey = realm.Theme,
             Settings = MapToSettingsDto(realm.Settings)
@@ -130,7 +120,8 @@ public class RealmsController(
 
         var response = new RealmSummaryResponse
         {
-            RealmCode = realm.Code,
+            Code = realm.Code,
+            Name = realm.Name,
             ThemeKey = realm.Theme,
             Settings = MapToSettingsDto(realm.Settings),
             MemberCount = realm.Members.Count,
@@ -139,6 +130,78 @@ public class RealmsController(
         };
 
         return Ok(response);
+    }
+
+    /// <summary>
+    /// Joins a realm and returns a member token.
+    /// </summary>
+    [HttpPost("{code}/join")]
+    [ProducesResponseType(typeof(JoinRealmResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<JoinRealmResponse>> JoinRealm(
+        string code,
+        [FromBody] JoinRealmRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var clientId = Request.Headers["X-PointRealm-ClientId"].ToString();
+        if (string.IsNullOrWhiteSpace(clientId))
+        {
+            return Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "Client Id Required",
+                detail: "X-PointRealm-ClientId header is required.",
+                type: "Auth.ClientIdRequired");
+        }
+
+        var realm = await dbContext.Realms
+            .Include(r => r.Members)
+            .FirstOrDefaultAsync(r => r.Code == code, cancellationToken);
+
+        if (realm is null)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status404NotFound,
+                title: "Realm Not Found",
+                detail: $"No realm found with code '{code}'.",
+                type: "Realm.NotFound");
+        }
+
+        // Check the database directly for the member to be safe
+        var member = await dbContext.PartyMembers
+            .FirstOrDefaultAsync(m => m.RealmId == realm.Id && m.ClientInstanceId == clientId, cancellationToken);
+
+        if (member is null)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var isHost = request.Role?.Equals("GM", StringComparison.OrdinalIgnoreCase) ?? false;
+            
+            member = PartyMember.Create(realm.Id, clientId, request.DisplayName, isHost, userId);
+            dbContext.PartyMembers.Add(member);
+            
+            try 
+            {
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("UNIQUE") == true)
+            {
+                // Concurrency fallback - if they joined at the same time
+                member = await dbContext.PartyMembers
+                    .FirstAsync(m => m.RealmId == realm.Id && m.ClientInstanceId == clientId, cancellationToken);
+            }
+        }
+
+        var role = member.IsHost ? "GM" : (request.Role ?? "Participant");
+        var token = tokenService.GenerateToken(member.Id, realm.Id, role);
+
+        return Ok(new JoinRealmResponse
+        {
+            MemberToken = token,
+            MemberId = member.Id.ToString(),
+            RealmCode = realm.Code,
+            RealmName = realm.Name,
+            ThemeKey = realm.Theme,
+            Role = role
+        });
     }
 
     /// <summary>
@@ -215,12 +278,14 @@ public class RealmsController(
     {
         var deck = RuneDeck.Standard(); // Default deck
         
-        if (!string.IsNullOrWhiteSpace(request?.DeckName))
+        if (request?.DeckType is not null)
         {
-            deck = request.DeckName.ToLowerInvariant() switch
+            deck = request.DeckType.ToUpperInvariant() switch
             {
-                "fibonacci" => RuneDeck.Fibonacci(),
-                "t-shirt" or "tshirt" => RuneDeck.TShirt(),
+                "FIBONACCI" => RuneDeck.Fibonacci(),
+                "SHORT_FIBONACCI" => RuneDeck.ShortFibonacci(),
+                "TSHIRT" => RuneDeck.TShirt(),
+                "CUSTOM" when request.CustomDeckValues != null => RuneDeck.Custom(request.CustomDeckValues),
                 _ => RuneDeck.Standard()
             };
         }

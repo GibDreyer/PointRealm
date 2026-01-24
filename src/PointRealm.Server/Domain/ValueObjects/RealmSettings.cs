@@ -1,14 +1,22 @@
+using System.Text.Json.Serialization;
 using PointRealm.Server.Domain.Primitives;
 
 namespace PointRealm.Server.Domain.ValueObjects;
 
 public sealed class RealmSettings : ValueObject
 {
-    public RuneDeck Deck { get; }
-    public bool AutoReveal { get; }
-    public bool AllowAbstain { get; }
-    public bool HideVoteCounts { get; }
+    public RuneDeck Deck { get; private set; }
+    public bool AutoReveal { get; private set; }
+    public bool AllowAbstain { get; private set; }
+    public bool HideVoteCounts { get; private set; }
 
+    // Parameterless constructor for EF Core
+    private RealmSettings()
+    {
+        Deck = RuneDeck.Standard();
+    }
+
+    [JsonConstructor]
     public RealmSettings(RuneDeck deck, bool autoReveal, bool allowAbstain, bool hideVoteCounts)
     {
         Deck = deck;

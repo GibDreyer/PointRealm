@@ -33,8 +33,11 @@ public static class DependencyInjection
             })
             .AddJwtBearer(options =>
             {
-                var memberTokenSettings = configuration.GetSection(MemberTokenSettings.SectionName).Get<MemberTokenSettings>();
-                var key = System.Text.Encoding.ASCII.GetBytes(memberTokenSettings!.Key);
+                var memberTokenSection = configuration.GetSection(MemberTokenSettings.SectionName);
+                var memberTokenSettings = memberTokenSection.Get<MemberTokenSettings>();
+                
+                string keyStr = memberTokenSettings?.Key ?? configuration["MemberToken:Key"] ?? "default_security_key_for_development_only_12345";
+                var key = System.Text.Encoding.ASCII.GetBytes(keyStr);
 
                 options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                 {

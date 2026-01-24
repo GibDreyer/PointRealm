@@ -22,7 +22,11 @@ public sealed class RealmConfiguration : IEntityTypeConfiguration<Realm>
             settingsBuilder.Property(s => s.Deck)
                 .HasConversion(
                     d => JsonSerializer.Serialize(d, JsonSerializerOptions.Default),
-                    json => JsonSerializer.Deserialize<RuneDeck>(json, JsonSerializerOptions.Default)!);
+                    json => JsonSerializer.Deserialize<RuneDeck>(json, JsonSerializerOptions.Default)!,
+                    new Microsoft.EntityFrameworkCore.ChangeTracking.ValueComparer<RuneDeck>(
+                        (l, r) => JsonSerializer.Serialize(l, JsonSerializerOptions.Default) == JsonSerializer.Serialize(r, JsonSerializerOptions.Default),
+                        v => v == null ? 0 : JsonSerializer.Serialize(v, JsonSerializerOptions.Default).GetHashCode(),
+                        v => JsonSerializer.Deserialize<RuneDeck>(JsonSerializer.Serialize(v, JsonSerializerOptions.Default), JsonSerializerOptions.Default)!));
             
             settingsBuilder.Property(s => s.AutoReveal);
             settingsBuilder.Property(s => s.AllowAbstain);
@@ -34,17 +38,26 @@ public sealed class RealmConfiguration : IEntityTypeConfiguration<Realm>
             .HasForeignKey(x => x.RealmId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.Navigation(x => x.Quests)
+            .HasField("_quests")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
         builder.HasMany(x => x.Encounters)
             .WithOne()
-            .HasForeignKey("RealmId") // Implicit FK if we don't have navigation back to Realm on Encounter, but we do need it if we want cascade delete.
-            .OnDelete(DeleteBehavior.Cascade); // Actually Encounter doesn't have RealmId in my initial plan, only linked via Quest?
-            // Wait, Quest has RealmId. Encounter is linked to Quest. Or is it?
-            // User request said: "Realm contains: ... Current quest and current encounter references".
-            // Implementation plan: Realm has Encounters collection.
-            // Encounter has QuestId.
-            // If Encounter only links to Quest, how does Realm have a collection of Encounters efficiently?
-            // The Realm entity has `_encounters` list. So EF needs to map this.
-            // If I want Realm -> Encounters explicitly, Encounter needs a RealmId FK.
-            // Let's check Encounter entity again.
+            .HasForeignKey("RealmId")
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Navigation(x => x.Encounters)
+            .HasField("_encounters")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.HasMany(x => x.Members)
+            .WithOne(x => x.Realm)
+            .HasForeignKey(x => x.RealmId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Navigation(x => x.Members)
+            .HasField("_members")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

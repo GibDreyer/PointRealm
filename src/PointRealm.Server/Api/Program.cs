@@ -2,6 +2,7 @@ using PointRealm.Server.Api.Infrastructure;
 using PointRealm.Server.Api.Hubs;
 using PointRealm.Server.Application;
 using PointRealm.Server.Infrastructure;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,28 @@ builder.Services.AddHealthChecks()
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+builder.Services.AddCors(options =>
+{
+    var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+
+    options.AddDefaultPolicy(policy =>
+    {
+        if (allowedOrigins.Length > 0)
+        {
+            policy.WithOrigins(allowedOrigins)
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials();
+        }
+        else
+        {
+            // Production safeguard: don't allow credentials with wildcard origins
+            policy.AllowAnyMethod()
+                  .AllowAnyHeader();
+        }
+    });
+});
+
 var app = builder.Build();
 
 var dbPath = app.Configuration.GetValue<string>("POINTREALM_DB_PATH") ?? 
@@ -32,12 +55,21 @@ Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    
+    // Enable Scalar API Reference UI at /scalar/v1
+    app.MapScalarApiReference();
 }
-
-app.UseHttpsRedirection();
+else
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseExceptionHandler();
 
+app.UseWebSockets();
+app.UseCors();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

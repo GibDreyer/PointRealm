@@ -1,17 +1,32 @@
+using System.Text.Json.Serialization;
 using PointRealm.Server.Domain.Primitives;
 
 namespace PointRealm.Server.Domain.ValueObjects;
 
 public sealed class RuneDeck : ValueObject
 {
-    public string Name { get; }
-    private readonly List<RuneCardValue> _cards;
-    public IReadOnlyCollection<RuneCardValue> Cards => _cards.AsReadOnly();
+    public string Name { get; private set; }
+    public List<RuneCardValue> Cards { get; private set; }
 
-    public RuneDeck(string name, IEnumerable<RuneCardValue> cards)
+    // Parameterless constructor for EF Core
+    private RuneDeck()
+    {
+        Name = string.Empty;
+        Cards = new List<RuneCardValue>();
+    }
+
+    [JsonConstructor]
+    public RuneDeck(string name, List<RuneCardValue> cards)
     {
         Name = name;
-        _cards = cards.ToList();
+        Cards = cards;
+    }
+
+    // Factory constructor - for internal use by static factory methods
+    private RuneDeck(string name, IEnumerable<RuneCardValue> cards)
+    {
+        Name = name;
+        Cards = cards.ToList();
     }
 
     public static RuneDeck Standard()
@@ -64,10 +79,38 @@ public sealed class RuneDeck : ValueObject
         });
     }
 
+    public static RuneDeck ShortFibonacci()
+    {
+        return new RuneDeck("Short Fibonacci", new[]
+        {
+            new RuneCardValue("0", 0),
+            new RuneCardValue("1/2", 0.5m),
+            new RuneCardValue("1", 1),
+            new RuneCardValue("2", 2),
+            new RuneCardValue("3", 3),
+            new RuneCardValue("5", 5),
+            new RuneCardValue("8", 8),
+            new RuneCardValue("?", null)
+        });
+    }
+
+    public static RuneDeck Custom(IEnumerable<string> labels)
+    {
+        return new RuneDeck("Custom", labels.Select(label => 
+        {
+            decimal? value = null;
+            if (decimal.TryParse(label, out var parsedValue))
+            {
+                value = parsedValue;
+            }
+            return new RuneCardValue(label, value);
+        }));
+    }
+
     public override IEnumerable<object> GetAtomicValues()
     {
         yield return Name;
-        foreach (var card in _cards)
+        foreach (var card in Cards)
         {
             yield return card;
         }

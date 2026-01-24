@@ -14,12 +14,12 @@ namespace PointRealm.Server.Api.Controllers;
 public class RealmsController(PointRealmDbContext dbContext, RealmAuthorizationService authService, MemberTokenService tokenService) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateRealmRequest request)
+    public async Task<IActionResult> Create([FromBody] LegacyCreateRealmRequest request)
     {
         var settings = RealmSettings.Default(); // Or from request
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         
-        var result = Realm.Create(request.Code, request.Theme, settings, userId);
+        var result = Realm.Create(request.Code, null, request.Theme, settings, userId);
         
         if (result.IsFailure)
         {
@@ -59,7 +59,7 @@ public class RealmsController(PointRealmDbContext dbContext, RealmAuthorizationS
     }
 
     [HttpPost("{code}/join")]
-    public async Task<IActionResult> Join(string code, [FromBody] JoinRealmRequest request)
+    public async Task<IActionResult> Join(string code, [FromBody] LegacyJoinRealmRequest request)
     {
         if (string.IsNullOrWhiteSpace(code)) return BadRequest("Realm code is required.");
         
@@ -100,7 +100,7 @@ public class RealmsController(PointRealmDbContext dbContext, RealmAuthorizationS
         var role = member.IsHost ? "Host" : "Participant"; // Simple role mapping for now
         var token = tokenService.GenerateToken(member.Id, realm.Id, role);
 
-        return Ok(new JoinRealmResponse(token, member.Id, realm.Id, role));
+        return Ok(new LegacyJoinRealmResponse(token, member.Id, realm.Id, role));
     }
 
     [HttpPost("{id}/gm-action")]
@@ -133,6 +133,6 @@ public class RealmsController(PointRealmDbContext dbContext, RealmAuthorizationS
     }
 }
 
-public record CreateRealmRequest(string Code, string Theme, string? ClientInstanceId);
-public record JoinRealmRequest(string? DisplayName);
-public record JoinRealmResponse(string MemberToken, Guid MemberId, Guid RealmId, string Role);
+public record LegacyCreateRealmRequest(string Code, string Theme, string? ClientInstanceId);
+public record LegacyJoinRealmRequest(string? DisplayName);
+public record LegacyJoinRealmResponse(string MemberToken, Guid MemberId, Guid RealmId, string Role);

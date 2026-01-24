@@ -1,5 +1,4 @@
 import * as signalR from "@microsoft/signalr";
-import { getClientId } from "../lib/storage";
 
 const HUB_URL = import.meta.env.VITE_SIGNALR_HUB_URL || "/hubs/realm";
 
@@ -22,10 +21,9 @@ class RealmHub {
 
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl(HUB_URL, {
-          headers: {
-              'X-PointRealm-ClientId': getClientId(),
-              'X-PointRealm-MemberToken': memberToken
-          }
+          // Pass the JWT token via accessTokenFactory for SignalR authentication
+          // The server extracts this from the query string and validates it
+          accessTokenFactory: () => memberToken
       })
       .withAutomaticReconnect()
       .build();
