@@ -1,0 +1,28 @@
+.panel {
+  background: var(--pr-surface-slate);
+  border: 1px solid var(--pr-surface-border);
+  border-radius: var(--pr-radius-lg);
+  box-shadow: var(--pr-shadow-lg), 
+              0 0 0 1px rgba(255, 255, 255, 0.05) inset; /* Inner highlight */
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+}
+
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("https://www.transparenttextures.com/patterns/dark-stone.png"); /* Concrete/Stone texture override or similar */
+  opacity: 0.15;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Optional glow for specific panels if needed */
+.panelGlow {
+  box-shadow: var(--pr-shadow-lg),
+              var(--pr-shadow-glow-cyan);
+  border-color: color-mix(in srgb, var(--pr-primary-cyan) 30%, var(--pr-surface-border));
+}

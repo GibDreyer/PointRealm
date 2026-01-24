@@ -50,17 +50,17 @@ export default {
         },
         // PointRealm Theme Tokens
         pr: {
-          bg: "var(--pr-bg)",
-          surface: "var(--pr-surface)",
-          "surface-2": "var(--pr-surface2)",
-          text: "var(--pr-text)",
+          bg: "var(--pr-bg-dark)",
+          surface: "var(--pr-surface-slate)",
+          "surface-2": "var(--pr-surface-elevated)", // Mapped to elevated
+          text: "var(--pr-text-primary)",
           "text-muted": "var(--pr-text-muted)",
-          primary: "var(--pr-primary)",
-          secondary: "var(--pr-secondary)",
+          primary: "var(--pr-primary-cyan)",
+          secondary: "var(--pr-secondary-gold)",
           success: "var(--pr-success)",
           danger: "var(--pr-danger)",
-          border: "var(--pr-border)",
-          shadow: "var(--pr-shadow)",
+          border: "var(--pr-border-color)",
+          shadow: "var(--pr-shadow-md)",
         },
       },
       borderRadius: {

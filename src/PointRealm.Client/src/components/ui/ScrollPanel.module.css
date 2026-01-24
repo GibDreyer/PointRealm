@@ -1,0 +1,23 @@
+.scrollPanel {
+  background: var(--pr-surface-inset);
+  border-radius: var(--pr-radius-md);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5); /* Inner shadow for depth */
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Custom scrollbar matching the theme is crucial here if not handled globally, 
+   but global scrollbar is set in index.css. We can refine if needed. */
+.scrollPanel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollPanel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollPanel::-webkit-scrollbar-thumb {
+  background: var(--pr-surface-border);
+  border-radius: 99px;
+}

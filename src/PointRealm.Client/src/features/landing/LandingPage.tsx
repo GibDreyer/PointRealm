@@ -51,18 +51,18 @@ export const LandingPage: React.FC = () => {
         >
           <motion.div variants={{ hidden: enterFrom, show: enter }}>
             <Button
-              variant="ghost"
+              variant="primary"
               onClick={() => navigate('/create')}
-              className={`${styles.heroButton} ${styles.primaryButton} normal-case text-base sm:text-lg tracking-[0.08em]`}
+              className={styles.heroButton}
             >
               Create Realm
             </Button>
           </motion.div>
           <motion.div variants={{ hidden: enterFrom, show: enter }}>
             <Button
-              variant="ghost"
+              variant="secondary"
               onClick={() => navigate('/join')}
-              className={`${styles.heroButton} ${styles.secondaryButton} normal-case text-base sm:text-lg tracking-[0.08em]`}
+              className={styles.heroButton}
             >
               Join Realm
             </Button>

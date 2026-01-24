@@ -1,0 +1,91 @@
+.wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.label {
+  color: var(--pr-text-primary);
+  font-family: var(--pr-body-font);
+  font-size: 0.95rem;
+}
+
+.switch {
+  position: relative;
+  width: 52px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.track {
+  position: absolute;
+  inset: 0;
+  background-color: var(--pr-surface-inset);
+  border: 1px solid var(--pr-surface-border);
+  border-radius: 999px;
+  transition: all 0.3s var(--pr-ease-out);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.input:checked + .track {
+  background-color: rgba(74, 158, 255, 0.15); /* Cyan tint */
+  border-color: var(--pr-primary-dim);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5), 0 0 10px var(--pr-primary-glow);
+}
+
+.thumb {
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 3px;
+  background-color: var(--pr-text-muted);
+  border-radius: 50%;
+  transition: transform 0.3s var(--pr-ease-out), background-color 0.3s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.input:checked + .track .thumb {
+  transform: translateX(26px);
+  background-color: var(--pr-primary-cyan);
+  box-shadow: 0 0 10px var(--pr-primary-cyan);
+}
+
+/* Runes/Arrows decoration for the "Summoning" feel */
+.track::before, .track::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid var(--pr-surface-border);
+  border-bottom: 2px solid var(--pr-surface-border);
+  opacity: 0.5;
+  transition: border-color 0.3s;
+}
+
+.track::before {
+  left: 8px;
+  transform: translateY(-50%) rotate(135deg); /* Left Arrow */
+}
+
+.track::after {
+  right: 8px;
+  transform: translateY(-50%) rotate(-45deg); /* Right Arrow */
+}
+
+.input:checked + .track::after {
+  border-color: var(--pr-primary-cyan);
+  opacity: 1;
+}

@@ -13,66 +13,82 @@
 
 .baseGradient {
   background:
-    radial-gradient(1200px 680px at 50% 8%,
-      color-mix(in srgb, var(--pr-primary) 22%, transparent) 0%,
-      transparent 62%),
-    radial-gradient(1000px 700px at 50% 80%,
-      color-mix(in srgb, var(--pr-secondary) 14%, transparent) 0%,
-      transparent 68%),
+    radial-gradient(1400px 800px at 50% 15%,
+      color-mix(in srgb, var(--pr-primary) 18%, transparent) 0%,
+      transparent 70%),
+    radial-gradient(1200px 900px at 50% 85%,
+      color-mix(in srgb, var(--pr-secondary) 12%, transparent) 0%,
+      transparent 75%),
     linear-gradient(180deg,
-      color-mix(in srgb, var(--pr-bg) 92%, black) 0%,
-      color-mix(in srgb, var(--pr-bg) 85%, black) 50%,
-      color-mix(in srgb, var(--pr-bg) 90%, black) 100%);
+      #030508 0%,
+      #050a10 50%,
+      #020406 100%);
+  animation: nebulaPulse 25s ease-in-out infinite alternate;
+}
+
+@keyframes nebulaPulse {
+  0% { transform: scale(1); filter: brightness(0.9); }
+  100% { transform: scale(1.15); filter: brightness(1.1); }
 }
 
 .backdrop {
-  background-image: url("../../../images/landing-background_default.jpeg");
-  background-size: cover;
-  background-position: center top;
-  opacity: 0.38;
-  filter: saturate(1.12) brightness(0.86) contrast(1.08);
-  mix-blend-mode: screen;
+  display: none; /* Removing static image */
+}
+
+@keyframes drift {
+  from { background-position: 45% 45%; }
+  to { background-position: 55% 55%; }
 }
 
 .stars {
   position: absolute;
   inset: 0;
+  opacity: 0.6;
+}
+
+.nebulaSystem {
+  position: absolute;
+  inset: -10%;
+  transform: rotate(-15deg);
+  opacity: 0.5;
+  filter: blur(2px);
+  mix-blend-mode: color-dodge;
 }
 
 .embers {
   position: absolute;
   inset: 0;
-  opacity: 0.7;
+  opacity: 0.4;
   mix-blend-mode: screen;
 }
 
 .fog {
   position: absolute;
-  inset: -10%;
-  filter: blur(60px);
-  opacity: 0.3;
+  inset: -25%;
+  filter: blur(100px);
+  opacity: 0.35;
   mix-blend-mode: screen;
 }
 
 .fogOne {
-  background: radial-gradient(60% 60% at 20% 30%,
-      color-mix(in srgb, var(--pr-primary) 18%, transparent) 0%,
+  background: radial-gradient(70% 70% at 20% 30%,
+      color-mix(in srgb, var(--pr-primary) 22%, transparent) 0%,
       transparent 70%);
-  animation: fogDrift 12s ease-in-out infinite;
+  animation: fogDrift 15s ease-in-out infinite;
 }
 
 .fogTwo {
-  background: radial-gradient(55% 55% at 80% 40%,
-      color-mix(in srgb, var(--pr-secondary) 16%, transparent) 0%,
+  background: radial-gradient(65% 65% at 80% 40%,
+      color-mix(in srgb, var(--pr-secondary) 18%, transparent) 0%,
       transparent 68%);
-  animation: fogDriftReverse 14s ease-in-out infinite;
+  animation: fogDriftReverse 18s ease-in-out infinite;
 }
 
 .fogThree {
-  background: radial-gradient(50% 50% at 50% 70%,
-      color-mix(in srgb, var(--pr-text-muted) 14%, transparent) 0%,
+  background: radial-gradient(60% 60% at 50% 70%,
+      color-mix(in srgb, var(--pr-text-muted) 16%, transparent) 0%,
       transparent 72%);
-  animation: fogPulse 10s ease-in-out infinite;
+  animation: fogPulse 12s ease-in-out infinite;
 }
 
 .horizon {
@@ -89,6 +105,12 @@
       color-mix(in srgb, var(--pr-bg) 80%, black) 100%);
   opacity: 0.7;
   pointer-events: none;
+  animation: shimmer 8s ease-in-out infinite alternate;
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.5; filter: brightness(0.9); }
+  100% { opacity: 0.8; filter: brightness(1.1); }
 }
 
 .foreground {
@@ -104,7 +126,7 @@
 .noise {
   position: absolute;
   inset: 0;
-  opacity: 0.05;
+  opacity: 0.08; /* Slightly more noise for texture */
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
@@ -120,32 +142,40 @@
 .runeShimmer {
   position: absolute;
   inset: 0;
-  opacity: 0.08;
+  opacity: 0.12;
   mix-blend-mode: screen;
   background:
-    radial-gradient(120px 120px at 12% 18%,
-      color-mix(in srgb, var(--pr-primary) 25%, transparent) 0%,
+    radial-gradient(140px 140px at 12% 18%,
+      color-mix(in srgb, var(--pr-primary) 30%, transparent) 0%,
       transparent 70%),
-    radial-gradient(140px 140px at 88% 16%,
-      color-mix(in srgb, var(--pr-primary) 18%, transparent) 0%,
+    radial-gradient(160px 160px at 88% 16%,
+      color-mix(in srgb, var(--pr-primary) 22%, transparent) 0%,
       transparent 72%),
-    radial-gradient(160px 160px at 10% 88%,
-      color-mix(in srgb, var(--pr-secondary) 12%, transparent) 0%,
+    radial-gradient(180px 180px at 10% 88%,
+      color-mix(in srgb, var(--pr-secondary) 15%, transparent) 0%,
       transparent 75%),
-    radial-gradient(180px 180px at 90% 85%,
-      color-mix(in srgb, var(--pr-secondary) 10%, transparent) 0%,
+    radial-gradient(200px 200px at 90% 85%,
+      color-mix(in srgb, var(--pr-secondary) 12%, transparent) 0%,
       transparent 78%);
+  animation: runePulse 10s ease-in-out infinite alternate;
 }
 
-.wrapper[data-reduced-motion="true"] .fog {
+@keyframes runePulse {
+  from { opacity: 0.08; }
+  to { opacity: 0.15; }
+}
+
+.wrapper[data-reduced-motion="true"] .fog,
+.wrapper[data-reduced-motion="true"] .baseGradient,
+.wrapper[data-reduced-motion="true"] .backdrop,
+.wrapper[data-reduced-motion="true"] .horizon,
+.wrapper[data-reduced-motion="true"] .runeShimmer {
   animation: none;
-  opacity: 0.25;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fog {
+  .fog, .baseGradient, .backdrop, .horizon, .runeShimmer {
     animation: none;
-    opacity: 0.25;
   }
 }
 
@@ -164,36 +194,36 @@
 }
 
 .wrapper[data-variant="realm"] .fog {
-  opacity: 0.22;
-  filter: blur(70px);
+  opacity: 0.25;
+  filter: blur(80px);
 }
 
 .wrapper[data-variant="realm"] .fogOne {
-  animation-duration: 36s;
-}
-
-.wrapper[data-variant="realm"] .fogTwo {
   animation-duration: 40s;
 }
 
+.wrapper[data-variant="realm"] .fogTwo {
+  animation-duration: 45s;
+}
+
 .wrapper[data-variant="realm"] .fogThree {
-  animation-duration: 34s;
+  animation-duration: 38s;
 }
 
 @keyframes fogDrift {
   0% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(2%, -3%, 0) scale(1.05); }
+  50% { transform: translate3d(3%, -4%, 0) scale(1.08); }
   100% { transform: translate3d(0, 0, 0) scale(1); }
 }
 
 @keyframes fogDriftReverse {
   0% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(-2%, 2%, 0) scale(1.04); }
+  50% { transform: translate3d(-3%, 3%, 0) scale(1.06); }
   100% { transform: translate3d(0, 0, 0) scale(1); }
 }
 
 @keyframes fogPulse {
-  0% { opacity: 0.28; transform: translate3d(0, 0, 0) scale(1); }
-  50% { opacity: 0.4; transform: translate3d(0, -2%, 0) scale(1.03); }
-  100% { opacity: 0.28; transform: translate3d(0, 0, 0) scale(1); }
+  0% { opacity: 0.3; transform: translate3d(0, 0, 0) scale(1); }
+  50% { opacity: 0.5; transform: translate3d(0, -3%, 0) scale(1.05); }
+  100% { opacity: 0.3; transform: translate3d(0, 0, 0) scale(1); }
 }

@@ -27,74 +27,85 @@ const densityMap: Record<Density, number> = {
 };
 
 const getCount = (base: number, density: Density, isMobile: boolean, reducedMotion: boolean) => {
-  const mobileScale = isMobile ? 0.56 : 1;
-  const reducedScale = reducedMotion ? 0.5 : 1;
+  const mobileScale = isMobile ? 0.6 : 1;
+  const reducedScale = reducedMotion ? 0.4 : 1;
   return Math.max(1, Math.round(base * densityMap[density] * mobileScale * reducedScale));
 };
 
-export const getStarfieldOptions = (
+export const getParticleOptions = (
   themeTokens: ThemeTokens,
   reducedMotion: boolean,
   density: Density,
   isMobile: boolean,
-  variant: 'stars' | 'embers'
+  type: 'stars' | 'nebula' | 'embers'
 ): ISourceOptions => {
-  const isStars = variant === 'stars';
-  const baseCount = isStars ? 80 : 6;
+  const isStars = type === 'stars';
+  const isNebula = type === 'nebula';
+  
+  let baseCount = 80;
+  if (isNebula) baseCount = 150;
+  if (type === 'embers') baseCount = 10;
+
   const count = getCount(baseCount, density, isMobile, reducedMotion);
-
-  const speedRange: [number, number] = isStars ? [0.15, 0.35] : [0.08, 0.18];
-  const speed = reducedMotion ? 0.02 : speedRange[1];
-
-  const sizeRange: [number, number] = isStars ? [0.6, 1.8] : [1.0, 2.5];
-  const opacityRange: [number, number] = isStars ? [0.4, 0.9] : [0.15, 0.35];
 
   return {
     fullScreen: { enable: false },
     detectRetina: true,
     fpsLimit: 60,
-    pauseOnBlur: true,
-    pauseOnOutsideViewport: true,
     particles: {
       number: {
         value: count,
-        density: {
-          enable: true,
-          area: 900,
-        },
+        density: { enable: true, area: 900 },
       },
       color: {
-        value: isStars
-          ? [themeTokens.textMuted, themeTokens.primary]
-          : [themeTokens.secondary],
+        value: isStars ? ["#ffffff", themeTokens.primary] : 
+               isNebula ? [themeTokens.primary, themeTokens.secondary, "#ffffff"] :
+               [themeTokens.secondary],
       },
       opacity: {
-        value: { min: opacityRange[0], max: opacityRange[1] },
+        value: isStars ? { min: 0.4, max: 1 } : 
+               isNebula ? { min: 0.1, max: 0.4 } : 
+               { min: 0.2, max: 0.6 },
         animation: {
-          enable: isStars && !reducedMotion,
-          speed: 0.4,
-          minimumValue: opacityRange[0],
+          enable: !reducedMotion,
+          speed: isStars ? 1 : 0.5,
+          minimumValue: 0.1,
           sync: false,
         },
       },
       size: {
-        value: { min: sizeRange[0], max: sizeRange[1] },
+        value: isStars ? { min: 0.5, max: 2 } : 
+               isNebula ? { min: 1, max: 3 } : 
+               { min: 1, max: 4 },
+        animation: {
+          enable: !reducedMotion,
+          speed: 1,
+          minimumValue: 0.5,
+          sync: false
+        }
       },
       move: {
         enable: true,
-        speed,
+        speed: isStars ? 0.4 : isNebula ? 0.2 : 0.3,
         direction: 'none',
+        random: true,
         straight: false,
         outModes: { default: 'out' },
+        attract: {
+            enable: !reducedMotion,
+            rotate: { x: 600, y: 1200 }
+        }
       },
       shape: { type: 'circle' },
-    },
-    interactivity: {
-      events: {
-        onHover: { enable: false, mode: [] },
-        onClick: { enable: false, mode: [] },
-        resize: true,
-      },
+      // Add twinkling effect for nebula
+      twinkle: isNebula ? {
+        particles: {
+            enable: true,
+            color: "#ffffff",
+            frequency: 0.05,
+            opacity: 1
+        }
+      } : undefined
     },
   };
 };
@@ -128,21 +139,9 @@ export const StarfieldBackground: React.FC<StarfieldBackgroundProps> = ({
     await loadSlim(engine);
   }, []);
 
-  const starsOptions = useMemo(
-    () => getStarfieldOptions(themeTokens, shouldReduceMotion, density, isMobile, 'stars'),
-    [themeTokens, shouldReduceMotion, density, isMobile]
-  );
-
-  const embersOptions = useMemo(
-    () => getStarfieldOptions(themeTokens, shouldReduceMotion, density, isMobile, 'embers'),
-    [themeTokens, shouldReduceMotion, density, isMobile]
-  );
-  const showParticles = variant === 'default';
-  const showEmbers = variant === 'default';
-  const showBackdrop = variant === 'default';
-  const showHorizon = variant === 'default';
-  const showForeground = variant === 'default';
-  const showRunes = variant === 'realm';
+  const starOptions = useMemo(() => getParticleOptions(themeTokens, shouldReduceMotion, density, isMobile, 'stars'), [themeTokens, shouldReduceMotion, density, isMobile]);
+  const nebulaOptions = useMemo(() => getParticleOptions(themeTokens, shouldReduceMotion, density, isMobile, 'nebula'), [themeTokens, shouldReduceMotion, density, isMobile]);
+  const emberOptions = useMemo(() => getParticleOptions(themeTokens, shouldReduceMotion, density, isMobile, 'embers'), [themeTokens, shouldReduceMotion, density, isMobile]);
 
   return (
     <div
@@ -152,15 +151,24 @@ export const StarfieldBackground: React.FC<StarfieldBackgroundProps> = ({
       data-variant={variant}
     >
       <div className={`${styles.layer} ${styles.baseGradient}`} />
-      {showBackdrop && <div className={`${styles.layer} ${styles.backdrop}`} />}
-      {showParticles && <Particles className={styles.stars} init={particlesInit} options={starsOptions} />}
-      {showEmbers && <Particles className={styles.embers} init={particlesInit} options={embersOptions} />}
+      
+      {/* Background Star Layer */}
+      <Particles className={styles.stars} init={particlesInit} options={starOptions} />
+      
+      {/* Nebula/Cosmic Dust Layer */}
+      <div className={styles.nebulaSystem}>
+         <Particles className={styles.nebula} init={particlesInit} options={nebulaOptions} />
+      </div>
+
       <div className={`${styles.fog} ${styles.fogOne}`} />
       <div className={`${styles.fog} ${styles.fogTwo}`} />
       <div className={`${styles.fog} ${styles.fogThree}`} />
-      {showHorizon && <div className={styles.horizon} />}
-      {showForeground && <div className={styles.foreground} />}
-      {showRunes && <div className={styles.runeShimmer} />}
+
+      {/* Embers/Foreground Sparks */}
+      <Particles className={styles.embers} init={particlesInit} options={emberOptions} />
+
+      <div className={styles.horizon} />
+      <div className={styles.foreground} />
       <div className={styles.vignette} />
       <div className={styles.noise} />
     </div>

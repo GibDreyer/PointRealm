@@ -1,0 +1,53 @@
+:root {
+  /* --- Colors: Core --- */
+  --pr-bg-dark: #050a10;        /* Deep void background */
+  --pr-bg-dark-end: #0b121e;    /* Gradient end */
+  
+  --pr-surface-slate: #13171f;  /* Panel base */
+  --pr-surface-elevated: #1a202c; /* Hover/Card */
+  --pr-surface-inset: #0a0c10;  /* Scroll areas/Inputs */
+  --pr-surface-border: #2a303b; 
+
+  /* --- Colors: Accents --- */
+  --pr-primary-cyan: #4a9eff;   /* Arcane Cyan (bright) */
+  --pr-primary-dim: #2b5c7a;    /* Azure (dimmed) */
+  --pr-primary-glow: rgba(74, 158, 255, 0.4);
+
+  --pr-secondary-gold: #e6b04e; /* Ember Gold */
+  --pr-secondary-dim: #8a6a2e;
+  --pr-secondary-glow: rgba(230, 176, 78, 0.3);
+
+  /* --- Colors: Text --- */
+  --pr-text-primary: #e2e8f0;   /* Bright Slate */
+  --pr-text-muted: #94a3b8;     /* Muted Slate */
+  --pr-text-dim: #64748b;       /* Very dim Slate */
+
+  /* --- Colors: Status --- */
+  --pr-success: #4ade80;
+  --pr-danger: #ef4444;
+  --pr-warning: #f59e0b;
+
+  /* --- Borders & Shadows --- */
+  --pr-border-color: #334155;
+  --pr-border-gold: #5c4d32;
+  --pr-border-cyan: #1e3a5f;
+
+  --pr-shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+  --pr-shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.5);
+  --pr-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
+  --pr-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+  --pr-shadow-glow-cyan: 0 0 15px rgba(74, 158, 255, 0.15);
+  --pr-shadow-glow-gold: 0 0 15px rgba(230, 176, 78, 0.15);
+
+  /* --- Typography --- */
+  /* Fonts defined in index.css imports, mapped here for consistency if needed or just use var(--pr-heading-font) */
+
+  /* --- Layout & Shape --- */
+  --pr-radius-sm: 0.125rem;
+  --pr-radius-md: 0.25rem;
+  --pr-radius-lg: 0.5rem;
+  --pr-radius-full: 9999px;
+
+  /* --- Animation --- */
+  --pr-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}

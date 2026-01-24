@@ -1,7 +1,7 @@
 import React from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { StarfieldBackground } from '@/components/backgrounds/StarfieldBackground';
+import { FantasySky3D } from '@/components/backgrounds/FantasySky3D';
 
 interface PageShellProps {
   children: React.ReactNode;
@@ -28,10 +28,9 @@ export const PageShell: React.FC<PageShellProps> = ({
   return (
     <div className={cn("relative min-h-screen w-full overflow-hidden bg-pr-bg text-pr-text", className)}>
       {showBackground && (
-        <StarfieldBackground
-          density={backgroundDensity}
-          reducedMotion={shouldReduceMotion}
-          variant={backgroundVariant}
+        <FantasySky3D 
+          variant={backgroundVariant} 
+          reducedMotion={shouldReduceMotion} 
         />
       )}
       <main className={cn("relative z-10 min-h-screen w-full", contentClassName)}>

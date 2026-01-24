@@ -1,0 +1,48 @@
+.input {
+  width: 100%;
+  background: var(--pr-surface-inset);
+  border: 1px solid var(--pr-surface-border);
+  color: var(--pr-text-primary);
+  padding: 0.75rem 1rem;
+  border-radius: var(--pr-radius-md);
+  font-family: var(--pr-body-font);
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.input::placeholder {
+  color: var(--pr-text-dim);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--pr-primary-cyan);
+  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.1);
+}
+
+.input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.label {
+  display: block;
+  font-family: var(--pr-heading-font);
+  font-size: 0.85rem;
+  color: var(--pr-secondary-gold);
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.helper {
+  font-size: 0.8rem;
+  color: var(--pr-text-dim);
+  margin-bottom: 0.5rem;
+}
+
+.error {
+  font-size: 0.8rem;
+  color: var(--pr-danger);
+  margin-top: 0.3rem;
+}

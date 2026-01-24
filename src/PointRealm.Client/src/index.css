@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:ital,wght@0,100..900;1,100..900&family=Fira+Code:wght@300..700&display=swap');
+@import './theme/tokens.css';
 
 :root {
   --pr-heading-font: 'Cinzel', serif;
@@ -14,10 +15,43 @@ html, body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background-color: #0a0b14; /* Fallback for dark-fantasy-arcane */
+  background-color: var(--pr-bg-dark);
+  color: var(--pr-text-primary);
+  font-family: var(--pr-body-font);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Global Utility: Bevel Clip Path (4 corners) */
+.clip-path-bevel {
+  clip-path: polygon(
+    8px 0, 
+    calc(100% - 8px) 0, 
+    100% 8px, 
+    100% calc(100% - 8px), 
+    calc(100% - 8px) 100%, 
+    8px 100%, 
+    0 calc(100% - 8px), 
+    0 8px
+  );
+}
+
+/* Global Utility: Text Shadow & Glows for Dark Fantasy look */
+.text-glow-cyan {
+  color: #fff;
+  text-shadow: 
+    0 0 10px rgba(6, 182, 212, 0.8),
+    0 0 20px rgba(6, 182, 212, 0.4);
+}
+.text-glow-gold {
+  color: var(--pr-secondary-gold);
+  text-shadow: 
+    0 0 10px rgba(230, 176, 78, 0.6),
+    0 0 20px rgba(230, 176, 78, 0.3);
+}
+.font-serif-fantasy {
+  font-family: var(--pr-heading-font);
 }
 
 /* Global Noise Overlay Utility */
@@ -26,14 +60,28 @@ html, body {
   inset: 0;
   z-index: 50;
   pointer-events: none;
-  opacity: 0.04;
-  background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre.png"); /* Subtle grain */
+  opacity: 0.035;
+  background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre.png");
   mix-blend-mode: overlay;
 }
 
 ::selection {
-  background-color: var(--pr-primary);
-  color: black;
+  background-color: var(--pr-primary-cyan);
+  color: #000;
 }
 
-/* Base scrollbar reset is in base.css, keeping index.css focused on global foundational styles */
+/* Scrollbar styling override using new tokens */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--pr-surface-slate);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--pr-surface-border);
+  border-radius: var(--pr-radius-md);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--pr-text-muted);
+}

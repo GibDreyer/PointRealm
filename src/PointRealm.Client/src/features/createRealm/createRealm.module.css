@@ -1,313 +1,169 @@
 .page {
-  min-height: 100svh;
-  min-height: 100vh;
-  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: clamp(1.5rem, 4vw, 3.5rem);
-  gap: clamp(1rem, 2.5vw, 2rem);
-  text-align: center;
-  box-sizing: border-box;
+  min-height: 100vh;
+  padding: 2rem;
+  position: relative;
+  z-index: 10;
 }
 
 .panel {
+  width: 100%;
+  max-width: 600px;
+  /* Panel component handles surface/border */
   position: relative;
-  width: min(100%, 720px);
-  padding: clamp(1.75rem, 3vw, 2.75rem);
-  border-radius: var(--pr-radius-xl);
-  border: 1px solid color-mix(in srgb, var(--pr-border) 80%, transparent);
-  background:
-    linear-gradient(180deg,
-      color-mix(in srgb, var(--pr-surface) 85%, transparent) 0%,
-      color-mix(in srgb, var(--pr-surface) 92%, transparent) 100%),
-    var(--pr-texture-surface-texture);
-  background-size: cover;
-  box-shadow: var(--pr-shadow-soft);
-  overflow: hidden;
-  text-align: center;
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
 }
 
-.panel::before {
-  content: "";
+/* Summoning Circle Background */
+.summoningCircle {
   position: absolute;
-  inset: -30% -25%;
-  background:
-    radial-gradient(circle at center,
-      transparent 58%,
-      color-mix(in srgb, var(--pr-primary) 20%, transparent) 60%,
-      transparent 62%);
-  opacity: 0.2;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 900px;
+  height: 900px;
   pointer-events: none;
+  z-index: -1;
+  opacity: 0.6;
+  background-image: url("https://www.transparenttextures.com/patterns/stardust.png"); /* Placeholder for ring graphic if no SVG available, but likely needs SVG */
+  /* Using CSS radial gradients for the ring effect */
+  background:
+    radial-gradient(circle at center, transparent 30%, 
+      color-mix(in srgb, var(--pr-primary-cyan) 10%, transparent) 31%, 
+      transparent 32%),
+    radial-gradient(circle at center, transparent 40%, 
+      color-mix(in srgb, var(--pr-primary-cyan) 5%, transparent) 41%, 
+      transparent 42%);
+  border-radius: 50%;
+  animation: rotateCircle 60s linear infinite;
 }
 
-.panel::after {
-  content: "";
-  position: absolute;
-  inset: -20% -15%;
-  background: radial-gradient(circle at center,
-    color-mix(in srgb, var(--pr-primary) 18%, transparent) 0%,
-    transparent 60%);
-  opacity: 0.35;
-  filter: blur(40px);
-  pointer-events: none;
+@keyframes rotateCircle {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 .header {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-}
-
-.error {
-  margin-top: 1.25rem;
-  padding: 0.75rem 1rem;
-  border-radius: var(--pr-radius-md);
-  border: 1px solid color-mix(in srgb, var(--pr-danger) 40%, transparent);
-  background: color-mix(in srgb, var(--pr-danger) 10%, transparent);
-  color: var(--pr-danger);
-  display: grid;
-  gap: 0.25rem;
-  text-align: left;
-}
-
-.errorTitle {
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-weight: 700;
-}
-
-.errorMessage {
-  font-size: 0.75rem;
-  color: color-mix(in srgb, var(--pr-danger) 80%, var(--pr-text));
+  margin-bottom: 2rem;
+  text-align: center;
+  padding: 2rem 2rem 0;
 }
 
 .form {
-  position: relative;
-  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 0 2rem 2rem;
+}
+
+/* Using ScrollPanel for the main content area inside if needed, or just standard flow.
+   Mock shows a single contained panel. */
+
+.fieldGroup {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  margin-top: 1.5rem;
-  text-align: left;
-}
-
-.formGrid {
-  display: grid;
-  gap: 1.5rem;
-}
-
-.formColumn {
-  display: grid;
-  gap: 1.5rem;
-}
-
-.fieldGroup {
-  display: grid;
-  gap: 1.25rem;
-}
-
-.field {
-  display: grid;
-  gap: 0.4rem;
 }
 
 .label {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: color-mix(in srgb, var(--pr-text-muted) 75%, var(--pr-text));
-  font-weight: 700;
-}
-
-.helper {
-  margin: 0;
-  font-size: 0.8rem;
-  color: color-mix(in srgb, var(--pr-text-muted) 70%, var(--pr-text));
+  display: block;
+  color: var(--pr-secondary-gold); /* Gold labels per mock */
+  font-family: var(--pr-heading-font);
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+  text-align: center;
 }
 
 .input {
   width: 100%;
-  padding: 0.8rem 1rem;
-  border-radius: var(--pr-radius-lg);
-  border: 1px solid color-mix(in srgb, var(--pr-border) 80%, transparent);
-  background: color-mix(in srgb, var(--pr-bg) 90%, var(--pr-surface));
-  color: var(--pr-text);
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--pr-surface-border);
+  color: var(--pr-text-primary);
+  padding: 0.75rem 1rem;
+  border-radius: var(--pr-radius-md);
   font-family: var(--pr-body-font);
-  font-size: 0.95rem;
-  transition: border-color var(--pr-motion-fast-ms) var(--pr-loop-easing);
+  font-size: 1rem;
+  transition: all 0.2s;
 }
 
-.input::placeholder {
-  color: color-mix(in srgb, var(--pr-text-muted) 45%, transparent);
-}
-
-.input:focus-visible {
+.input:focus {
   outline: none;
-  border-color: color-mix(in srgb, var(--pr-primary) 55%, var(--pr-border));
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--pr-primary) 20%, transparent);
+  border-color: var(--pr-primary-cyan);
+  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.1);
+  background: rgba(0,0,0,0.5);
 }
 
-.errorInline {
-  font-size: 0.75rem;
-  color: var(--pr-danger);
-  margin: 0.25rem 0 0;
-}
-
-.section {
-  display: grid;
-  gap: 0.9rem;
-}
-
-.sectionHeader {
-  display: grid;
-  gap: 0.25rem;
+.helper {
+  font-size: 0.8rem;
+  color: var(--pr-text-dim);
+  margin-bottom: 0.5rem;
+  text-align: center; /* Centered form text per mock */
 }
 
 .sectionTitle {
-  margin: 0;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: color-mix(in srgb, var(--pr-text-muted) 80%, var(--pr-text));
-}
-
-.sectionSubtitle {
-  margin: 0;
-  font-size: 0.85rem;
-  color: color-mix(in srgb, var(--pr-text-muted) 75%, var(--pr-text));
-}
-
-.optionRow {
+  color: var(--pr-secondary-gold);
+  font-family: var(--pr-heading-font);
+  font-size: 1.1rem;
+  text-align: center;
+  margin-bottom: 1rem;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.sectionTitle::before, .sectionTitle::after {
+  content: "";
+  height: 1px;
+  width: 30px;
+  background: linear-gradient(90deg, transparent, var(--pr-secondary-gold), transparent);
+  opacity: 0.5;
 }
 
 .toggleList {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 0.75rem;
-}
-
-.toggleIcon {
-  width: 16px;
-  height: 16px;
-  color: var(--pr-primary);
+  background: rgba(0,0,0,0.2);
+  padding: 1.5rem;
+  border-radius: var(--pr-radius-lg);
+  border: 1px solid var(--pr-surface-border);
 }
 
 .actions {
-  display: grid;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-}
-
-.primaryButton {
-  height: 56px;
-  border-radius: var(--pr-radius-lg);
-  border: 1px solid color-mix(in srgb, var(--pr-primary) 35%, var(--pr-border));
-  background:
-    linear-gradient(180deg,
-      color-mix(in srgb, var(--pr-primary) 22%, var(--pr-surface) 70%) 0%,
-      color-mix(in srgb, var(--pr-surface) 88%, black) 60%,
-      color-mix(in srgb, var(--pr-surface) 72%, black) 100%);
-  color: var(--pr-text);
-  font-family: var(--pr-heading-font);
-  box-shadow: 0 16px 24px -18px color-mix(in srgb, black 70%, transparent);
-}
-
-.primaryButton:hover {
-  filter: brightness(1.05);
-}
-
-.primaryButton:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--pr-primary) 40%, transparent);
-}
-
-.spinner {
-  width: 18px;
-  height: 18px;
-  margin-right: 0.5rem;
-}
-
-.disclaimer {
-  margin: 0;
-  font-size: 0.75rem;
-  color: color-mix(in srgb, var(--pr-text-muted) 80%, var(--pr-text));
+  margin-top: 1rem;
   text-align: center;
 }
 
-.inlineLink {
-  color: var(--pr-text);
-  text-decoration: none;
-  border-bottom: 1px solid color-mix(in srgb, var(--pr-border) 70%, transparent);
-}
-
-.inlineLink:hover {
-  color: var(--pr-primary);
-  border-color: color-mix(in srgb, var(--pr-primary) 40%, transparent);
+/* Footer layout */
+.footer {
+  margin-top: 2rem;
+  opacity: 0.6;
 }
 
 .backRow {
-  width: min(100%, 720px);
-  display: flex;
-  justify-content: flex-start;
+  position: absolute;
+  bottom: 2rem;
+  left: 2rem;
 }
 
 .backLink {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
+  color: var(--pr-text-muted);
   background: none;
   border: none;
-  color: color-mix(in srgb, var(--pr-text-muted) 75%, var(--pr-text));
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
   cursor: pointer;
-  padding: 0.25rem 0.4rem;
+  font-size: 0.9rem;
+  transition: color 0.2s;
 }
 
 .backLink:hover {
-  color: var(--pr-text);
-}
-
-.backLink:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--pr-primary) 35%, transparent);
-  border-radius: 999px;
-}
-
-.backIcon {
-  width: 14px;
-  height: 14px;
-}
-
-.footer {
-  display: grid;
-  align-items: center;
-  justify-items: center;
-}
-
-@media (max-width: 640px) {
-  .panel {
-    padding: 1.5rem;
-  }
-}
-
-@media (min-width: 960px) {
-  .panel {
-    width: min(100%, 940px);
-  }
-
-  .formGrid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    column-gap: 2rem;
-  }
-
-  .page {
-    gap: clamp(0.75rem, 1.6vw, 1.5rem);
-  }
+  color: var(--pr-text-primary);
 }

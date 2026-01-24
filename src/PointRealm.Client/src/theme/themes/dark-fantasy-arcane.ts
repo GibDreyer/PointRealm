@@ -7,17 +7,17 @@ export const darkFantasyArcane: Theme = {
   version: '1.0.0',
   tokens: {
     colors: {
-      bg: '#06070a', // Deeper black/navy
-      surface: '#0f1117', // Slate panels
-      surfaceElevated: '#1a1d26',
-      text: '#f8fafc', // Slate 50
-      textMuted: '#94a3b8', // Slate 400
-      border: '#1e293b', // Slate 800
-      primary: '#06b6d4', // Arcane Cyan
-      secondary: '#fbbf24', // Amber/Ember Gold (Vibrant)
-      success: '#10b981', // Potion Green
-      danger: '#f43f5e', // Blood Red
-      warning: '#f59e0b',
+      bg: '#050a10',        // --pr-bg-dark
+      surface: '#13171f',   // --pr-surface-slate
+      surfaceElevated: '#1a202c', // --pr-surface-elevated
+      text: '#e2e8f0',      // --pr-text-primary
+      textMuted: '#94a3b8', // --pr-text-muted
+      border: '#2a303b',    // --pr-surface-border
+      primary: '#4a9eff',   // --pr-primary-cyan
+      secondary: '#e6b04e', // --pr-secondary-gold
+      success: '#4ade80',   // --pr-success
+      danger: '#ef4444',    // --pr-danger
+      warning: '#f59e0b',   // --pr-warning
       info: '#3b82f6',
     },
     glow: {
