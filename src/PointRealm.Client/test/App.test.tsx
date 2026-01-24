@@ -12,6 +12,6 @@ describe('LandingPage', () => {
       </MemoryRouter>
     );
     expect(screen.getByText('PointRealm')).toBeInTheDocument();
-    expect(screen.getByText('Adventure awaits.')).toBeInTheDocument();
+    expect(screen.getByText('Co-op estimation, RPG style.')).toBeInTheDocument();
   });
 });

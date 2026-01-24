@@ -92,7 +92,6 @@ export function RealmScreen() {
                 <aside className="hidden lg:flex w-[260px] xl:w-[300px] flex-col h-full border-l border-[var(--pr-border)]">
                     <PartyRosterPanel 
                         members={partyRoster.members}
-                        isGM={!!isGM}
                         currentMemberId={myMemberId || ""}
                         hideVoteCounts={settings.hideVoteCounts}
                         encounterStatus={encounter?.isRevealed ? 'revealed' : (encounter ? 'voting' : 'idle')}

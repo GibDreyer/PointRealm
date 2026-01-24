@@ -471,7 +471,7 @@ public class RealmHub : Hub<IRealmClient>
 
         // Status logic: ready/choosing/disconnected
         string status = "ready";
-        if (activeEncounter != null && activeEncounter.Status == EncounterStatus.Voting)
+        if (activeEncounter is not null && activeEncounter.Status == EncounterStatus.Voting)
         {
             var hasVoted = activeEncounter.Votes?.Any(v => v?.PartyMemberId == m.Id) ?? false;
             status = hasVoted ? "ready" : "choosing";
