@@ -1,28 +1,53 @@
 .panel {
-  background: var(--pr-surface-slate);
-  border: 1px solid var(--pr-surface-border);
+  background: linear-gradient(
+    145deg, 
+    rgba(19, 23, 31, 0.95) 0%, 
+    rgba(10, 12, 16, 0.98) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--pr-radius-lg);
-  box-shadow: var(--pr-shadow-lg), 
-              0 0 0 1px rgba(255, 255, 255, 0.05) inset; /* Inner highlight */
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.9), /* Deep shadow */
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset, /* Inner rim */
+    0 0 40px rgba(0, 0, 0, 0.5) inset; /* Inner vignette */
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
 }
 
 .panel::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url("https://www.transparenttextures.com/patterns/dark-stone.png"); /* Concrete/Stone texture override or similar */
-  opacity: 0.15;
+  /* Subtle grain/noise texture for reality */
+  background-image: url("https://www.transparenttextures.com/patterns/stardust.png"); 
+  opacity: 0.1;
   mix-blend-mode: overlay;
   pointer-events: none;
   z-index: 0;
 }
 
-/* Optional glow for specific panels if needed */
+/* Elegant top highlight */
+.panel::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.2) 20%, 
+    rgba(255, 255, 255, 0.2) 80%, 
+    transparent 100%
+  );
+  opacity: 0.6;
+}
+
 .panelGlow {
-  box-shadow: var(--pr-shadow-lg),
-              var(--pr-shadow-glow-cyan);
-  border-color: color-mix(in srgb, var(--pr-primary-cyan) 30%, var(--pr-surface-border));
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.9),
+    0 0 30px rgba(74, 158, 255, 0.1);
+  border-color: rgba(74, 158, 255, 0.2);
 }

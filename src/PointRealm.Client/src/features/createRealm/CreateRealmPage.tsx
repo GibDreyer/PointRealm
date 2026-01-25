@@ -168,65 +168,67 @@ export function CreateRealmPage() {
   return (
     <PageShell
       backgroundDensity="medium"
-      backgroundVariant="realm" // Use realm variant to possibly show runes or different bg
+      backgroundVariant="realm"
       reducedMotion={prefersReducedMotion}
       contentClassName={styles.page}
     >
       <div className={styles.summoningCircle} aria-hidden="true" />
       
+      <div className={styles.backRow}>
+        <button type="button" className={styles.backLink} onClick={() => navigate("/")} aria-label="Back to Tavern"> 
+          <ArrowLeft className={styles.backIcon} />
+        </button>
+      </div>
+
       <motion.div
-        initial={prefersReducedMotion ? false : { opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: prefersReducedMotion ? 0 : 0.25, ease: "easeOut" }}
+        initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: prefersReducedMotion ? 0 : 0.4, ease: [0.16, 1, 0.3, 1] }}
         className="w-full flex justify-center z-10"
       >
         <Panel className={styles.panel}>
           <PageHeader
             title="Create Realm"
-            subtitle="Summon a new session."
+            subtitle="Summon a new session"
             size="panel"
             className={styles.header}
           />
 
           {serverError && (
-            <div className={styles.error}>
-              <span className={styles.errorTitle}>The spell fizzled</span>
-              <span className={styles.errorMessage}>{serverError}</span>
+            <div className="mx-8 mb-4 p-3 bg-red-900/20 border border-red-500/30 rounded text-center">
+              <span className="text-red-400 font-medium block text-sm">The spell fizzled</span>
+              <span className="text-red-300/80 text-xs">{serverError}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
             <div className={styles.formGrid}>
               
-              {/* Left Column */}
+              {/* Left Column: Core Identity */}
               <div className={styles.formColumn}>
                 
                 <section className={styles.section}>
                   <div className={styles.sectionHeader}>
-                     <h2 className={styles.sectionTitle}>Realm Name</h2>
+                     <h2 className={styles.sectionTitle}>Identity</h2>
                   </div>
                   <div className={styles.field}>
                     <Input
+                      label="Realm Name"
                       {...form.register("realmName")}
-                      placeholder="Optional name for your realm"
+                      placeholder="Optional name..."
                       disabled={isSubmitting}
                       error={errors.realmName?.message}
-                      className="bg-black/30 border-white/10" // Overlay specific style if needed or rely on default
+                      className="bg-black/20"
                     />
-                  </div>
-                </section>
-
-                <section className={styles.section}>
-                  <div className={styles.sectionHeader}>
-                     <h2 className={styles.sectionTitle}>Display Name</h2>
                   </div>
                   <div className={styles.field}>
                     <Input
+                      label="Your Name"
                       {...form.register("displayName")}
                       placeholder="e.g. Archmage"
                       disabled={isSubmitting}
                       error={errors.displayName?.message}
-                      helper="Name shown to other players"
+                      className="bg-black/20"
                     />
                   </div>
                 </section>
@@ -251,9 +253,9 @@ export function CreateRealmPage() {
                   {selectedDeckType === "CUSTOM" && (
                     <motion.div
                       className={styles.field}
-                      initial={prefersReducedMotion ? false : { opacity: 0, y: -6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: prefersReducedMotion ? 0 : 0.2, ease: "easeOut" }}
+                      initial={prefersReducedMotion ? false : { opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      transition={{ duration: 0.2 }}
                     >
                       <Input
                         label="Custom Values"
@@ -262,49 +264,49 @@ export function CreateRealmPage() {
                         placeholder="0, 1, 2, 3, 5, 8, ?"
                         disabled={isSubmitting}
                         error={errors.customDeckValuesInput?.message}
+                        className="bg-black/20"
                       />
                     </motion.div>
                   )}
                 </section>
               </div>
 
-              {/* Right Column */}
+              {/* Right Column: Settings & Rituals */}
               <div className={styles.formColumn}>
                 
                 <section className={styles.section}>
                   <div className={styles.sectionHeader}>
-                    <h2 className={styles.sectionTitle}>Realm Rituals</h2>
+                    <h2 className={styles.sectionTitle}>Rituals</h2>
                   </div>
                   <div className={styles.toggleList}>
-                    {/* Manual Layout for Toggle Row to match mock */}
-                    <div className="flex items-center justify-between p-2 rounded-lg bg-black/20 border border-white/5 hover:border-white/10 transition-colors">
+                    <div className="flex items-center justify-between py-2 px-1 hover:bg-white/5 rounded transition-colors">
                         <div className="flex items-center gap-3">
-                           <Eye className="w-4 h-4 text-[var(--pr-primary-cyan)]" />
+                           <Eye className="w-4 h-4 text-[var(--pr-primary-cyan)] opacity-70" />
                            <div className="flex flex-col text-left">
-                               <span className="text-sm font-medium text-[var(--pr-text-primary)]">Prophecy reveals when all have voted</span>
-                               <span className="text-xs text-[var(--pr-text-muted)]">Auto reveal</span>
+                               <span className="text-sm font-medium text-[var(--pr-text-primary)]">Auto Reveal</span>
+                               <span className="text-[10px] text-[var(--pr-text-muted)] uppercase tracking-wide">When all voted</span>
                            </div>
                         </div>
                         <Toggle {...form.register("autoReveal")} disabled={isSubmitting} />
                     </div>
 
-                    <div className="flex items-center justify-between p-2 rounded-lg bg-black/20 border border-white/5 hover:border-white/10 transition-colors">
+                    <div className="flex items-center justify-between py-2 px-1 hover:bg-white/5 rounded transition-colors">
                         <div className="flex items-center gap-3">
-                           <UserX className="w-4 h-4 text-[var(--pr-primary-cyan)]" />
+                           <UserX className="w-4 h-4 text-[var(--pr-primary-cyan)] opacity-70" />
                            <div className="flex flex-col text-left">
-                               <span className="text-sm font-medium text-[var(--pr-text-primary)]">Permit uncertainty (?)</span>
-                               <span className="text-xs text-[var(--pr-text-muted)]">Allow abstain</span>
+                               <span className="text-sm font-medium text-[var(--pr-text-primary)]">Allow Abstain</span>
+                               <span className="text-[10px] text-[var(--pr-text-muted)] uppercase tracking-wide">Permit uncertainty</span>
                            </div>
                         </div>
                         <Toggle {...form.register("allowAbstain")} disabled={isSubmitting} />
                     </div>
 
-                    <div className="flex items-center justify-between p-2 rounded-lg bg-black/20 border border-white/5 hover:border-white/10 transition-colors">
+                    <div className="flex items-center justify-between py-2 px-1 hover:bg-white/5 rounded transition-colors">
                         <div className="flex items-center gap-3">
-                           <EyeOff className="w-4 h-4 text-[var(--pr-primary-cyan)]" />
+                           <EyeOff className="w-4 h-4 text-[var(--pr-primary-cyan)] opacity-70" />
                            <div className="flex flex-col text-left">
-                               <span className="text-sm font-medium text-[var(--pr-text-primary)]">Hide vote counts</span>
-                               <span className="text-xs text-[var(--pr-text-muted)]">Visibility</span>
+                               <span className="text-sm font-medium text-[var(--pr-text-primary)]">Hide Counts</span>
+                               <span className="text-[10px] text-[var(--pr-text-muted)] uppercase tracking-wide">Until reveal</span>
                            </div>
                         </div>
                         <Toggle {...form.register("hideVoteCounts")} disabled={isSubmitting} />
@@ -314,13 +316,13 @@ export function CreateRealmPage() {
 
                 <section className={styles.section}>
                   <div className={styles.sectionHeader}>
-                    <h2 className={styles.sectionTitle}>Theme</h2>
+                    <h2 className={styles.sectionTitle}>Atmosphere</h2>
                   </div>
                   <Controller
                     control={control}
                     name="themeKey"
                     render={({ field }) => (
-                      <ThemePicker selectedThemeKey={field.value} onThemeSelect={field.onChange} />
+                      <ThemePicker selectedThemeKey={field.value || "dark-fantasy-arcane"} onThemeSelect={field.onChange} />
                     )}
                   />
                 </section>
@@ -331,35 +333,27 @@ export function CreateRealmPage() {
             <div className={styles.actions}>
               <Button
                 type="submit"
-                fullWidth
                 disabled={isSubmitting}
                 variant="primary"
-                className="h-14 text-base tracking-[0.2em]"
+                className="w-full md:w-auto min-w-[300px] h-14 text-lg tracking-[0.2em] uppercase"
               >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="animate-spin mr-2" />
-                    Creating Realm...
+                    Summoning...
                   </>
                 ) : (
                   "Create Realm"
                 )}
               </Button>
               <p className={styles.disclaimer}>
-                By creating a realm, you agree to the{" "}
+                By entering the realm, you agree to the{" "}
                 <a className={styles.inlineLink} href="/code-of-conduct">Code of Conduct</a>.
               </p>
             </div>
           </form>
         </Panel>
       </motion.div>
-
-      <div className={styles.backRow}>
-        <button type="button" className={styles.backLink} onClick={() => navigate("/")}> 
-          <ArrowLeft className={styles.backIcon} />
-          Back to Tavern
-        </button>
-      </div>
 
       <footer className={styles.footer}>
         <PageFooter tipUrl={tipUrl} tipIsExternal={tipIsExternal} />

@@ -4,19 +4,23 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 2rem;
+  padding: 1rem;
   position: relative;
   z-index: 10;
 }
 
 .panel {
   width: 100%;
-  max-width: 600px;
-  /* Panel component handles surface/border */
+  max-width: 1000px; /* Wider for 2-column "Character Sheet" feel */
   position: relative;
-  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5);
+  /* Enhanced RPG finish */
+  box-shadow: 
+    0 0 0 1px rgba(255, 255, 255, 0.1), /* Inner rim */
+    0 20px 50px -10px rgba(0, 0, 0, 0.7);
+  background: var(--pr-surface-slate);
   display: flex;
   flex-direction: column;
+  overflow: visible; /* Allow decorative elements to bleed if needed */
 }
 
 /* Summoning Circle Background */
@@ -24,146 +28,181 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  width: 900px;
-  height: 900px;
+  transform: translate(-50%, -50%) scale(1.2);
+  width: 100vh;
+  height: 100vh;
+  max-width: 1000px;
+  max-height: 1000px;
   pointer-events: none;
   z-index: -1;
-  opacity: 0.6;
-  background-image: url("https://www.transparenttextures.com/patterns/stardust.png"); /* Placeholder for ring graphic if no SVG available, but likely needs SVG */
-  /* Using CSS radial gradients for the ring effect */
+  opacity: 0.4;
   background:
     radial-gradient(circle at center, transparent 30%, 
-      color-mix(in srgb, var(--pr-primary-cyan) 10%, transparent) 31%, 
+      rgba(74, 158, 255, 0.08) 31%, 
       transparent 32%),
-    radial-gradient(circle at center, transparent 40%, 
-      color-mix(in srgb, var(--pr-primary-cyan) 5%, transparent) 41%, 
-      transparent 42%);
+    radial-gradient(circle at center, transparent 45%, 
+      rgba(74, 158, 255, 0.05) 46%, 
+      transparent 47%);
   border-radius: 50%;
-  animation: rotateCircle 60s linear infinite;
+  animation: rotateCircle 120s linear infinite;
 }
 
 @keyframes rotateCircle {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to { transform: translate(-50%, -50%) rotate(360deg); }
+  from { transform: translate(-50%, -50%) scale(1.2) rotate(0deg); }
+  to { transform: translate(-50%, -50%) scale(1.2) rotate(360deg); }
 }
 
 .header {
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
   text-align: center;
-  padding: 2rem 2rem 0;
+  padding: 2rem 2rem 0.5rem;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 0 2rem 2rem;
+  gap: 1.5rem;
+  padding: 1rem 2.5rem 2.5rem;
+  width: 100%;
 }
 
-/* Using ScrollPanel for the main content area inside if needed, or just standard flow.
-   Mock shows a single contained panel. */
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
 
-.fieldGroup {
+@media (min-width: 800px) {
+  .formGrid {
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 3rem;
+    align-items: start;
+  }
+}
+
+.formColumn {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-.label {
-  display: block;
-  color: var(--pr-secondary-gold); /* Gold labels per mock */
-  font-family: var(--pr-heading-font);
-  font-size: 1.1rem;
-  margin-bottom: 0.4rem;
-  text-align: center;
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
-.input {
-  width: 100%;
-  background: rgba(0,0,0,0.3);
-  border: 1px solid var(--pr-surface-border);
-  color: var(--pr-text-primary);
-  padding: 0.75rem 1rem;
-  border-radius: var(--pr-radius-md);
-  font-family: var(--pr-body-font);
-  font-size: 1rem;
-  transition: all 0.2s;
-}
-
-.input:focus {
-  outline: none;
-  border-color: var(--pr-primary-cyan);
-  box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.1);
-  background: rgba(0,0,0,0.5);
-}
-
-.helper {
-  font-size: 0.8rem;
-  color: var(--pr-text-dim);
-  margin-bottom: 0.5rem;
-  text-align: center; /* Centered form text per mock */
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
 }
 
 .sectionTitle {
   color: var(--pr-secondary-gold);
   font-family: var(--pr-heading-font);
-  font-size: 1.1rem;
-  text-align: center;
-  margin-bottom: 1rem;
-  display: flex;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
+  gap: 0.75rem;
+  width: 100%;
 }
 
-.sectionTitle::before, .sectionTitle::after {
+.sectionTitle::after {
   content: "";
+  flex: 1;
   height: 1px;
-  width: 30px;
-  background: linear-gradient(90deg, transparent, var(--pr-secondary-gold), transparent);
-  opacity: 0.5;
+  background: linear-gradient(90deg, var(--pr-secondary-gold), transparent);
+  opacity: 0.3;
+}
+
+/* Grid for rune options to ensure perfect fit */
+.optionRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 500px) {
+  .optionRow {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.field {
+  position: relative;
 }
 
 .toggleList {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  background: rgba(0,0,0,0.2);
-  padding: 1.5rem;
-  border-radius: var(--pr-radius-lg);
-  border: 1px solid var(--pr-surface-border);
 }
 
+/* Actions Area */
 .actions {
   margin-top: 1rem;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Footer layout */
-.footer {
-  margin-top: 2rem;
-  opacity: 0.6;
+.disclaimer {
+  font-size: 0.75rem;
+  color: var(--pr-text-dim);
 }
+
+.inlineLink {
+  color: var(--pr-primary-cyan);
+  text-decoration: none;
+}
+.inlineLink:hover {
+  text-decoration: underline;
+}
+
+/* Footer & Back layout */
+.footer {
+  margin-top: 1rem;
+  opacity: 0.5;
+  font-size: 0.8rem;
+}
+
 
 .backRow {
   position: absolute;
-  bottom: 2rem;
+  top: 2rem;
   left: 2rem;
+  z-index: 20;
 }
 
 .backLink {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   color: var(--pr-text-muted);
-  background: none;
-  border: none;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--pr-surface-border);
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: color 0.2s;
+  transition: all 0.2s;
 }
 
 .backLink:hover {
   color: var(--pr-text-primary);
+  border-color: var(--pr-primary-cyan);
+  background: rgba(74, 158, 255, 0.1);
+}
+
+.backIcon {
+  width: 20px;
+  height: 20px;
 }
