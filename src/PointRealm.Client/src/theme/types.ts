@@ -61,6 +61,8 @@ export const themeSchema = z.object({
   effects: z.object({
     particlesEnabled: z.boolean().optional(),
     vignettePulseEnabled: z.boolean().optional(),
+    vibe: z.enum(['space', 'forest', 'water', 'fire', 'arcane']).optional(),
+    particleColor: z.string().optional(),
   }).optional(),
 });
 

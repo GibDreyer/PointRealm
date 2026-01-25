@@ -59,5 +59,7 @@ export const darkFantasyArcane: Theme = {
   effects: {
     particlesEnabled: true,
     vignettePulseEnabled: true,
+    vibe: 'arcane',
+    particleColor: '#4a9eff',
   }
 };

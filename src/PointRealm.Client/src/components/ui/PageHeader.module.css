@@ -122,13 +122,13 @@
 }
 
 .panel .title {
-  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-size: clamp(2rem, 3.5vw, 2.5rem);
   color: #fff;
 }
 
 .panel .subtitle {
-  font-size: clamp(1rem, 2.2vw, 1.2rem);
-  color: var(--pr-secondary-gold);
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  color: #e5e7eb;
 }
 
 @media (max-width: 640px) {

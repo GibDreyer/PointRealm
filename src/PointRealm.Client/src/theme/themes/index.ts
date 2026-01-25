@@ -5,8 +5,8 @@ const themes: Record<string, Theme> = {
   [darkFantasyArcane.key]: darkFantasyArcane,
 };
 
-// Stubs for other themes (can be expanded later)
-const createStubTheme = (key: string, name: string, primary: string, secondary: string): Theme => ({
+// Stubs for other themes
+const createStubTheme = (key: string, name: string, primary: string, secondary: string, bg: string, vibe: 'space' | 'forest' | 'water' | 'fire' | 'arcane'): Theme => ({
   ...darkFantasyArcane,
   key,
   name,
@@ -14,19 +14,29 @@ const createStubTheme = (key: string, name: string, primary: string, secondary: 
     ...darkFantasyArcane.tokens,
     colors: {
       ...darkFantasyArcane.tokens.colors,
+      bg,
+      surface: `color-mix(in srgb, ${bg}, white 5%)`,
+      surfaceElevated: `color-mix(in srgb, ${bg}, white 10%)`,
       primary,
       secondary,
     }
+  },
+  effects: {
+    ...darkFantasyArcane.effects,
+    vibe,
+    particleColor: primary,
   }
 });
 
-const frostRealm = createStubTheme('frost-realm', 'Frost Realm', '#38bdf8', '#a78bfa');
-const emberRealm = createStubTheme('ember-realm', 'Ember Realm', '#f97316', '#ef4444');
-const voidRealm = createStubTheme('void-realm', 'Void Realm', '#a855f7', '#6366f1');
+const celestialVoid = createStubTheme('celestial-void', 'Celestial Void', '#a855f7', '#6366f1', '#050510', 'space');
+const emeraldGrove = createStubTheme('emerald-grove', 'Emerald Grove', '#10b981', '#fbbf24', '#041a10', 'forest');
+const abyssalTide = createStubTheme('abyssal-tide', 'Abyssal Tide', '#0ea5e9', '#06b6d4', '#02101a', 'water');
+const infernalKeep = createStubTheme('infernal-keep', 'Infernal Keep', '#ef4444', '#f59e0b', '#1a0505', 'fire');
 
-themes[frostRealm.key] = frostRealm;
-themes[emberRealm.key] = emberRealm;
-themes[voidRealm.key] = voidRealm;
+themes[celestialVoid.key] = celestialVoid;
+themes[emeraldGrove.key] = emeraldGrove;
+themes[abyssalTide.key] = abyssalTide;
+themes[infernalKeep.key] = infernalKeep;
 
 export const themeRegistry = themes;
 

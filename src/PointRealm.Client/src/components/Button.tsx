@@ -126,51 +126,21 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
 }, ref) => {
   const { style, ...filteredProps } = props;
 
-  // Define thematic color scales for the RPG SVG
-  const themes = {
-    primary: {
-      accentLight: "#7dd3fc", // Cyan/Sky Light
-      accentMain: "#0ea5e9",  // Mid
-      accentDim: "#0369a1",   // Deep
-      accentDark: "#0c1a2b",  // Void
-      text: "#ffffff",
-      glow: "0 0 40px rgba(14, 165, 233, 0.45)",
-    },
-    secondary: { // The Golden Variant
-      accentLight: "#fbbf24", // Amber/Gold Light
-      accentMain: "#d97706",  // Mid
-      accentDim: "#92400e",   // Deep
-      accentDark: "#2d1a0a",  // Void
-      text: "#ffffff",
-      glow: "0 0 40px rgba(217, 119, 6, 0.45)",
-    },
-    danger: {
-      accentLight: "#fca5a5", // Red Light
-      accentMain: "#dc2626",  // Mid
-      accentDim: "#991b1b",   // Deep
-      accentDark: "#2d0a0a",  // Void
-      text: "#ffffff",
-      glow: "0 0 40px rgba(220, 38, 38, 0.45)",
-    },
-    ghost: {
-      accentLight: "transparent",
-      accentMain: "transparent",
-      accentDim: "transparent",
-      accentDark: "transparent",
-      text: "var(--pr-text-muted)",
-      glow: "",
-    }
-  };
-
-  const currentTheme = themes[variant];
-
-  // Pass these colors down to the SVG via CSS variables
-  const cssVariables = {
-    '--btn-accent-light': currentTheme.accentLight,
-    '--btn-accent-main': currentTheme.accentMain,
-    '--btn-accent-dim': currentTheme.accentDim,
-    '--btn-accent-dark': currentTheme.accentDark,
+  // Determine base colors from CSS variables depending on the variant
+  const baseColorVar = variant === 'secondary' ? 'var(--pr-secondary)' : 
+                       variant === 'danger' ? 'var(--pr-danger)' : 
+                       'var(--pr-primary)';
+  
+  // We use CSS color-mix to derive the multi-tone scales from the single base theme color
+  const cssVariables = variant === 'ghost' ? {} : {
+    '--btn-accent-light': `color-mix(in srgb, ${baseColorVar}, white 40%)`,
+    '--btn-accent-main': baseColorVar,
+    '--btn-accent-dim': `color-mix(in srgb, ${baseColorVar}, black 40%)`,
+    '--btn-accent-dark': `color-mix(in srgb, ${baseColorVar}, black 85%)`,
   } as React.CSSProperties;
+
+  const textColor = variant === 'ghost' ? 'var(--pr-text-muted)' : '#ffffff';
+  const glowShadow = variant === 'ghost' ? '' : `0 0 40px color-mix(in srgb, ${baseColorVar}, transparent 55%)`;
 
   return (
     <motion.button 
@@ -189,7 +159,7 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
       style={{
         ...style as any,
         ...cssVariables,
-        color: currentTheme.text,
+        color: textColor,
       }}
       {...filteredProps}
     >
@@ -203,8 +173,8 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
           hover: { opacity: 1, scale: 1.1, filter: "blur(20px)" }
         }}
         style={{ 
-          backgroundColor: variant === 'ghost' ? 'transparent' : currentTheme.accentMain, 
-          boxShadow: currentTheme.glow,
+          backgroundColor: variant === 'ghost' ? 'transparent' : `color-mix(in srgb, ${baseColorVar}, transparent 50%)`, 
+          boxShadow: glowShadow,
           filter: "blur(24px)"
         }}
       />

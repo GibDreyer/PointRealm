@@ -4,7 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, Eye, EyeOff, Loader2, UserX } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Loader2, UserX, Sparkles } from "lucide-react";
+import { generateRandomRealmName } from "@/lib/realmNames";
 
 import { useTheme } from "@/theme/ThemeProvider";
 import { ThemePicker } from "./components/ThemePicker";
@@ -13,12 +14,12 @@ import { hub } from "@/realtime/hub";
 import { updateProfile, getProfile, STORAGE_KEYS } from "@/lib/storage";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/ui/Input";
-import { RuneChip } from "@/components/ui/RuneChip";
 import { PageShell } from "@/components/shell/PageShell";
 import { PageFooter } from "@/components/ui/PageFooter";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Panel } from "@/components/ui/Panel"; // Use new Panel
 import { Toggle } from "@/components/ui/Toggle"; // Use new Toggle
+import { DECKS } from "./constants";
 import styles from "./createRealm.module.css";
 
 // --- Schema ---
@@ -96,7 +97,7 @@ export function CreateRealmPage() {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      realmName: "",
+      realmName: generateRandomRealmName(),
       displayName: initialDisplayName,
       themeKey: "dark-fantasy-arcane",
       deckType: "FIBONACCI",
@@ -189,7 +190,7 @@ export function CreateRealmPage() {
         <Panel className={styles.panel}>
           <PageHeader
             title="Create Realm"
-            subtitle="Summon a new session"
+            subtitle="Inscribe the laws of your new dominion"
             size="panel"
             className={styles.header}
           />
@@ -215,17 +216,25 @@ export function CreateRealmPage() {
                     <Input
                       label="Realm Name"
                       {...form.register("realmName")}
-                      placeholder="Optional name..."
+                      placeholder="e.g. The Emerald Sanctum..."
                       disabled={isSubmitting}
                       error={errors.realmName?.message}
-                      className="bg-black/20"
+                      className="bg-black/20 pr-10"
                     />
+                    <button
+                      type="button"
+                      className={styles.randomizeBtn}
+                      onClick={() => setValue("realmName", generateRandomRealmName())}
+                      title="Randomize Realm Name"
+                    >
+                      <Sparkles size={16} />
+                    </button>
                   </div>
                   <div className={styles.field}>
                     <Input
                       label="Your Name"
                       {...form.register("displayName")}
-                      placeholder="e.g. Archmage"
+                      placeholder="e.g. Archmage Aethelgard"
                       disabled={isSubmitting}
                       error={errors.displayName?.message}
                       className="bg-black/20"
@@ -239,14 +248,15 @@ export function CreateRealmPage() {
                   </div>
                   <div className={styles.optionRow}>
                     {(["FIBONACCI", "SHORT_FIBONACCI", "TSHIRT", "CUSTOM"] as const).map(type => (
-                      <RuneChip
+                      <Button
                         key={type}
                         type="button"
-                        active={selectedDeckType === type}
+                        variant={selectedDeckType === type ? "secondary" : "primary"}
                         onClick={() => setValue("deckType", type)}
+                        className={`w-full min-h-[44px] h-[48px] px-2 py-0 !text-[0.6rem] sm:!text-[0.7rem] leading-none tracking-widest ${selectedDeckType !== type ? 'opacity-70 hover:opacity-100 grayscale-[0.6] hover:grayscale-0' : ''}`}
                       >
-                        {type === "SHORT_FIBONACCI" ? "Short Fib." : type === "TSHIRT" ? "T-Shirt" : type.charAt(0) + type.slice(1).toLowerCase()}
-                      </RuneChip>
+                        {type === "SHORT_FIBONACCI" ? "Short Fib." : type === "TSHIRT" ? "T-Shirt" : type.replace("_", " ")}
+                      </Button>
                     ))}
                   </div>
 
@@ -264,10 +274,27 @@ export function CreateRealmPage() {
                         placeholder="0, 1, 2, 3, 5, 8, ?"
                         disabled={isSubmitting}
                         error={errors.customDeckValuesInput?.message}
-                        className="bg-black/20"
+                        className="bg-black/20 font-heading"
                       />
                     </motion.div>
                   )}
+
+                  {/* Rune Deck Preview */}
+                  <div className={styles.deckPreview}>
+                     <div className={styles.deckGrid}>
+                        {(selectedDeckType === "CUSTOM" 
+                            ? (watch("customDeckValuesInput") ? parseCustomDeck(watch("customDeckValuesInput")!) : [])
+                            : DECKS[selectedDeckType as keyof typeof DECKS] || []
+                        ).slice(0, 8).map((val, i) => (
+                           <div key={i} className={styles.previewCard}>
+                              <span className={styles.previewCardValue}>{val}</span>
+                           </div>
+                        ))}
+                        {(selectedDeckType === "CUSTOM" || DECKS[selectedDeckType as keyof typeof DECKS]?.length > 8) && (
+                           <div className={styles.previewCardMore}>...</div>
+                        )}
+                     </div>
+                  </div>
                 </section>
               </div>
 
@@ -279,38 +306,40 @@ export function CreateRealmPage() {
                     <h2 className={styles.sectionTitle}>Rituals</h2>
                   </div>
                   <div className={styles.toggleList}>
-                    <div className="flex items-center justify-between py-2 px-1 hover:bg-white/5 rounded transition-colors">
-                        <div className="flex items-center gap-3">
-                           <Eye className="w-4 h-4 text-[var(--pr-primary-cyan)] opacity-70" />
-                           <div className="flex flex-col text-left">
-                               <span className="text-sm font-medium text-[var(--pr-text-primary)]">Auto Reveal</span>
-                               <span className="text-[10px] text-[var(--pr-text-muted)] uppercase tracking-wide">When all voted</span>
+                    <div className={styles.toggleItem}>
+                        <div className={styles.toggleLabelGroup}>
+                           <Eye className={styles.toggleIcon} />
+                           <div className={styles.toggleText}>
+                               <span className="text-sm font-heading font-bold text-[var(--pr-text-primary)] tracking-wide">Auto Reveal</span>
+                               <span className="text-[10px] text-[var(--pr-text-muted)] uppercase tracking-widest font-medium">When all voted</span>
                            </div>
                         </div>
                         <Toggle {...form.register("autoReveal")} disabled={isSubmitting} />
                     </div>
 
-                    <div className="flex items-center justify-between py-2 px-1 hover:bg-white/5 rounded transition-colors">
-                        <div className="flex items-center gap-3">
-                           <UserX className="w-4 h-4 text-[var(--pr-primary-cyan)] opacity-70" />
-                           <div className="flex flex-col text-left">
-                               <span className="text-sm font-medium text-[var(--pr-text-primary)]">Allow Abstain</span>
-                               <span className="text-[10px] text-[var(--pr-text-muted)] uppercase tracking-wide">Permit uncertainty</span>
+                    <div className={styles.toggleItem}>
+                        <div className={styles.toggleLabelGroup}>
+                           <UserX className={styles.toggleIcon} />
+                           <div className={styles.toggleText}>
+                               <span className="text-sm font-heading font-bold text-[var(--pr-text-primary)] tracking-wide">Allow Abstain</span>
+                               <span className="text-[10px] text-[var(--pr-text-muted)] uppercase tracking-widest font-medium">Permit uncertainty</span>
                            </div>
                         </div>
                         <Toggle {...form.register("allowAbstain")} disabled={isSubmitting} />
                     </div>
 
-                    <div className="flex items-center justify-between py-2 px-1 hover:bg-white/5 rounded transition-colors">
-                        <div className="flex items-center gap-3">
-                           <EyeOff className="w-4 h-4 text-[var(--pr-primary-cyan)] opacity-70" />
-                           <div className="flex flex-col text-left">
-                               <span className="text-sm font-medium text-[var(--pr-text-primary)]">Hide Counts</span>
-                               <span className="text-[10px] text-[var(--pr-text-muted)] uppercase tracking-wide">Until reveal</span>
+                    <div className={styles.toggleItem}>
+                        <div className={styles.toggleLabelGroup}>
+                           <EyeOff className={styles.toggleIcon} />
+                           <div className={styles.toggleText}>
+                               <span className="text-sm font-heading font-bold text-[var(--pr-text-primary)] tracking-wide">Hide Counts</span>
+                               <span className="text-[10px] text-[var(--pr-text-muted)] uppercase tracking-widest font-medium">Until reveal</span>
                            </div>
                         </div>
                         <Toggle {...form.register("hideVoteCounts")} disabled={isSubmitting} />
                     </div>
+
+
                   </div>
                 </section>
 
@@ -322,7 +351,13 @@ export function CreateRealmPage() {
                     control={control}
                     name="themeKey"
                     render={({ field }) => (
-                      <ThemePicker selectedThemeKey={field.value || "dark-fantasy-arcane"} onThemeSelect={field.onChange} />
+                      <ThemePicker 
+                        selectedThemeKey={field.value || "dark-fantasy-arcane"} 
+                        onThemeSelect={(key) => {
+                          field.onChange(key);
+                          setThemeKey(key);
+                        }} 
+                      />
                     )}
                   />
                 </section>

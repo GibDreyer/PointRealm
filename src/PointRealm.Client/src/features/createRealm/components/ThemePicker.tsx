@@ -1,6 +1,8 @@
 import { useTheme } from '../../../theme/ThemeProvider';
 import { ChevronDown, Check } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { cn } from '@/lib/utils';
+import styles from './ThemePicker.module.css';
 
 interface ThemePickerProps {
   selectedThemeKey: string;
@@ -25,30 +27,29 @@ export function ThemePicker({ selectedThemeKey, onThemeSelect }: ThemePickerProp
   }, []);
 
   return (
-    <div className="relative" ref={containerRef}>
-      <label className="block text-sm font-medium text-[var(--pr-text-muted)] mb-1.5">
-        Realm Theme
+    <div className={styles.container} ref={containerRef}>
+      <label className={styles.label}>
+        Realm Atmosphere
       </label>
       
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-3 rounded-[var(--pr-radius-md)] border border-[var(--pr-border)] bg-[var(--pr-surface)] hover:border-[var(--pr-text-muted)] transition-colors focus:outline-none focus:border-[var(--pr-primary)] focus:ring-1 focus:ring-[var(--pr-primary)]"
+        className={styles.trigger}
       >
-        <div className="flex items-center gap-3">
-          {/* Color Chips */}
-          <div className="flex -space-x-1">
-             <div className="w-4 h-4 rounded-full border border-white/10" style={{ backgroundColor: selectedTheme.tokens.colors.bg }} />
-             <div className="w-4 h-4 rounded-full border border-white/10" style={{ backgroundColor: selectedTheme.tokens.colors.primary }} />
-             <div className="w-4 h-4 rounded-full border border-white/10" style={{ backgroundColor: selectedTheme.tokens.colors.secondary }} />
+        <div className={styles.themeInfo}>
+          <div className={styles.colorChips}>
+             <div className={styles.chip} style={{ backgroundColor: selectedTheme.tokens.colors.bg }} />
+             <div className={styles.chip} style={{ backgroundColor: selectedTheme.tokens.colors.primary }} />
+             <div className={styles.chip} style={{ backgroundColor: selectedTheme.tokens.colors.secondary }} />
           </div>
-          <span className="font-medium text-[var(--pr-text)]">{selectedTheme.name}</span>
+          <span className={styles.themeName}>{selectedTheme.name}</span>
         </div>
-        <ChevronDown className={`w-4 h-4 text-[var(--pr-text-muted)] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={cn(styles.chevron, isOpen && styles.chevronActive)} />
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-2 rounded-[var(--pr-radius-md)] border border-[var(--pr-border)] bg-[var(--pr-surface-elevated)] shadow-xl max-h-60 overflow-auto">
+        <div className={styles.dropdown}>
           {availableThemes.map((theme) => (
             <button
               key={theme.key}
@@ -57,19 +58,19 @@ export function ThemePicker({ selectedThemeKey, onThemeSelect }: ThemePickerProp
                 onThemeSelect(theme.key);
                 setIsOpen(false);
               }}
-              className="w-full flex items-center justify-between p-3 text-left hover:bg-[var(--pr-surface)] transition-colors first:rounded-t-[var(--pr-radius-md)] last:rounded-b-[var(--pr-radius-md)]"
+              className={cn(styles.option, selectedThemeKey === theme.key && styles.optionActive)}
             >
-              <div className="flex items-center gap-3">
-                  <div className="flex -space-x-1">
-                    <div className="w-4 h-4 rounded-full border border-white/10" style={{ backgroundColor: theme.tokens.colors.bg }} />
-                    <div className="w-4 h-4 rounded-full border border-white/10" style={{ backgroundColor: theme.tokens.colors.primary }} />
-                    <div className="w-4 h-4 rounded-full border border-white/10" style={{ backgroundColor: theme.tokens.colors.secondary }} />
+              <div className={styles.optionContent}>
+                  <div className={styles.colorChips}>
+                    <div className={styles.chip} style={{ backgroundColor: theme.tokens.colors.bg }} />
+                    <div className={styles.chip} style={{ backgroundColor: theme.tokens.colors.primary }} />
+                    <div className={styles.chip} style={{ backgroundColor: theme.tokens.colors.secondary }} />
                   </div>
-                  <span className={`text-sm ${selectedThemeKey === theme.key ? 'text-[var(--pr-primary)] font-bold' : 'text-[var(--pr-text)]'}`}>
+                  <span className={styles.optionName}>
                       {theme.name}
                   </span>
               </div>
-              {selectedThemeKey === theme.key && <Check className="w-4 h-4 text-[var(--pr-primary)]" />}
+              {selectedThemeKey === theme.key && <Check className={styles.check} />}
             </button>
           ))}
         </div>
