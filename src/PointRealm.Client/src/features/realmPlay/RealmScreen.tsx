@@ -9,6 +9,7 @@ import { ConnectionBanner } from '../realmLobby/components/ConnectionBanner';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { PageShell } from '../../components/shell/PageShell';
 import { Users } from 'lucide-react';
+import { RealmSettingsDialog } from '../realmLobby/components/RealmSettingsDialog';
 import styles from './realmScreen.module.css';
 
 export function RealmScreen() {
@@ -19,6 +20,7 @@ export function RealmScreen() {
     const [isQuestModalOpen, setQuestModalOpen] = useState(false);
     const [isQuestOpen, setQuestOpen] = useState(false);
     const [isPartyOpen, setPartyOpen] = useState(false);
+    const [isSettingsOpen, setSettingsOpen] = useState(false);
     const prefersReducedMotion = useReducedMotion() ?? false;
 
     useEffect(() => {
@@ -107,6 +109,7 @@ export function RealmScreen() {
                             activeQuestId={encounter?.questId || undefined}
                             isGM={!!isGM}
                             onAddQuest={() => setQuestModalOpen(true)}
+                            onOpenSettings={() => setSettingsOpen(true)}
                             onSelectQuest={(id) => {
                                  if(isGM) actions.startEncounter(id);
                             }}
@@ -199,6 +202,7 @@ export function RealmScreen() {
                                 activeQuestId={encounter?.questId || undefined}
                                 isGM={!!isGM}
                                 onAddQuest={() => setQuestModalOpen(true)}
+                                onOpenSettings={() => setSettingsOpen(true)}
                                 onSelectQuest={(id) => {
                                      if(isGM) actions.startEncounter(id);
                                 }}
@@ -246,6 +250,16 @@ export function RealmScreen() {
                 }}
                 mode="add"
             />
+
+            {isSettingsOpen && isGM && code && (
+                <RealmSettingsDialog 
+                    realmCode={code}
+                    currentSettings={settings}
+                    currentThemeKey={state.themeKey || 'dark-fantasy-arcane'}
+                    isOpen={isSettingsOpen}
+                    onClose={() => setSettingsOpen(false)}
+                />
+            )}
         </PageShell>
     );
 }

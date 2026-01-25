@@ -4,7 +4,7 @@ import { RealmLayout } from "@/app/layouts/RealmLayout"; // Logic/Data layout
 import { LandingPage } from "@/features/landing/LandingPage";
 import { CreateRealmPage } from "@/features/createRealm/CreateRealmPage";
 import { JoinRealmPage } from "@/features/joinRealm/JoinRealmPage";
-import { TavernLobbyPage } from "@/features/realmLobby/LobbyPage";
+
 import { LoginPage } from "@/features/auth/LoginPage";
 import { RegisterPage } from "@/features/auth/RegisterPage";
 import { ErrorPage } from "@/components/ErrorPage";
@@ -60,10 +60,6 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <RealmScreen />,
-      },
-      {
-        path: "lobby",
-        element: <TavernLobbyPage />,
       },
     ],
   },

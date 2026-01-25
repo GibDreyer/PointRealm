@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, Eye, EyeOff, Loader2, UserX, Sparkles } from "lucide-react";
 import { generateRandomRealmName } from "@/lib/realmNames";
+import { SummoningCircle } from "@/components/ui/SummoningCircle";
 
 import { useTheme } from "@/theme/ThemeProvider";
 import { ThemePicker } from "./components/ThemePicker";
@@ -156,7 +157,7 @@ export function CreateRealmPage() {
 
       await hub.connect(joinResponse.memberToken);
       setThemeKey(data.themeKey);
-      navigate(`/realm/${realmCode}/lobby`);
+      navigate(`/realm/${realmCode}`);
 
     } catch (err: any) {
       console.error(err);
@@ -173,7 +174,7 @@ export function CreateRealmPage() {
       reducedMotion={prefersReducedMotion}
       contentClassName={styles.page}
     >
-      <div className={styles.summoningCircle} aria-hidden="true" />
+      <SummoningCircle />
       
       <div className={styles.backRow}>
         <button type="button" className={styles.backLink} onClick={() => navigate("/")} aria-label="Back to Tavern"> 
@@ -187,7 +188,7 @@ export function CreateRealmPage() {
         transition={{ duration: prefersReducedMotion ? 0 : 0.4, ease: [0.16, 1, 0.3, 1] }}
         className="w-full flex justify-center z-10"
       >
-        <Panel className={styles.panel}>
+        <Panel variant="realm" className="w-[100%] max-w-[900px]">
           <PageHeader
             title="Create Realm"
             subtitle="Inscribe the laws of your new dominion"

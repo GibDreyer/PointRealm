@@ -89,22 +89,8 @@ const ButtonSVG = ({ variant }: { variant: ButtonVariant }) => {
       {/* Top Gloss Sheen */}
       <path d="M14 26 H646 A4 4 0 0 1 650 30 V46 H10 V30 A4 4 0 0 1 14 26 Z" fill={`url(#topSheen-${variant})`} opacity="0.5"></path>
 
-      {/* Side Diamonds & Rays */}
-      <g filter={`url(#glow-${variant})`}>
-        {/* Left Diamond */}
-        <g transform="translate(34 62)">
-          <rect x="-10" y="-10" width="20" height="20" transform="rotate(45)" fill={`url(#diamondGrad-${variant})`} stroke="white" strokeOpacity="0.5" strokeWidth="1"></rect>
-          <path d="M-28 0 H-12" stroke="var(--btn-accent-light)" strokeOpacity="0.5" strokeWidth="2" strokeLinecap="round"></path>
-          <path d="M12 0 H28" stroke="var(--btn-accent-light)" strokeOpacity="0.3" strokeWidth="2" strokeLinecap="round"></path>
-        </g>
-        
-        {/* Right Diamond */}
-        <g transform="translate(626 62)">
-          <rect x="-10" y="-10" width="20" height="20" transform="rotate(45)" fill={`url(#diamondGrad-${variant})`} stroke="white" strokeOpacity="0.5" strokeWidth="1"></rect>
-          <path d="M-28 0 H-12" stroke="var(--btn-accent-light)" strokeOpacity="0.3" strokeWidth="2" strokeLinecap="round"></path>
-          <path d="M12 0 H28" stroke="var(--btn-accent-light)" strokeOpacity="0.5" strokeWidth="2" strokeLinecap="round"></path>
-        </g>
-      </g>
+      {/* Side Diamonds & Rays Removed */ }
+
 
       {/* Corner Carvings */}
       <g opacity="0.4" fill="white">

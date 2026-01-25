@@ -73,22 +73,33 @@
   border: 1px solid color-mix(in srgb, var(--pr-secondary), transparent 85%); /* Faint Gold Trace */
   backdrop-filter: blur(4px);
   border-radius: 12px;
+  /* Ensure overflow is visible for ornaments if we want them outside, 
+     but CreateRealm had overflow:hidden on panel. 
+     The CreateRealm ornaments were ::before on the panel itself. 
+     Let's check if we need overflow visible. 
+     CreateRealm CSS said: "overflow: hidden" on .panel. 
+     And ::before was "inset: 6px". So inside. */
+  overflow: hidden; 
 }
 
-/* Decorative Corner Ornaments hidden as per user feedback to reduce 'random triangles' */
+/* Corner Ornaments (Golden Glyphs) via pseudo-elements */
+/* Corner Ornaments (Golden Glyphs) via pseudo-elements */
 .panelRealm::before {
   display: none;
 }
 
+
 .panelRealm::after {
   content: "";
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  height: auto; /* Reset height from default */
-  background: none; /* Remove line form default */
+  inset: 0;
   pointer-events: none;
   z-index: 3;
-  box-shadow: inset 0 0 60px rgba(0,0,0,0.6);
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
   border-radius: 12px;
   opacity: 1;
+}
+
+.noPadding {
+  padding: 0 !important;
 }

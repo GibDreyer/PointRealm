@@ -1,5 +1,6 @@
 import { PartyMember } from '../../../types/realm';
 import { Crown, WifiOff } from 'lucide-react';
+import { RealmPortalCard } from '../../realmLobby/components/RealmPortalCard';
 import { cn } from '../../../lib/utils';
 import { SectionHeader } from '../../../components/ui/SectionHeader';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -112,6 +113,15 @@ export function PartyRosterPanel({ members, currentMemberId, hideVoteCounts, enc
                     </p>
                 )}
             </div>
+
+            <footer className="p-4 border-t border-pr-border/20 bg-pr-surface/40">
+                 <div className="rounded-lg overflow-hidden border border-pr-border/10">
+                    <RealmPortalCard 
+                        joinUrl={`${window.location.origin}/join?realmCode=${window.location.pathname.split('/')[2]}`}
+                        className="!bg-transparent !shadow-none !border-none p-0 scale-90 -translate-y-1"
+                    />
+                 </div>
+            </footer>
         </div>
     );
 }

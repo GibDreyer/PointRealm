@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { X, Save, Loader2, Eye, EyeOff, UserX } from 'lucide-react';
+import { Save, Loader2, Eye, EyeOff, UserX } from 'lucide-react';
 import { RealmSettings } from '../types';
 import { ThemePicker } from '../../createRealm/components/ThemePicker';
 import { api } from '../../../api/client';
 import { Button } from '../../../components/Button';
-import { SectionHeader } from '../../../components/ui/SectionHeader';
+import { Dialog } from '../../../components/ui/Dialog';
 
 interface Props {
     realmCode: string;
@@ -48,85 +48,75 @@ export function RealmSettingsDialog({ realmCode, currentSettings, currentThemeKe
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-pr-bg/80 backdrop-blur-sm">
-            <div className="w-full max-w-2xl bg-pr-surface border border-pr-border rounded-[var(--pr-radius-xl)] shadow-2xl flex flex-col max-h-[90vh] relative overflow-hidden">
-                {/* Visual Accent */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-pr-primary to-transparent opacity-50" />
-
-                <div className="p-5 border-b border-pr-border/30 flex items-center justify-between">
-                    <SectionHeader title="Realm Settings" subtitle={`Modifying ${realmCode}`} className="mb-0" />
-                    <button 
-                        onClick={onClose} 
-                        className="p-2 text-pr-text-muted hover:text-pr-text hover:bg-pr-surface-2 rounded-full transition-all disabled:opacity-50" 
-                        disabled={isSaving}
-                    >
-                        <X size={20} />
-                    </button>
+        <Dialog 
+            isOpen={isOpen} 
+            onClose={onClose} 
+            title="Realm Settings" 
+            subtitle={`Modifying ${realmCode}`}
+            className="max-w-2xl"
+        >
+            <div className="space-y-8">
+                {/* Toggles */}
+                <div className="space-y-4">
+                        <h3 className="text-[10px] font-black uppercase text-pr-text-muted tracking-[0.2em]">Mechanics & Rules</h3>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <ToggleRow 
+                            label="Auto Reveal" 
+                            description="Show cards when everyone votes"
+                            icon={<Eye size={18} />}
+                            checked={settings.autoReveal}
+                            onChange={() => toggle('autoReveal')}
+                            disabled={isSaving}
+                            />
+                            <ToggleRow 
+                            label="Allow Abstain" 
+                            description="Allow '?' card"
+                            icon={<UserX size={18} />}
+                            checked={settings.allowAbstain}
+                            onChange={() => toggle('allowAbstain')}
+                            disabled={isSaving}
+                            />
+                            <ToggleRow 
+                            label="Hide Vote Counts" 
+                            description="Don't show who has voted"
+                            icon={<EyeOff size={18} />}
+                            checked={settings.hideVoteCounts}
+                            onChange={() => toggle('hideVoteCounts')}
+                            disabled={isSaving}
+                            />
+                        </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-6 space-y-8">
-                    {/* Toggles */}
+                <div className="h-px bg-pr-border/20" />
+
+                    {/* Theme Picker */}
                     <div className="space-y-4">
-                         <h3 className="text-[10px] font-black uppercase text-pr-text-muted tracking-[0.2em]">Mechanics & Rules</h3>
-                         
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                             <ToggleRow 
-                                label="Auto Reveal" 
-                                description="Show cards when everyone votes"
-                                icon={<Eye size={18} />}
-                                checked={settings.autoReveal}
-                                onChange={() => toggle('autoReveal')}
-                                disabled={isSaving}
-                             />
-                             <ToggleRow 
-                                label="Allow Abstain" 
-                                description="Allow '?' card"
-                                icon={<UserX size={18} />}
-                                checked={settings.allowAbstain}
-                                onChange={() => toggle('allowAbstain')}
-                                disabled={isSaving}
-                             />
-                             <ToggleRow 
-                                label="Hide Vote Counts" 
-                                description="Don't show who has voted"
-                                icon={<EyeOff size={18} />}
-                                checked={settings.hideVoteCounts}
-                                onChange={() => toggle('hideVoteCounts')}
-                                disabled={isSaving}
-                             />
-                         </div>
+                        <h3 className="text-[10px] font-black uppercase text-pr-text-muted tracking-[0.2em]">Visual Theme</h3>
+                        <ThemePicker selectedThemeKey={themeKey} onThemeSelect={setThemeKey} />
                     </div>
-
-                    <div className="h-px bg-pr-border/20" />
-
-                     {/* Theme Picker */}
-                     <div className="space-y-4">
-                         <h3 className="text-[10px] font-black uppercase text-pr-text-muted tracking-[0.2em]">Visual Theme</h3>
-                         <ThemePicker selectedThemeKey={themeKey} onThemeSelect={setThemeKey} />
-                     </div>
-                </div>
-
-                <div className="p-5 border-t border-pr-border/30 flex justify-end gap-3 bg-pr-surface-2/50">
-                    <Button 
-                        onClick={onClose}
-                        disabled={isSaving}
-                        variant="secondary"
-                        className="px-6"
-                    >
-                        Discard
-                    </Button>
-                    <Button
-                        onClick={handleSave}
-                        disabled={isSaving}
-                        variant="primary"
-                        className="px-8"
-                    >
-                        {isSaving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save className="mr-2" size={18} />}
-                        Inscribe Changes
-                    </Button>
-                </div>
             </div>
-        </div>
+
+            <div className="mt-8 pt-5 border-t border-pr-border/30 flex justify-end gap-3">
+                <Button 
+                    onClick={onClose}
+                    disabled={isSaving}
+                    variant="secondary"
+                    className="px-6"
+                >
+                    Discard
+                </Button>
+                <Button
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    variant="primary"
+                    className="px-8"
+                >
+                    {isSaving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save className="mr-2" size={18} />}
+                    Inscribe Changes
+                </Button>
+            </div>
+        </Dialog>
     );
 }
 

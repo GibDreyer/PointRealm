@@ -16,6 +16,7 @@ import { PageShell } from '../../components/shell/PageShell';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Panel } from '../../components/ui/Panel';
+import { SummoningCircle } from '../../components/ui/SummoningCircle';
 import { RealmBackButton } from '../../components/ui/RealmBackButton';
 import { Button } from '../../components/Button';
 import styles from './lobby.module.css';
@@ -153,9 +154,11 @@ export function TavernLobbyPage() {
     return (
         <PageShell
             backgroundDensity="medium"
+            backgroundVariant="realm"
             reducedMotion={prefersReducedMotion}
             contentClassName={styles.page}
         >
+            <SummoningCircle />
             <RealmBackButton to="/" />
             
             {status !== 'connected' && (
@@ -223,10 +226,10 @@ export function TavernLobbyPage() {
                         but using Ghost variant of Button */}
                     <Button
                         variant="ghost"
-                        className="min-w-[180px] uppercase tracking-widest text-xs"
+                        className="min-w-[160px] uppercase tracking-[0.15em] text-[10px] opacity-60 hover:opacity-100"
                         onClick={() => navigate('/')}
                     >
-                        Index
+                        Exit to Tavern
                     </Button>
                     <Button
                         variant="primary"

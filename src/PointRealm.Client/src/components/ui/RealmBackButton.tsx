@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -20,8 +21,10 @@ export const RealmBackButton = ({ to = "/", className, label = "Back", onClick }
     }
   };
 
-  return (
-    <div className={cn("fixed top-4 left-4 lg:top-8 lg:left-8 z-50", className)}>
+
+
+  return createPortal(
+    <div className={cn("fixed top-6 left-6 z-[9999]", className)}>
       <button 
         type="button" 
         onClick={handleClick}
@@ -39,6 +42,7 @@ export const RealmBackButton = ({ to = "/", className, label = "Back", onClick }
       >
         <ArrowLeft className="w-[22px] h-[22px]" />
       </button>
-    </div>
+    </div>,
+    document.body
   );
 };

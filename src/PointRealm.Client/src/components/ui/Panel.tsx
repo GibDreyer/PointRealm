@@ -4,11 +4,13 @@ import styles from './Panel.module.css';
 
 interface PanelProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'glow' | 'realm';
+  noPadding?: boolean;
 }
 
 export const Panel = React.forwardRef<HTMLDivElement, PanelProps>(({ 
   className, 
   variant = 'default',
+  noPadding = false,
   children, 
   ...props 
 }, ref) => {
@@ -19,9 +21,9 @@ export const Panel = React.forwardRef<HTMLDivElement, PanelProps>(({
         styles.panel, 
         variant === 'glow' && styles.panelGlow,
         variant === 'realm' && styles.panelRealm,
+        noPadding && styles.noPadding,
         className
-      )} 
-      {...props}
+      )}       {...props}
     >
       {children}
     </div>

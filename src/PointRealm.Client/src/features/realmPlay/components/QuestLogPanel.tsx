@@ -12,12 +12,13 @@ interface QuestLogPanelProps {
     isGM: boolean;
     onAddQuest: () => void;
     onSelectQuest: (id: string) => void; 
+    onOpenSettings?: () => void;
     onReorder?: (newOrder: string[]) => void;
     onEdit?: (quest: Quest) => void;
     onDelete?: (id: string) => void;
 }
 
-export function QuestLogPanel({ quests, activeQuestId, isGM, onAddQuest, onSelectQuest }: QuestLogPanelProps) {
+export function QuestLogPanel({ quests, activeQuestId, isGM, onAddQuest, onSelectQuest, onOpenSettings }: QuestLogPanelProps) {
     const [isEditing, setIsEditing] = useState(false);
 
     return (
@@ -39,11 +40,18 @@ export function QuestLogPanel({ quests, activeQuestId, isGM, onAddQuest, onSelec
                                 <Plus size={16} />
                             </button>
                         )}
-                        <button
+                         <button
                             onClick={() => setIsEditing((prev) => !prev)}
                             className="px-3 py-1 rounded-full border border-pr-border/40 text-[10px] uppercase tracking-[0.3em] text-pr-text-muted hover:text-pr-text hover:border-pr-primary/40 transition-all"
                         >
                             {isEditing ? 'Done' : 'Edit'}
+                        </button>
+                        <button
+                            onClick={onOpenSettings}
+                            className="p-2 rounded-full border border-pr-border/40 text-pr-text-muted hover:text-pr-text hover:border-pr-primary/40 transition-all"
+                            title="Realm Settings"
+                        >
+                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.72l-.22-.39a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
                 )}
@@ -77,7 +85,7 @@ export function QuestLogPanel({ quests, activeQuestId, isGM, onAddQuest, onSelec
                                     onClick={() => onSelectQuest(quest.id)}
                                 >
                                 <Panel
-                                    variant={isActive ? 'default' : 'subtle'}
+                                    variant={isActive ? 'default' : 'realm'}
                                     noPadding
                                     className={cn(
                                         "relative transition-all duration-300 border-pr-border/30 overflow-hidden",

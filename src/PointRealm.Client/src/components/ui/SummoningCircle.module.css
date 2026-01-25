@@ -1,0 +1,27 @@
+.summoningCircle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1.2);
+  width: 100vh;
+  height: 100vh;
+  max-width: 1000px;
+  max-height: 1000px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.3;
+  background:
+    radial-gradient(circle at center, transparent 30%, 
+      color-mix(in srgb, var(--pr-primary), transparent 94%) 31%, 
+      transparent 32%),
+    radial-gradient(circle at center, transparent 45%, 
+      color-mix(in srgb, var(--pr-primary), transparent 96%) 46%, 
+      transparent 47%);
+  border-radius: 50%;
+  animation: rotateCircle 180s linear infinite;
+}
+
+@keyframes rotateCircle {
+  from { transform: translate(-50%, -50%) scale(1.2) rotate(0deg); }
+  to { transform: translate(-50%, -50%) scale(1.2) rotate(360deg); }
+}

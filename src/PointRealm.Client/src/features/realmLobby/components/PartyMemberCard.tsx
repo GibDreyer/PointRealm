@@ -54,9 +54,9 @@ export function PartyMemberCard({ member }: Props) {
             <Panel 
                 variant="default" 
                 className={cn(
-                    "flex items-center gap-4 p-3 transition-all",
-                    !isOffline && "group-hover:-translate-y-0.5 group-hover:border-pr-border/60",
-                    isOffline && "grayscale"
+                    "flex items-center gap-4 p-3 transition-all border border-pr-border/10 bg-pr-surface/40 hover:bg-pr-surface/60",
+                    !isOffline && "group-hover:border-pr-primary/30 group-hover:shadow-[0_0_20px_rgba(6,182,212,0.05)]",
+                    isOffline && "opacity-60 grayscale"
                 )}
             >
                 {/* Class Icon */}
@@ -73,17 +73,17 @@ export function PartyMemberCard({ member }: Props) {
                 <div className="flex-1 min-w-0 flex flex-col justify-center">
                     <div className="flex items-center gap-2">
                         <span className={cn(
-                            "font-bold truncate text-base",
+                            "font-bold truncate text-[0.95rem] font-heading tracking-wide",
                             isOffline ? "text-pr-text-muted" : "text-pr-text"
                         )} title={member.displayName}>
                             {member.displayName}
                         </span>
                         {member.isGM && (
-                           <span className="text-[9px] font-black tracking-tighter uppercase border border-pr-secondary/40 text-pr-secondary px-1 rounded-sm">GM</span>
+                           <span className="text-[8px] font-black tracking-widest uppercase bg-pr-secondary/10 border border-pr-secondary/30 text-pr-secondary px-1.5 py-0.5 rounded-sm">GM</span>
                         )}
                     </div>
                     <span className={cn(
-                        "text-xs uppercase tracking-widest font-semibold transition-colors",
+                        "text-[10px] uppercase tracking-[0.15em] font-bold opacity-70",
                         statusClasses
                     )}>
                         {statusText}
