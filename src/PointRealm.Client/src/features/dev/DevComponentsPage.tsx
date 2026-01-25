@@ -5,6 +5,7 @@ import { QuestLogPanel } from '../realmPlay/components/QuestLogPanel';
 import { PartyRosterPanel } from '../realmPlay/components/PartyRosterPanel';
 import { useToast } from '../../components/ui/ToastSystem';
 import { ProphecyReveal } from '../reveal/ProphecyReveal';
+import { BackButton } from '../../components/ui/BackButton';
 
 export const DevComponentsPage: React.FC = () => {
   const [selectedRune, setSelectedRune] = useState<string | null>(null);
@@ -27,6 +28,7 @@ export const DevComponentsPage: React.FC = () => {
 
   return (
     <RealmShell>
+      <BackButton to="/" label="Exit Lab" />
       <div className="w-full max-w-6xl mx-auto flex flex-col gap-10">
         <header className="py-6 border-b border-pr-border/20">
             <h1 className="text-2xl font-black text-pr-primary uppercase tracking-widest">Arcane Repository</h1>

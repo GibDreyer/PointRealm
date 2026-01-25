@@ -20,7 +20,7 @@ import { Button } from '../../components/Button';
 import { PageShell } from '../../components/shell/PageShell';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { PageFooter } from '../../components/ui/PageFooter';
-import { RealmBackButton } from '../../components/ui/RealmBackButton';
+import { BackButton } from '../../components/ui/BackButton';
 import { Panel } from '../../components/ui/Panel';
 import { Input } from '../../components/ui/Input';
 import { SectionHeader } from '../../components/ui/SectionHeader';
@@ -169,7 +169,7 @@ export function JoinRealmPage() {
       className="relative"
       contentClassName={styles.page}
     >
-      <RealmBackButton />
+      <BackButton to="/" />
       
       <div className={styles.container}>
         <motion.div

@@ -1,16 +1,32 @@
 import { useRouteError } from "react-router-dom";
+import { PageShell } from "./shell/PageShell";
+import { BackButton } from "./ui/BackButton";
+import { Panel } from "./ui/Panel";
+import { PageHeader } from "./ui/PageHeader";
 
 export function ErrorPage() {
   const error = useRouteError() as any;
   console.error(error);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
-      <h1 className="text-4xl font-bold mb-4">Oops!</h1>
-      <p className="text-xl mb-4">Sorry, an unexpected error has occurred.</p>
-      <p className="text-muted-foreground">
-        <i>{error.statusText || error.message}</i>
-      </p>
-    </div>
+    <PageShell backgroundDensity="high">
+      <BackButton to="/" />
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
+        <Panel variant="realm" className="max-w-md w-full p-8">
+          <PageHeader 
+            title="Magical Turbulence" 
+            subtitle="An unexpected rift has occurred" 
+            size="panel"
+          />
+          <div className="text-6xl my-8">⚡</div>
+          <p className="text-[var(--pr-text-muted)] italic mb-4">
+            The spell has backfired in an unforeseen way.
+          </p>
+          <div className="p-3 bg-red-900/20 border border-red-500/30 rounded text-red-400 text-sm font-mono break-all">
+            {error.statusText || error.message || "Unknown error"}
+          </div>
+        </Panel>
+      </div>
+    </PageShell>
   );
 }

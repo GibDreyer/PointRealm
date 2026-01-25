@@ -17,7 +17,7 @@ import { PageHeader } from '../../components/ui/PageHeader';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Panel } from '../../components/ui/Panel';
 import { SummoningCircle } from '../../components/ui/SummoningCircle';
-import { RealmBackButton } from '../../components/ui/RealmBackButton';
+import { BackButton } from '../../components/ui/BackButton';
 import { Button } from '../../components/Button';
 import styles from './lobby.module.css';
 
@@ -159,7 +159,7 @@ export function TavernLobbyPage() {
             contentClassName={styles.page}
         >
             <SummoningCircle />
-            <RealmBackButton to="/" />
+            <BackButton to="/" />
             
             {status !== 'connected' && (
                 <ConnectionBanner 
@@ -221,9 +221,7 @@ export function TavernLobbyPage() {
                 </div>
 
                 <div className={styles.footerRow}>
-                    {/* Back button handled by RealmBackButton top-left, but 'Leave Realm' might be clearer here? 
-                        The original button was 'Back to Tavern'. keeping it for accessibility/clarity at bottom of flow
-                        but using Ghost variant of Button */}
+                    {/* Back button handled by BackButton top-left, but 'Leave Realm' might be clearer here? */}
                     <Button
                         variant="ghost"
                         className="min-w-[160px] uppercase tracking-[0.15em] text-[10px] opacity-60 hover:opacity-100"

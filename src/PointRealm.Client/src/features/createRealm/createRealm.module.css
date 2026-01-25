@@ -240,39 +240,7 @@
   opacity: 0.6;
 }
 
-.backRow {
-  position: absolute;
-  top: 2rem;
-  left: 2rem;
-  z-index: 20;
-}
 
-.backLink {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  color: var(--pr-text-muted);
-  background: rgba(0,0,0,0.4);
-  border: 1px solid var(--pr-surface-border);
-  cursor: pointer;
-  transition: all 0.3s var(--pr-ease-out);
-}
-
-.backLink:hover {
-  color: white;
-  border-color: var(--pr-primary-cyan);
-  background: rgba(74, 158, 255, 0.15);
-  transform: scale(1.1);
-  box-shadow: 0 0 15px rgba(74, 158, 255, 0.2);
-}
-
-.backIcon {
-  width: 22px;
-  height: 22px;
-}
 
 
 .toggleLabelGroup {

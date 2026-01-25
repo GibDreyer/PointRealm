@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, Eye, EyeOff, Loader2, UserX, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Loader2, UserX, Sparkles } from "lucide-react";
 import { generateRandomRealmName, generateRandomQuestName } from "@/lib/realmNames";
 import { SummoningCircle } from "@/components/ui/SummoningCircle";
 
@@ -21,6 +21,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Panel } from "@/components/ui/Panel";
 import { ToggleSettingRow } from "@/components/ui/ToggleSettingRow";
 import { DECKS } from "./constants";
+import { BackButton } from "@/components/ui/BackButton";
 import styles from "./createRealm.module.css";
 
 // --- Schema ---
@@ -191,11 +192,7 @@ export function CreateRealmPage() {
     >
       <SummoningCircle />
       
-      <div className={styles.backRow}>
-        <button type="button" className={styles.backLink} onClick={() => navigate("/")} aria-label="Back to Tavern"> 
-          <ArrowLeft className={styles.backIcon} />
-        </button>
-      </div>
+      <BackButton to="/" label="Back to Tavern" position="absolute" />
 
       <motion.div
         initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.95, y: 10 }}
