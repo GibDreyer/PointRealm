@@ -243,25 +243,7 @@
 
 
 
-.toggleLabelGroup {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem; /* 20px */
-}
 
-.toggleText {
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-}
-
-.toggleIcon {
-  width: 1rem; /* 16px */
-  height: 1rem;
-  color: var(--pr-primary);
-  opacity: 0.7;
-  flex-shrink: 0;
-}
 
 .randomizeBtn {
   position: absolute;

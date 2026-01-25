@@ -28,11 +28,13 @@ export const ToggleSettingRow = React.forwardRef<HTMLInputElement, ToggleSetting
 }, ref) => {
     return (
         <div className={`flex items-center justify-between gap-4 ${rowClassName || ''}`}>
-            <div className="flex items-center gap-3">
-                <Icon 
-                    size={18} 
-                    className="text-[var(--pr-text-muted)] shrink-0"
-                />
+            <div className="flex items-center gap-4">
+                <div className="flex items-center justify-center w-8 shrink-0">
+                    <Icon 
+                        size={20} 
+                        className="text-[var(--pr-text-muted)]"
+                    />
+                </div>
                 <div className="flex flex-col gap-0.5">
                     <span className="text-sm font-heading font-bold text-[var(--pr-text-primary)] tracking-wide">
                         {label}
