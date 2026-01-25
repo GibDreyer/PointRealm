@@ -19,7 +19,7 @@ export const PageShell: React.FC<PageShellProps> = ({
   className,
   contentClassName,
   showBackground = true,
-  backgroundDensity = 'medium',
+  backgroundDensity: _backgroundDensity = 'medium',
   backgroundVariant = 'default',
   reducedMotion,
 }) => {

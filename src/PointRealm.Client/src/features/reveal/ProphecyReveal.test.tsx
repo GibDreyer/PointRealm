@@ -9,9 +9,8 @@ const baseEncounter = (overrides?: Partial<Encounter>): Encounter => ({
   isRevealed: true,
   votes: {},
   distribution: {},
-  outcome: undefined,
   ...overrides,
-});
+} as Encounter);
 
 const partyRoster: PartyMember[] = [
   { id: 'm1', name: 'Aria', role: 'Member', status: 'ready', isOnline: true },

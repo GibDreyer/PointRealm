@@ -1,7 +1,6 @@
 ﻿import React, { useEffect, useMemo, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Encounter, PartyMember, Quest } from '@/types/realm';
-import { SectionHeader } from '@/components/ui/SectionHeader';
 import { Panel } from '@/components/ui/Panel';
 import { useToast } from '@/components/ui/ToastSystem';
 import { PartyVotesList } from './components/PartyVotesList';

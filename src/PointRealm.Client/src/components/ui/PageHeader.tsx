@@ -3,11 +3,11 @@ import styles from "./PageHeader.module.css";
 
 interface PageHeaderProps {
   title: string;
-  subtitle?: string;
-  align?: "center" | "left";
-  size?: "hero" | "panel";
-  showOrnaments?: boolean;
-  className?: string;
+  subtitle?: string | undefined;
+  align?: "center" | "left" | undefined;
+  size?: "hero" | "panel" | undefined;
+  showOrnaments?: boolean | undefined;
+  className?: string | undefined;
 }
 
 export const PageHeader: React.FC<PageHeaderProps> = ({

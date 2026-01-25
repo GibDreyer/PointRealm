@@ -8,7 +8,7 @@ interface Props {
 
 export function IdentityCard({ currentName }: Props) {
     return (
-        <Panel variant="subtle" className="border-pr-border/40">
+        <Panel variant="default" className="border-pr-border/40">
             <SectionHeader 
                 title="Your Identity" 
                 subtitle="How the realm sees you" 

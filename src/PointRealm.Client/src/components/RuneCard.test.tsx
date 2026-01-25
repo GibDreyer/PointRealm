@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { RuneCard } from './RuneCard';
+import { RuneCard } from '../features/realmPlay/components/RuneCard';
 
 describe('RuneCard', () => {
   it('renders value correctly', () => {

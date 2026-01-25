@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { PlayCircle, Eye, RefreshCw, AlertTriangle } from 'lucide-react';
+import { PlayCircle, Eye, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSound } from '@/hooks/useSound';
+import { ActionButton } from '@/components/ui/ActionButton';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 interface GMControlsProps {
   phase: "lobby" | "voting" | "revealed";
@@ -27,7 +28,7 @@ export const GMControls: React.FC<GMControlsProps> = ({
 }) => {
   const { play } = useSound();
   const [loading, setLoading] = useState<string | null>(null);
-  const [confirmAction, setConfirmAction] = useState<{ type: 'reroll' | 'reset', onConfirm: () => Promise<void> } | null>(null);
+  const [showConfirmReroll, setShowConfirmReroll] = useState(false);
 
   if (!canGM) return null;
 
@@ -41,14 +42,9 @@ export const GMControls: React.FC<GMControlsProps> = ({
     }
   };
 
-  const confirmReroll = () => {
-    setConfirmAction({
-      type: 'reroll',
-      onConfirm: async () => {
-        setConfirmAction(null);
-        await handleAction('reroll', onReroll);
-      }
-    });
+  const handleConfirmReroll = async () => {
+    setShowConfirmReroll(false);
+    await handleAction('reroll', onReroll);
   };
 
   return (
@@ -61,7 +57,7 @@ export const GMControls: React.FC<GMControlsProps> = ({
 
         <div className="flex flex-col gap-3">
           {phase === 'lobby' && (
-             <ControlBtn
+             <ActionButton
                icon={<PlayCircle size={18} />}
                label="Begin Encounter"
                sub="Start a new round"
@@ -73,7 +69,7 @@ export const GMControls: React.FC<GMControlsProps> = ({
           )}
 
           {phase === 'voting' && (
-            <ControlBtn
+            <ActionButton
               icon={<Eye size={18} />}
               label="Reveal Prophecy"
               sub="Show all votes"
@@ -86,11 +82,11 @@ export const GMControls: React.FC<GMControlsProps> = ({
 
           {phase === 'revealed' && (
             <>
-              <ControlBtn
+              <ActionButton
                 icon={<RefreshCw size={18} />}
                 label="Re-roll Fates"
                 sub="Clear and restart"
-                onClick={confirmReroll}
+                onClick={() => setShowConfirmReroll(true)}
                 disabled={!!loading}
                 variant="danger"
               />
@@ -110,108 +106,13 @@ export const GMControls: React.FC<GMControlsProps> = ({
       </div>
 
       <ConfirmDialog 
-        isOpen={!!confirmAction} 
-        onClose={() => setConfirmAction(null)} 
-        onConfirm={confirmAction?.onConfirm}
+        isOpen={showConfirmReroll} 
+        onClose={() => setShowConfirmReroll(false)} 
+        onConfirm={handleConfirmReroll}
         title="Re-roll the Fates?"
         description="This will clear all current votes and reset the round. This action cannot be undone."
+        variant="danger"
       />
     </>
-  );
-};
-
-interface ControlBtnProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  icon: React.ReactNode;
-  label: string;
-  sub?: string;
-  loading?: boolean;
-  variant?: 'primary' | 'action' | 'danger' | 'default';
-}
-
-const ControlBtn: React.FC<ControlBtnProps> = ({ icon, label, sub, loading, variant = 'default', className, ...props }) => {
-  const variants = {
-    primary: "bg-primary/20 hover:bg-primary/30 text-primary border-primary/30",
-    action: "bg-secondary/20 hover:bg-secondary/30 text-secondary border-secondary/30",
-    danger: "bg-danger/10 hover:bg-danger/20 text-danger border-danger/20",
-    default: "bg-surfaceElevated hover:bg-surface border-border",
-  };
-
-  return (
-    <button
-      className={cn(
-        "flex items-center gap-3 p-3 rounded-lg border transition-all disabled:opacity-50 disabled:cursor-not-allowed",
-        variants[variant],
-        className
-      )}
-      disabled={props.disabled || loading}
-      {...props}
-    >
-      <div className={cn("p-2 rounded-full bg-black/20", loading && "animate-spin")}>
-        {loading ? <RefreshCw size={18} /> : icon}
-      </div>
-      <div className="flex flex-col items-start">
-        <span className="text-sm font-bold leading-none">{label}</span>
-        {sub && <span className="text-[10px] opacity-80 mt-1">{sub}</span>}
-      </div>
-    </button>
-  );
-};
-
-const ConfirmDialog: React.FC<{
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm?: any;
-  title: string;
-  description: string;
-}> = ({ isOpen, onClose, onConfirm, title, description }) => {
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center -translate-y-[100px] pointer-events-none">
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto"
-          />
-
-          {/* Dialog */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className="relative pointer-events-auto bg-surface border border-danger/30 rounded-xl shadow-2xl p-6 max-w-sm w-full mx-4 overflow-hidden"
-          >
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-danger/0 via-danger to-danger/0" />
-            
-            <div className="flex flex-col gap-4 text-center items-center">
-              <div className="p-3 rounded-full bg-danger/10 text-danger mb-2">
-                <AlertTriangle size={24} />
-              </div>
-              
-              <h3 className="text-lg font-bold font-heading">{title}</h3>
-              <p className="text-sm text-textMuted">{description}</p>
-              
-              <div className="flex gap-3 w-full mt-2">
-                <button
-                  onClick={onClose}
-                  className="flex-1 py-2 rounded-lg border border-border hover:bg-surfaceElevated transition-colors text-sm"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={onConfirm}
-                  className="flex-1 py-2 rounded-lg bg-danger hover:bg-danger/90 text-white font-bold transition-colors text-sm"
-                >
-                  Confirm
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
   );
 };

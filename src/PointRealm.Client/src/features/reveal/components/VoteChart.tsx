@@ -39,12 +39,14 @@ export const VoteChart: React.FC<VoteChartProps> = ({
     const average = weightedSum / totalWeight;
     
     // Mode (most common)
-    const mode = numericData.reduce((max, d) => d.count > max.count ? d : max, numericData[0]);
+    const mode = numericData.length > 0 
+      ? numericData.reduce((maxItem, d) => d.count > maxItem.count ? d : maxItem, numericData[0]!)
+      : undefined;
     
     // Range
     const values = numericData.map(d => d.value);
     const min = Math.min(...values);
-    const max = Math.max(...values);
+    const max = values.length > 0 ? Math.max(...values) : min;
     
     return {
       average: average.toFixed(1),

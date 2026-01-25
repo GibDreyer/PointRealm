@@ -18,8 +18,8 @@ import { Input } from "@/components/ui/Input";
 import { PageShell } from "@/components/shell/PageShell";
 import { PageFooter } from "@/components/ui/PageFooter";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Panel } from "@/components/ui/Panel"; // Use new Panel
-import { Toggle } from "@/components/ui/Toggle"; // Use new Toggle
+import { Panel } from "@/components/ui/Panel";
+import { ToggleSettingRow } from "@/components/ui/ToggleSettingRow";
 import { DECKS } from "./constants";
 import styles from "./createRealm.module.css";
 
@@ -322,40 +322,32 @@ export function CreateRealmPage() {
                     <h2 className={styles.sectionTitle}>Rituals</h2>
                   </div>
                   <div className={styles.toggleList}>
-                    <div className={styles.toggleItem}>
-                        <div className={styles.toggleLabelGroup}>
-                           <Eye className={styles.toggleIcon} />
-                           <div className={styles.toggleText}>
-                               <span className="text-sm font-heading font-bold text-[var(--pr-text-primary)] tracking-wide">Auto Reveal</span>
-                               <span className="text-[10px] text-[var(--pr-text-muted)] uppercase tracking-widest font-medium">When all voted</span>
-                           </div>
-                        </div>
-                        <Toggle {...form.register("autoReveal")} disabled={isSubmitting} />
-                    </div>
+                    <ToggleSettingRow
+                      icon={Eye}
+                      label="Auto Reveal"
+                      description="When all voted"
+                      {...form.register("autoReveal")}
+                      disabled={isSubmitting}
+                      rowClassName={styles.toggleItem}
+                    />
 
-                    <div className={styles.toggleItem}>
-                        <div className={styles.toggleLabelGroup}>
-                           <UserX className={styles.toggleIcon} />
-                           <div className={styles.toggleText}>
-                               <span className="text-sm font-heading font-bold text-[var(--pr-text-primary)] tracking-wide">Allow Abstain</span>
-                               <span className="text-[10px] text-[var(--pr-text-muted)] uppercase tracking-widest font-medium">Permit uncertainty</span>
-                           </div>
-                        </div>
-                        <Toggle {...form.register("allowAbstain")} disabled={isSubmitting} />
-                    </div>
+                    <ToggleSettingRow
+                      icon={UserX}
+                      label="Allow Abstain"
+                      description="Permit uncertainty"
+                      {...form.register("allowAbstain")}
+                      disabled={isSubmitting}
+                      rowClassName={styles.toggleItem}
+                    />
 
-                    <div className={styles.toggleItem}>
-                        <div className={styles.toggleLabelGroup}>
-                           <EyeOff className={styles.toggleIcon} />
-                           <div className={styles.toggleText}>
-                               <span className="text-sm font-heading font-bold text-[var(--pr-text-primary)] tracking-wide">Hide Counts</span>
-                               <span className="text-[10px] text-[var(--pr-text-muted)] uppercase tracking-widest font-medium">Until reveal</span>
-                           </div>
-                        </div>
-                        <Toggle {...form.register("hideVoteCounts")} disabled={isSubmitting} />
-                    </div>
-
-
+                    <ToggleSettingRow
+                      icon={EyeOff}
+                      label="Hide Counts"
+                      description="Until reveal"
+                      {...form.register("hideVoteCounts")}
+                      disabled={isSubmitting}
+                      rowClassName={styles.toggleItem}
+                    />
                   </div>
                 </section>
 

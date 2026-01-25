@@ -1,4 +1,4 @@
-import { History, Trash2, X } from 'lucide-react';
+import { Trash2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RecentRealmItem } from '../../../lib/storage';
 import styles from './RecentRealmsList.module.css';
