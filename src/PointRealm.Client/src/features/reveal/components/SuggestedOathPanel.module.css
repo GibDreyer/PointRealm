@@ -2,15 +2,16 @@
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: linear-gradient(145deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%);
-  padding: 1.5rem 2rem;
-  text-align: center;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
   position: relative;
   overflow: hidden;
-  max-width: 360px;
-  width: 100%;
-  margin: 0 auto;
+  max-width: 400px;
+  width: auto;
   box-shadow: 
-    0 10px 30px rgba(0, 0, 0, 0.5),
+    0 4px 20px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
@@ -48,33 +49,24 @@
   border-image: linear-gradient(
     135deg,
     var(--pr-primary-cyan) 0%,
-    transparent 30%,
-    transparent 70%,
+    transparent 20%,
+    transparent 80%,
     var(--pr-primary-cyan) 100%
   ) 1;
   pointer-events: none;
   opacity: 0.2;
 }
 
-.panel {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+.runeContainer {
+  flex-shrink: 0;
   position: relative;
   z-index: 1;
 }
 
-.chipWrap {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.25rem 0;
-}
-
 .runeValue {
-  width: 70px;
-  height: 70px;
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
   border: 2px solid var(--pr-primary-cyan);
   background: linear-gradient(
     145deg,
@@ -85,91 +77,81 @@
   align-items: center;
   justify-content: center;
   font-family: var(--pr-heading-font);
-  font-size: 2.25rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--pr-primary-cyan);
-  text-shadow: 0 0 16px var(--pr-primary-glow);
+  text-shadow: 0 0 12px var(--pr-primary-glow);
   box-shadow: 
-    0 0 20px var(--pr-primary-glow),
-    0 0 40px color-mix(in srgb, var(--pr-primary-cyan) 10%, transparent),
-    0 8px 24px rgba(0, 0, 0, 0.4),
+    0 0 15px var(--pr-primary-glow),
+    0 4px 12px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   animation: oathPulse 3s ease-in-out infinite;
   position: relative;
 }
 
-.runeValue::before {
-  content: "";
-  position: absolute;
-  inset: -4px;
-  border-radius: 16px;
-  border: 1px solid var(--pr-primary-cyan);
-  opacity: 0.2;
-  animation: ringPulse 3s ease-in-out infinite;
+.textContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  white-space: nowrap;
+}
+
+.label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: var(--pr-heading-font);
+  color: var(--pr-secondary-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.9;
+}
+
+.titleLine {
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(90deg, rgba(230, 176, 78, 0.4), transparent);
+}
+
+.helper {
+  font-size: 0.65rem;
+  color: var(--pr-text-muted);
+  line-height: 1.2;
 }
 
 @keyframes oathPulse {
   0%, 100% {
     box-shadow: 
-      0 0 20px var(--pr-primary-glow),
-      0 0 40px color-mix(in srgb, var(--pr-primary-cyan) 10%, transparent),
-      0 8px 24px rgba(0, 0, 0, 0.4),
+      0 0 15px var(--pr-primary-glow),
+      0 4px 12px rgba(0, 0, 0, 0.4),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
   50% {
     box-shadow: 
-      0 0 30px var(--pr-primary-glow),
-      0 0 60px color-mix(in srgb, var(--pr-primary-cyan) 20%, transparent),
-      0 8px 24px rgba(0, 0, 0, 0.4),
+      0 0 25px var(--pr-primary-glow),
+      0 4px 12px rgba(0, 0, 0, 0.4),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
-}
-
-@keyframes ringPulse {
-  0%, 100% {
-    opacity: 0.2;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.4;
-    transform: scale(1.02);
-  }
-}
-
-.helper {
-  font-size: 0.65rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--pr-text-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.helper::before,
-.helper::after {
-  content: "";
-  width: 16px;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--pr-text-dim),
-    transparent
-  );
 }
 
 /* Responsive */
 @media (max-width: 640px) {
   .wrapper {
-    padding: 0.75rem 1rem;
-    max-width: 280px;
+    padding: 0.6rem 1rem;
+    gap: 1rem;
   }
   
   .runeValue {
-    width: 60px;
-    height: 60px;
-    font-size: 2rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
   }
 }

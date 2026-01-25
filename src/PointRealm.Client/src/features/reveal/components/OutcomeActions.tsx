@@ -1,5 +1,4 @@
 ﻿import React from 'react';
-import { SectionHeader } from '@/components/ui/SectionHeader';
 import styles from './OutcomeActions.module.css';
 import { cn } from '@/lib/utils';
 
@@ -22,23 +21,18 @@ export const OutcomeActions: React.FC<OutcomeActionsProps> = ({
   onReroll,
   onSealOutcome,
 }) => {
+  if (!isGM) return null;
+
   const sealOptions = deckValues.filter(isNumericValue);
 
   return (
     <div className={styles.container}>
-      <div className={styles.row}>
-        <SectionHeader title="Seal the Outcome" subtitle="Final estimate" className="mb-0" />
-        <button
-          type="button"
-          className={styles.rerollButton}
-          onClick={onReroll}
-          disabled={isSealed}
-        >
-          Re-roll the Fates
-        </button>
-      </div>
+      <div className={styles.content}>
+        <div className={styles.labelGroup}>
+          <span className={styles.label}>Seal Prophecy</span>
+          <div className={styles.labelLine} />
+        </div>
 
-      {isGM && (
         <div className={styles.chipRow}>
           {sealOptions.map((val) => (
             <button
@@ -55,18 +49,19 @@ export const OutcomeActions: React.FC<OutcomeActionsProps> = ({
               {sealingValue === val ? '...' : val}
             </button>
           ))}
-          {deckValues.filter(v => !isNumericValue(v)).map((val) => (
-            <button
-              key={val}
-              type="button"
-              className={cn(styles.sealChip, styles.disabledChip)}
-              disabled
-            >
-              {val}
-            </button>
-          ))}
         </div>
-      )}
+
+        <div className={styles.divider} />
+
+        <button
+          type="button"
+          className={styles.rerollButton}
+          onClick={onReroll}
+          disabled={isSealed}
+        >
+          Re-roll
+        </button>
+      </div>
     </div>
   );
 };

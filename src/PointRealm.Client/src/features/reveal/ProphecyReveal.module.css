@@ -41,17 +41,26 @@
   opacity: 0.3;
 }
 
+/* New Top Row layout */
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2rem 0.75rem;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.03), transparent);
+  gap: 2rem;
+}
+
 /* Header Section */
 .headerSection {
-  padding: 2rem 2rem 1rem;
+  flex: 1;
   position: relative;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.03), transparent);
 }
 
 .headerDecor {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 1rem;
   margin-bottom: 0.5rem;
 }
@@ -77,12 +86,12 @@
 }
 
 .header {
-  text-align: center;
+  text-align: left;
 }
 
 .mainTitle {
   font-family: var(--pr-heading-font);
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
   font-weight: 700;
   color: var(--pr-text-primary);
   text-transform: uppercase;
@@ -139,7 +148,7 @@
 }
 
 .stamp {
-  margin-left: auto;
+  margin-left: 0.5rem;
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
   border: 1px solid var(--pr-success);
@@ -153,17 +162,15 @@
 
 /* Oath Section */
 .oathSection {
-  padding: 1.5rem 2rem;
-  display: flex;
-  justify-content: center;
+  flex-shrink: 0;
 }
 
 /* Main Grid */
 .grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
-  gap: 2rem;
-  padding: 0 2rem 2rem;
+  grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.9fr);
+  gap: 1.5rem;
+  padding: 0 1.5rem 1.5rem;
 }
 
 .chartSection {
@@ -216,36 +223,53 @@
   .panel::after {
     display: none;
   }
-  
+
+  .topRow {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
   .headerSection {
-    padding: 1rem 1rem 0.5rem;
+    text-align: center;
+  }
+
+  .headerDecor {
+    justify-content: center;
+  }
+
+  .header {
+    text-align: center;
   }
 
   .banner {
     flex-direction: row;
     justify-content: center;
     padding: 0.4rem 0.75rem;
+    margin: 0 1rem;
   }
   
   .bannerId {
     display: none;
   }
-  
+
   .stamp {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
+    position: relative;
+    top: auto;
+    right: auto;
+    margin: 0 0.5rem 0 0;
   }
 
   .grid {
-    padding: 0 1rem 1rem;
+    padding: 0 1rem 1.5rem;
   }
 
   .oathSection {
-    padding: 0.75rem 1rem;
+    padding: 0;
   }
 
   .actionsRow {
-    padding: 0.75rem 1rem;
+    padding: 1rem;
   }
 }

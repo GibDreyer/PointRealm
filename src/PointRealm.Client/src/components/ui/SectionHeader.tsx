@@ -3,7 +3,7 @@ import { cn } from '../../lib/utils';
 
 interface SectionHeaderProps {
   title: string;
-  subtitle?: string;
+  subtitle?: string | undefined;
   className?: string;
 }
 

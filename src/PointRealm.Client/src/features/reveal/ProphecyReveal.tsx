@@ -134,31 +134,52 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
     return { kind: 'median' as const, value: median.toString() };
   }, [revealed, voteRows]);
 
+  const spread = useMemo(() => {
+    if (!revealed) return null;
+    const numericVotes = voteRows
+      .map(row => getNumericVote(row.voteValue))
+      .filter((val): val is number => val !== null);
+    
+    if (numericVotes.length < 2) return null;
+    return Math.max(...numericVotes) - Math.min(...numericVotes);
+  }, [revealed, voteRows]);
+
   return (
     <div className={`${styles.wrapper} ${className ?? ''}`}>
       <VignettePulse active={showVignette && !prefersReducedMotion} />
 
       <Panel className={styles.panel} noPadding variant={panelVariant}>
-        {/* Header with decorative elements */}
-        <div className={styles.headerSection}>
-          {!minimal && <div className={styles.headerDecor}>
-            <div className={styles.decorLine} />
-            <div className={styles.decorGem} />
-            <div className={styles.decorLine} />
-          </div>}
+        <div className={styles.topRow}>
+          {/* Header with decorative elements */}
+          <div className={styles.headerSection}>
+            {!minimal && <div className={styles.headerDecor}>
+              <div className={styles.decorLine} />
+              <div className={styles.decorGem} />
+              <div className={styles.decorLine} />
+            </div>}
+            <motion.div 
+              className={styles.header}
+              initial={prefersReducedMotion ? {} : { opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <h1 className={styles.mainTitle}>{minimal ? 'The Prophecy' : 'Prophecy Revealed'}</h1>
+              {!minimal && <p className={styles.subtitle}>The runes have spoken</p>}
+            </motion.div>
+          </div>
+
+          {/* Suggested Oath - Now on the right */}
           <motion.div 
-            className={styles.header}
-            initial={prefersReducedMotion ? {} : { opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+            className={styles.oathSection}
+            initial={prefersReducedMotion ? {} : { opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <h1 className={styles.mainTitle}>{minimal ? 'The Prophecy' : 'Prophecy Revealed'}</h1>
-            {!minimal && <p className={styles.subtitle}>The runes have spoken</p>}
+            <SuggestedOathPanel suggestion={suggestion} />
           </motion.div>
         </div>
 
         {/* Quest Banner */}
-        {/* Quest Banner - Hide in minimal, or show simplified */}
         {!minimal && <motion.div 
           className={styles.banner}
           initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.98 }}
@@ -180,18 +201,8 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
           )}
         </motion.div>}
 
-        {/* Suggested Oath - Prominent Center Display */}
-        <motion.div 
-          className={styles.oathSection}
-          initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <SuggestedOathPanel suggestion={suggestion} />
-        </motion.div>
-
         {/* Main Content Grid */}
-        <div className={minimal ? "grid grid-cols-1 sm:grid-cols-2 gap-4 h-full min-h-0" : styles.grid}>
+        <div className={minimal ? "p-4 grid grid-cols-1 sm:grid-cols-2 gap-6 h-full min-h-0" : styles.grid}>
           {/* Chart Section - ALWAYS render, but compact if minimal */}
           <motion.div 
             className={minimal ? "min-h-0 overflow-visible" : styles.chartSection}
@@ -219,12 +230,14 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
               deckValues={deckValues}
               revealed={revealed}
               hideVoteCounts={hideVoteCounts}
+              compact={minimal}
+              spread={spread}
             />
           </motion.div>
         </div>
 
-        {/* Actions Section */}
-        {revealed && (
+        {/* Actions Section - GM Only */}
+        {revealed && isGM && (
           <motion.div 
             className={styles.actionsRow}
             initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}

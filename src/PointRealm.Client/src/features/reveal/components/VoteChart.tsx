@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { cn } from '@/lib/utils';
 import styles from './VoteChart.module.css';
 
 export interface ChartDataItem {
@@ -60,7 +61,11 @@ export const VoteChart: React.FC<VoteChartProps> = ({
   if (!revealed || data.length === 0) {
     return (
       <div className={styles.wrapper}>
-        {!compact && <SectionHeader title="Vote Analysis" subtitle="Results" className="mb-0" />}
+        {compact ? (
+          <SectionHeader title="Vote Analysis" className="mb-0" />
+        ) : (
+          <SectionHeader title="Vote Analysis" subtitle="Results" className="mb-0" />
+        )}
         <div className={styles.empty}>
           <div className={styles.emptyIcon}>📊</div>
           <div className={styles.emptyText}>Awaiting revelation...</div>
@@ -70,28 +75,32 @@ export const VoteChart: React.FC<VoteChartProps> = ({
   }
 
   return (
-    <div className={compact ? "flex flex-col gap-4 w-full h-full" : styles.wrapper}>
-      {!compact && <SectionHeader title="Vote Analysis" subtitle="Results" className="mb-0" />}
+    <div className={cn(styles.wrapper, compact && "gap-4")}>
+      {compact ? (
+        <SectionHeader title="Vote Analysis" className="mb-0" />
+      ) : (
+        <SectionHeader title="Vote Analysis" subtitle="Results" className="mb-0" />
+      )}
       
       {/* Stats Row */}
       {stats && (
         <motion.div 
-          className={compact ? "grid grid-cols-3 gap-2" : styles.statsRow}
+          className={cn(styles.statsRow, compact && styles.statsRowCompact)}
           initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <div className={compact ? "bg-black/20 rounded p-2 text-center border border-white/5" : styles.statCard}>
-            <div className={compact ? "text-xl font-bold text-pr-primary leading-none" : styles.statValue}>{stats.average}</div>
-            <div className={compact ? "text-[10px] uppercase tracking-wider text-pr-text-muted mt-1" : styles.statLabel}>AVG</div>
+          <div className={styles.statCard}>
+            <div className={styles.statValue}>{stats.average}</div>
+            <div className={styles.statLabel}>AVG</div>
           </div>
-          <div className={compact ? "bg-black/20 rounded p-2 text-center border border-white/5" : styles.statCard}>
-            <div className={compact ? "text-xl font-bold text-pr-primary leading-none" : styles.statValue}>{stats.mode}</div>
-            <div className={compact ? "text-[10px] uppercase tracking-wider text-pr-text-muted mt-1" : styles.statLabel}>MODE</div>
+          <div className={styles.statCard}>
+            <div className={styles.statValue}>{stats.mode}</div>
+            <div className={styles.statLabel}>MODE</div>
           </div>
-          <div className={compact ? "bg-black/20 rounded p-2 text-center border border-white/5" : styles.statCard}>
-            <div className={compact ? "text-xl font-bold text-pr-text leading-none" : styles.statValue}>{totalVotes}</div>
-            <div className={compact ? "text-[10px] uppercase tracking-wider text-pr-text-muted mt-1" : styles.statLabel}>VOTES</div>
+          <div className={styles.statCard}>
+            <div className={styles.statValue}>{totalVotes}</div>
+            <div className={styles.statLabel}>VOTES</div>
           </div>
         </motion.div>
       )}
@@ -139,35 +148,6 @@ export const VoteChart: React.FC<VoteChartProps> = ({
         </div>
       </div>
       
-      {/* Consensus Indicator */}
-      {stats && data.length > 1 && (
-        <motion.div 
-          className={styles.consensus}
-          initial={prefersReducedMotion ? {} : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-        >
-          <div className={styles.consensusLabel}>Consensus Level</div>
-          <div className={styles.consensusBar}>
-            <motion.div 
-              className={styles.consensusFill}
-              style={{ 
-                background: stats.spread <= 2 
-                  ? 'linear-gradient(90deg, var(--pr-success), #22c55e)' 
-                  : stats.spread <= 5 
-                    ? 'linear-gradient(90deg, var(--pr-warning), #fbbf24)'
-                    : 'linear-gradient(90deg, var(--pr-danger), #f87171)'
-              }}
-              initial={prefersReducedMotion ? {} : { width: 0 }}
-              animate={{ width: `${Math.max(20, 100 - stats.spread * 8)}%` }}
-              transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            />
-          </div>
-          <div className={styles.consensusText}>
-            {stats.spread <= 2 ? 'High agreement' : stats.spread <= 5 ? 'Moderate spread' : 'Wide disagreement'}
-          </div>
-        </motion.div>
-      )}
     </div>
   );
 };

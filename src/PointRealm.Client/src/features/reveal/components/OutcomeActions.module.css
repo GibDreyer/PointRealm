@@ -1,47 +1,50 @@
 ﻿.container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  padding-top: 0.5rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.2);
 }
 
-.row {
+.content {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
+  gap: 1.5rem;
+  padding: 0 1.5rem;
+  flex-wrap: wrap;
 }
 
-.rerollButton {
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--pr-secondary-gold) 40%, var(--pr-surface-border));
-  background: color-mix(in srgb, var(--pr-secondary-gold) 6%, transparent);
+.labelGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  white-space: nowrap;
+}
+
+.label {
+  font-family: var(--pr-heading-font);
+  font-size: 0.65rem;
+  font-weight: 700;
   color: var(--pr-secondary-gold);
-  padding: 0.35rem 1rem;
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
   text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.25s ease;
+  letter-spacing: 0.12em;
 }
 
-.rerollButton:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--pr-secondary-gold) 12%, transparent);
-  border-color: var(--pr-secondary-gold);
-}
-
-.rerollButton:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
+.labelLine {
+  height: 1px;
+  width: 30px;
+  background: linear-gradient(90deg, rgba(230, 176, 78, 0.4), transparent);
 }
 
 .chipRow {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
+  flex: 1;
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .sealChip {
@@ -104,4 +107,55 @@
   opacity: 0.2;
   cursor: not-allowed;
   color: var(--pr-text-dim);
+}
+
+.rerollButton {
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--pr-secondary-gold) 40%, var(--pr-surface-border));
+  background: color-mix(in srgb, var(--pr-secondary-gold) 10%, transparent);
+  color: var(--pr-secondary-gold);
+  padding: 0.4rem 1.2rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.rerollButton:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--pr-secondary-gold) 20%, transparent);
+  border-color: var(--pr-secondary-gold);
+  box-shadow: 0 0 15px rgba(230, 176, 78, 0.2);
+}
+
+.rerollButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.25rem;
+    padding: 1rem;
+  }
+  
+  .divider {
+    display: none;
+  }
+  
+  .labelLine {
+    flex: 1;
+  }
+  
+  .chipRow {
+    justify-content: center;
+  }
+  
+  .rerollButton {
+    text-align: center;
+  }
 }

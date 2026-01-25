@@ -2,7 +2,7 @@ import * as signalR from "@microsoft/signalr";
 
 const HUB_URL = import.meta.env.VITE_SIGNALR_HUB_URL || "/hubs/realm";
 
-class RealmHub {
+export class RealmHub {
   private connection: signalR.HubConnection | null = null;
   private startedPromise: Promise<void> | null = null;
   private currentMemberToken: string | null = null;

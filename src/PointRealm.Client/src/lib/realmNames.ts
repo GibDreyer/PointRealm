@@ -48,3 +48,15 @@ export function generateRandomQuestName(): string {
   const target = QUEST_TARGETS[Math.floor(Math.random() * QUEST_TARGETS.length)];
   return `${action} ${target}`;
 }
+
+const BOT_CLASSES = [
+  "Rogue", "Wizard", "Paladin", "Cleric", "Barbarian", "Druid", "Bard", 
+  "Sorcerer", "Warlock", "Monk", "Ranger", "Fighter", "Artificer",
+  "Goblin", "Skeleton", "Orc", "Ghost", "Spirit", "Apprentice"
+];
+
+export function generateBotName(): string {
+  const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+  const cls = BOT_CLASSES[Math.floor(Math.random() * BOT_CLASSES.length)];
+  return `${adj} ${cls}`;
+}
