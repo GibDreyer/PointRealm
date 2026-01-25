@@ -1,4 +1,4 @@
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet, useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { api } from "../../api/client";
@@ -10,6 +10,16 @@ export function RealmLayout() {
   const { code } = useParams<{ code: string }>();
   const realmCode = code;
   const { setThemeKey } = useTheme();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (realmCode) {
+      const token = sessionStorage.getItem(`pointrealm:v1:realm:${realmCode}:token`);
+      if (!token) {
+        navigate(`/join?realmCode=${realmCode}`, { replace: true });
+      }
+    }
+  }, [realmCode, navigate]);
 
   const { data: realm } = useQuery({
     queryKey: ['realm', realmCode],

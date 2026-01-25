@@ -41,13 +41,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 1;
-  min-height: clamp(320px, 50vh, 520px);
+  flex: 1 1 200px; /* Highly flexible, allows shrinking to 200px */
+  min-height: 0;
 }
 
 .tableWrap {
   position: relative;
   width: min(100%, 560px);
+  max-height: 100%;
   aspect-ratio: 1 / 1;
 }
 
@@ -221,37 +222,58 @@
 }
 
 .voteTray {
-  position: sticky;
-  bottom: 0;
-  padding: 1.25rem clamp(1.25rem, 3vw, 2rem);
-  border-radius: 16px;
-  border: 1px solid var(--pr-surface-border);
+  position: relative;
+  z-index: 20;
+  margin-top: auto;
+  padding: 1rem clamp(1rem, 3vw, 2rem); /* More compact padding */
+  border-radius: var(--pr-radius-lg);
+  border: 1px solid rgba(74, 158, 255, 0.1);
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--pr-surface-slate) 85%, transparent) 0%,
-    color-mix(in srgb, var(--pr-bg-dark) 90%, transparent) 100%
+    rgba(19, 23, 31, 0.8) 0%,
+    rgba(5, 10, 16, 0.95) 100%
   );
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
   box-shadow: 
-    0 -4px 24px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    0 -10px 40px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .voteHeader {
   text-align: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.75rem; /* Reduced from 1.25rem */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
 }
 
 .voteScroller {
   display: flex;
-  gap: 0.75rem;
+  justify-content: center;
+  gap: 1rem; /* More compact gap */
   overflow-x: auto;
-  padding-bottom: 0.3rem;
+  padding: 0.25rem 0.5rem 0.75rem;
   scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: var(--pr-surface-border) transparent;
+}
+
+.voteScroller::-webkit-scrollbar {
+  height: 4px;
+}
+
+.voteScroller::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.voteScroller::-webkit-scrollbar-thumb {
+  background: var(--pr-surface-border);
+  border-radius: 2px;
 }
 
 .voteCard {
-  width: clamp(56px, 7vw, 72px);
+  width: clamp(70px, 8vw, 90px); /* Slightly smaller width = smaller height */
   flex: 0 0 auto;
   scroll-snap-align: start;
 }
@@ -316,6 +338,6 @@
   }
 
   .voteCard {
-    width: clamp(52px, 16vw, 64px);
+    width: clamp(70px, 20vw, 90px);
   }
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useRealm } from '../../hooks/useRealm';
 import { QuestLogPanel } from './components/QuestLogPanel';
 import { PartyRosterPanel } from './components/PartyRosterPanel';
@@ -11,10 +11,12 @@ import { PageShell } from '../../components/shell/PageShell';
 import { Users } from 'lucide-react';
 import { RealmSettingsDialog } from '../realmLobby/components/RealmSettingsDialog';
 import { Panel } from '../../components/ui/Panel';
+import { Button } from '../../components/Button';
 import styles from './realmScreen.module.css';
 
 export function RealmScreen() {
     const { code } = useParams<{ code: string }>();
+    const navigate = useNavigate();
     
     // We use the 'code' from params for hook
     const { state, loading, error, isConnected, actions, connect } = useRealm(code);
@@ -44,13 +46,30 @@ export function RealmScreen() {
                     animate={{ opacity: 1 }}
                     className="flex flex-col items-center gap-6"
                 >
-                    <div className="relative w-16 h-16">
-                        <div className="absolute inset-0 rounded-full border-4 border-pr-primary/20" />
-                        <div className="absolute inset-0 rounded-full border-4 border-t-pr-primary animate-spin" />
-                    </div>
-                    <div className="text-pr-primary font-black uppercase tracking-[0.3em] text-sm animate-pulse">
-                        Entering the Realm
-                    </div>
+                    {error ? (
+                        <>
+                            <div className="text-red-500 font-black uppercase tracking-[0.2em] text-center">
+                                <h2 className="text-xl mb-2">The Portal is Blocked</h2>
+                                <p className="text-sm opacity-80">{error}</p>
+                            </div>
+                            <Button 
+                                variant="secondary" 
+                                onClick={() => navigate(`/join?realmCode=${code}`)}
+                            >
+                                Rejoin Realm
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <div className="relative w-16 h-16">
+                                <div className="absolute inset-0 rounded-full border-4 border-pr-primary/20" />
+                                <div className="absolute inset-0 rounded-full border-4 border-t-pr-primary animate-spin" />
+                            </div>
+                            <div className="text-pr-primary font-black uppercase tracking-[0.3em] text-sm animate-pulse">
+                                Entering the Realm
+                            </div>
+                        </>
+                    )}
                 </motion.div>
             </PageShell>
         );

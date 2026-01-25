@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Eye, Shield, Loader2 } from 'lucide-react';
 
@@ -30,12 +30,13 @@ export type RealmRole = 'participant' | 'observer';
 
 export function JoinRealmPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const prefersReducedMotion = useReducedMotion() ?? false;
   const tipUrl = import.meta.env.VITE_TIP_JAR_URL || '/tip';
   const tipIsExternal = /^https?:\/\//i.test(tipUrl);
 
   const [displayName, setDisplayName] = useState('');
-  const [realmInput, setRealmInput] = useState('');
+  const [realmInput, setRealmInput] = useState(searchParams.get('realmCode') || '');
   const [role, setRole] = useState<RealmRole>('participant');
 
   const [recentRealms, setRecentRealms] = useState<RecentRealmItem[]>([]);
@@ -48,6 +49,13 @@ export function JoinRealmPage() {
     if (savedName) setDisplayName(savedName);
     setRecentRealms(getRecentRealms());
   }, []);
+
+  useEffect(() => {
+    const codeFromUrl = searchParams.get('realmCode');
+    if (codeFromUrl) {
+      setRealmInput(codeFromUrl);
+    }
+  }, [searchParams]);
 
   const handleNameBlur = () => {
     if (displayName.trim()) {
