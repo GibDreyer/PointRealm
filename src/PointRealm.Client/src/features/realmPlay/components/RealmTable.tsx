@@ -21,6 +21,7 @@ interface RealmTableProps {
     onSealOutcome: (value: string) => Promise<void>;
     deckValues: string[];
     hideVoteCounts: boolean;
+    actionsDisabled?: boolean;
     className?: string;
 }
 
@@ -34,6 +35,7 @@ export function RealmTable({
     onSealOutcome, 
     deckValues,
     hideVoteCounts,
+    actionsDisabled = false,
     className 
 }: RealmTableProps) {
     // We need to distribute members around the table
@@ -123,7 +125,7 @@ export function RealmTable({
                                             <Button
                                                 variant="secondary"
                                                 onClick={onReroll}
-                                                disabled={readyCount === 0}
+                                                disabled={readyCount === 0 || actionsDisabled}
                                                 className="px-10 py-5 text-lg min-h-0 h-14"
                                             >
                                                 <RefreshCcw size={18} className="mr-3" />
@@ -131,7 +133,7 @@ export function RealmTable({
                                             </Button>
                                             <Button
                                                 onClick={onReveal}
-                                                disabled={readyCount === 0}
+                                                disabled={readyCount === 0 || actionsDisabled}
                                                 className="px-10 py-5 text-lg min-h-0 h-14"
                                             >
                                                 <Eye size={18} className="mr-3" />
@@ -185,6 +187,7 @@ export function RealmTable({
                                              <Button
                                                  variant="secondary"
                                                  onClick={onReroll}
+                                                 disabled={actionsDisabled}
                                                  className="px-10 py-2 text-xs min-h-0 h-10 border-pr-secondary/30 hover:border-pr-secondary/60 transition-all duration-500"
                                              >
                                                  <RefreshCcw size={14} className="mr-3 opacity-70" />
@@ -238,6 +241,7 @@ export function RealmTable({
                         hideVoteCounts={hideVoteCounts}
                         minimal
                         panelVariant="realm"
+                        actionsDisabled={actionsDisabled}
                     />
                 )}
             </Dialog>

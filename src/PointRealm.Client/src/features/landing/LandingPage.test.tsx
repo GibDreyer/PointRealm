@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { LandingPage } from './LandingPage';
 import { MemoryRouter } from 'react-router-dom';
+import { RootProvider } from '@/app/providers/RootProvider';
 import '@testing-library/jest-dom';
 
 // Mock useNavigate
@@ -15,7 +16,6 @@ vi.mock('react-router-dom', async () => {
 });
 
 // Mock ResizeObserver for Framer Motion or Layout
-// This is often needed in JSDOM environments
 window.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
@@ -36,13 +36,18 @@ vi.mock('@/components/backgrounds/StarfieldBackground', () => ({
   StarfieldBackground: () => null,
 }));
 
-describe('LandingPage', () => {
-  it('navigates to create realm page when "Create Realm" is clicked', () => {
-    render(
+const renderPage = () =>
+  render(
+    <RootProvider>
       <MemoryRouter>
         <LandingPage />
       </MemoryRouter>
-    );
+    </RootProvider>
+  );
+
+describe('LandingPage', () => {
+  it('navigates to create realm page when "Create Realm" is clicked', () => {
+    renderPage();
 
     const createBtn = screen.getByText(/Create Realm/i);
     fireEvent.click(createBtn);
@@ -51,11 +56,7 @@ describe('LandingPage', () => {
   });
 
   it('navigates to join realm page when "Join Realm" is clicked', () => {
-    render(
-      <MemoryRouter>
-        <LandingPage />
-      </MemoryRouter>
-    );
+    renderPage();
 
     const joinBtn = screen.getByText(/Join Realm/i);
     fireEvent.click(joinBtn);
@@ -64,11 +65,7 @@ describe('LandingPage', () => {
   });
 
   it('renders key content', () => {
-    render(
-      <MemoryRouter>
-        <LandingPage />
-      </MemoryRouter>
-    );
+    renderPage();
     
     expect(screen.getByText('PointRealm')).toBeInTheDocument();
     expect(screen.getByText('Co-op estimation, RPG style.')).toBeInTheDocument();

@@ -23,6 +23,7 @@ interface ProphecyRevealProps {
   hideVoteCounts?: boolean;
   minimal?: boolean;
   panelVariant?: 'default' | 'glow' | 'realm';
+  actionsDisabled?: boolean;
 }
 
 // getNumericVote moved to statsHooks.ts
@@ -39,6 +40,7 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
   hideVoteCounts = false,
   minimal = false,
   panelVariant = 'default',
+  actionsDisabled = false,
 }) => {
   const revealed = encounter.isRevealed;
   const prefersReducedMotion = useReducedMotion() ?? false;
@@ -64,6 +66,7 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
   }, [encounter.outcome, lastOutcome, toast]);
 
   const handleSeal = async (value: string) => {
+    if (actionsDisabled) return;
     if (sealingValue || (encounter.outcome !== undefined && encounter.outcome !== null)) return;
     setSealingValue(value);
     try {
@@ -188,6 +191,7 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
                   sealingValue={sealingValue}
                   onReroll={onReroll}
                   onSealOutcome={handleSeal}
+                  actionsDisabled={actionsDisabled}
                 />
               </div>
             )}

@@ -9,6 +9,7 @@ interface OutcomeActionsProps {
   sealingValue: string | null;
   onReroll: () => void;
   onSealOutcome: (value: string) => void;
+  actionsDisabled?: boolean;
 }
 
 const isNumericValue = (value: string) => Number.isFinite(Number(value));
@@ -20,6 +21,7 @@ export const OutcomeActions: React.FC<OutcomeActionsProps> = ({
   sealingValue,
   onReroll,
   onSealOutcome,
+  actionsDisabled = false,
 }) => {
   if (!isGM) return null;
 
@@ -44,7 +46,7 @@ export const OutcomeActions: React.FC<OutcomeActionsProps> = ({
                 sealingValue === val && styles.loadingChip
               )}
               onClick={() => onSealOutcome(val)}
-              disabled={isSealed || !!sealingValue}
+              disabled={isSealed || !!sealingValue || actionsDisabled}
             >
               {sealingValue === val ? '...' : val}
             </button>
@@ -57,7 +59,7 @@ export const OutcomeActions: React.FC<OutcomeActionsProps> = ({
           type="button"
           className={styles.rerollButton}
           onClick={onReroll}
-          disabled={isSealed}
+          disabled={isSealed || actionsDisabled}
         >
           Re-roll
         </button>

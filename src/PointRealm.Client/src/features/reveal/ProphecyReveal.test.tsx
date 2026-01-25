@@ -1,7 +1,6 @@
 ﻿import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
-import { ToastProvider } from '@/components/ui/ToastSystem';
 import type { Encounter, PartyMember, Quest } from '@/types/realm';
 
 const baseEncounter = (overrides?: Partial<Encounter>): Encounter => ({
@@ -38,6 +37,7 @@ const renderReveal = async (opts: {
   });
 
   const { ProphecyReveal } = await import('./ProphecyReveal');
+  const { ToastProvider } = await import('@/components/ui/ToastSystem');
 
   return render(
     <ToastProvider>

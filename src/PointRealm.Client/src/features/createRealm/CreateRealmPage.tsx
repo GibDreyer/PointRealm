@@ -11,7 +11,8 @@ import { SummoningCircle } from "@/components/ui/SummoningCircle";
 import { useTheme } from "@/theme/ThemeProvider";
 import { ThemePicker } from "./components/ThemePicker";
 import { api } from "@/api/client";
-import { hub } from "@/realtime/hub";
+import { useRealmClient } from "@/app/providers/RealtimeProvider";
+import { getClientId } from "@/lib/storage";
 import { updateProfile, getProfile, STORAGE_KEYS } from "@/lib/storage";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/ui/Input";
@@ -88,6 +89,7 @@ const parseCustomDeck = (input: string): string[] => {
 export function CreateRealmPage() {
   const navigate = useNavigate();
   const { setThemeKey } = useTheme();
+  const client = useRealmClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const prefersReducedMotion = useReducedMotion() ?? false;
@@ -156,17 +158,18 @@ export function CreateRealmPage() {
       sessionStorage.setItem(`pointrealm:v1:realm:${realmCode}:token`, joinResponse.memberToken);
       sessionStorage.setItem(`pointrealm:v1:realm:${realmCode}:memberId`, joinResponse.memberId);
 
-      await hub.connect(joinResponse.memberToken);
+      const clientId = getClientId();
+      await client.connect({ realmCode, memberToken: joinResponse.memberToken, clientId });
       
       // Add a default fun quest
       const questName = generateRandomQuestName();
       try {
         // We invoke directly on hub since we are in the creation flow
         // The backend method 'AddQuest' usually returns the new quest ID
-        const questId = await hub.invoke<string>("AddQuest", questName, "Your journey begins here. Cast your runes to estimate the complexity of this task.");
+        const questId = await client.addQuest(questName, "Your journey begins here. Cast your runes to estimate the complexity of this task.");
         if (questId) {
           // Immediately start the encounter so the creator lands in a voting state
-          await hub.invoke("StartEncounter", questId);
+          await client.startEncounter(questId);
         }
       } catch (err) {
         console.error("Failed to add default quest:", err);

@@ -4,18 +4,21 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '../../theme/ThemeProvider';
 import { api } from '../../api/client';
-import { hub } from '../../realtime/hub';
+
+const mockClient = {
+  connect: vi.fn().mockResolvedValue(undefined),
+  addQuest: vi.fn().mockResolvedValue('quest-1'),
+  startEncounter: vi.fn().mockResolvedValue(undefined),
+};
+
+vi.mock('@/app/providers/RealtimeProvider', () => ({
+  useRealmClient: () => mockClient,
+}));
 
 // Mock dependencies
 vi.mock('../../api/client', () => ({
   api: {
     post: vi.fn(),
-  }
-}));
-
-vi.mock('../../realtime/hub', () => ({
-  hub: {
-    connect: vi.fn().mockResolvedValue(undefined),
   }
 }));
 
@@ -47,7 +50,7 @@ describe('CreateRealmPage', () => {
     renderComponent();
 
     // Select Custom Deck
-    fireEvent.click(screen.getByText('Custom'));
+    fireEvent.click(screen.getByText('CUSTOM'));
 
     // Input invalid values
     const input = screen.getByPlaceholderText('0, 1, 2, 3, 5, 8, ?');
@@ -69,10 +72,10 @@ describe('CreateRealmPage', () => {
     renderComponent();
 
     // Fill Display Name
-    fireEvent.change(screen.getByPlaceholderText('e.g. Archmage'), { target: { value: 'Merlin' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. Archmage Aethelgard'), { target: { value: 'Merlin' } });
 
     // Select Custom Deck & Input Valid
-    fireEvent.click(screen.getByText('Custom'));
+    fireEvent.click(screen.getByText('CUSTOM'));
     const input = screen.getByPlaceholderText('0, 1, 2, 3, 5, 8, ?');
     fireEvent.change(input, { target: { value: '1, 2, 3' } });
 
@@ -85,7 +88,7 @@ describe('CreateRealmPage', () => {
           customDeckValues: ['1', '2', '3', '?']
         })
       }));
-      expect(hub.connect).toHaveBeenCalled();
+      expect(mockClient.connect).toHaveBeenCalled();
     });
   });
 
@@ -98,7 +101,7 @@ describe('CreateRealmPage', () => {
     renderComponent();
 
     // Fill required
-    fireEvent.change(screen.getByPlaceholderText('e.g. Archmage'), { target: { value: 'TestUser' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. Archmage Aethelgard'), { target: { value: 'TestUser' } });
 
     // Submit
     const submitBtn = screen.getByRole('button', { name: /create realm/i });
@@ -107,7 +110,7 @@ describe('CreateRealmPage', () => {
     // Check disabled/loading state
     await waitFor(() => {
       expect(submitBtn).toBeDisabled();
-      expect(screen.getByText('Creating Realm...')).toBeInTheDocument();
+      expect(screen.getByText('Summoning...')).toBeInTheDocument();
     });
 
     // Resolve

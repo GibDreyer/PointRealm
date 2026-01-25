@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useRealm } from '../../hooks/useRealm';
 import { QuestLogPanel } from './components/QuestLogPanel';
-import { ConnectionBanner } from '../realmLobby/components/ConnectionBanner';
+import { ConnectionStatusBanner } from '@/realtime/ConnectionStatusBanner';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { PageShell } from '../../components/shell/PageShell';
 import { RealmSettingsDialog } from '../realmLobby/components/RealmSettingsDialog';
@@ -17,7 +17,7 @@ export function RealmScreen() {
     const navigate = useNavigate();
     
     // We use the 'code' from params for hook
-    const { state, loading, error, isConnected, actions, connect } = useRealm(code);
+    const { state, loading, error, isConnected, connectionStatus, actions, connect } = useRealm(code);
     const [isQuestSidebarOpen, setQuestSidebarOpen] = useState(false);
     const [isSettingsOpen, setSettingsOpen] = useState(false);
     const prefersReducedMotion = useReducedMotion() ?? false;
@@ -82,9 +82,14 @@ export function RealmScreen() {
             reducedMotion={prefersReducedMotion}
             contentClassName={styles.page}
         >
-             {!isConnected && (
-                  <ConnectionBanner isConnecting={loading} onRetry={() => connect(code || "")} />
-             )}
+            <AnimatePresence>
+                {connectionStatus !== 'connected' && (
+                    <ConnectionStatusBanner
+                        status={connectionStatus}
+                        onRetry={() => connect(code || '')}
+                    />
+                )}
+            </AnimatePresence>
             
             <div className={styles.shell}>
                 {/* Header Controls */}
@@ -133,6 +138,7 @@ export function RealmScreen() {
                         }}
                         deckValues={getDeckValues()}
                         hideVoteCounts={settings.hideVoteCounts}
+                        actionsDisabled={!isConnected}
                      />
                 </main>
 
@@ -141,7 +147,7 @@ export function RealmScreen() {
                     <RuneHand 
                         options={getDeckValues()}
                         selectedValue={myVote || null}
-                        disabled={!me || me.role === 'GM'} // GM can vote? Usually no.
+                        disabled={!me || me.role === 'GM' || !isConnected} // GM can vote? Usually no.
                         onVote={handleVote}
                     />
                 )}
