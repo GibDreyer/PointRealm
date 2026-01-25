@@ -52,8 +52,7 @@ export function PartyMemberCard({ member }: Props) {
             className="group"
         >
             <Panel 
-                variant={isOffline ? 'subtle' : 'default'} 
-                noPadding
+                variant="default" 
                 className={cn(
                     "flex items-center gap-4 p-3 transition-all",
                     !isOffline && "group-hover:-translate-y-0.5 group-hover:border-pr-border/60",

@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import styles from './Panel.module.css';
 
 interface PanelProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'glow';
+  variant?: 'default' | 'glow' | 'realm';
 }
 
 export const Panel = React.forwardRef<HTMLDivElement, PanelProps>(({ 
@@ -18,6 +18,7 @@ export const Panel = React.forwardRef<HTMLDivElement, PanelProps>(({
       className={cn(
         styles.panel, 
         variant === 'glow' && styles.panelGlow,
+        variant === 'realm' && styles.panelRealm,
         className
       )} 
       {...props}

@@ -51,3 +51,44 @@
     0 0 30px rgba(74, 158, 255, 0.1);
   border-color: rgba(74, 158, 255, 0.2);
 }
+
+/* --- Realm Variant (from CreateRealmPage) --- */
+
+.panelRealm {
+  /* 1. Deep Metallic Background with Lamp Light Center */
+  background: 
+    radial-gradient(circle at 50% 30%, 
+      color-mix(in srgb, var(--pr-surface-elevated), var(--pr-primary) 10%), 
+      var(--pr-bg) 70%);
+    
+  /* 2. Complex Layered Shadow/Glow (Ambient Arcane) */
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.8), /* Dark Outline */
+    0 0 0 2px color-mix(in srgb, var(--pr-border), white 10%), /* Steel Rim */
+    0 0 50px rgba(0, 0, 0, 0.9), /* Heavy Shadow */
+    0 0 100px color-mix(in srgb, var(--pr-primary), transparent 95%), /* Ambient Arcane Glow */
+    inset 0 1px 0 rgba(255, 255, 255, 0.08), /* Top Highlight */
+    inset 0 -4px 12px rgba(0,0,0,0.5); /* Bottom Deepen */
+
+  border: 1px solid color-mix(in srgb, var(--pr-secondary), transparent 85%); /* Faint Gold Trace */
+  backdrop-filter: blur(4px);
+  border-radius: 12px;
+}
+
+/* Decorative Corner Ornaments hidden as per user feedback to reduce 'random triangles' */
+.panelRealm::before {
+  display: none;
+}
+
+.panelRealm::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  height: auto; /* Reset height from default */
+  background: none; /* Remove line form default */
+  pointer-events: none;
+  z-index: 3;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.6);
+  border-radius: 12px;
+  opacity: 1;
+}

@@ -50,7 +50,7 @@ export function GMPanel({ activeQuestId, quests, onManageSettings, gmName, class
     const targetId = selectedQuestId || activeQuestId;
 
     return (
-        <Panel className={cn("relative overflow-hidden", className)}>
+        <Panel variant="realm" className={cn("relative overflow-hidden", className)}>
             <div className={styles.panelHeader}>
                 <SectionHeader 
                     title="Game Master" 

@@ -20,6 +20,10 @@ import { Button } from '../../components/Button';
 import { PageShell } from '../../components/shell/PageShell';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { PageFooter } from '../../components/ui/PageFooter';
+import { RealmBackButton } from '../../components/ui/RealmBackButton';
+import { Panel } from '../../components/ui/Panel';
+import { Input } from '../../components/ui/Input';
+import { SectionHeader } from '../../components/ui/SectionHeader';
 import styles from './joinRealm.module.css';
 
 export type RealmRole = 'participant' | 'observer';
@@ -160,138 +164,150 @@ export function JoinRealmPage() {
 
   return (
     <PageShell
-      backgroundDensity="medium"
+      backgroundDensity="low"
       reducedMotion={prefersReducedMotion}
+      className="relative"
       contentClassName={styles.page}
     >
-      <motion.section
-        className={styles.panel}
-        initial={prefersReducedMotion ? false : { opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: prefersReducedMotion ? 0 : 0.25, ease: 'easeOut' }}
-      >
-        <PageHeader
-          title="Enter the Realm"
-          subtitle="Join a session."
-          size="panel"
-          className={styles.header}
-        />
+      <RealmBackButton />
+      
+      <div className={styles.container}>
+        <motion.div
+          className={styles.mainContent}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.25, ease: 'easeOut' }}
+        >
+          <Panel variant="realm" className={styles.panel}>
+            <div className={styles.panelInner}>
+              <PageHeader
+                title="Enter the Realm"
+                subtitle="Join a session."
+                size="panel"
+                className={styles.header || ''}
+              />
 
-        {error && (
-          <div className={styles.error} role="alert">
-            <span className={styles.errorTitle}>Unable to join</span>
-            <span className={styles.errorMessage}>{error}</span>
-          </div>
-        )}
-
-        <form className={styles.form} onSubmit={(e) => { e.preventDefault(); handleJoin(); }}>
-          <div className={styles.field}>
-            <label className={styles.label}>Realm Code or Link</label>
-            <p className={styles.helper}>Paste an invite or enter a realm code</p>
-            <input
-              value={realmInput}
-              onChange={(e) => {
-                setRealmInput(e.target.value);
-                if (inputError) setInputError(null);
-              }}
-              onPaste={handlePaste}
-              onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleJoin()}
-              placeholder="Realm code or link"
-              className={styles.input}
-              disabled={isLoading}
-            />
-            {inputError && <p className={styles.errorInline}>{inputError}</p>}
-          </div>
-
-          <div className={styles.field}>
-            <label className={styles.label}>Display Name</label>
-            <p className={styles.helper}>How the party will see you</p>
-            <input
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              onBlur={handleNameBlur}
-              onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleJoin()}
-              placeholder="e.g. Archmage"
-              className={styles.input}
-              disabled={isLoading}
-            />
-          </div>
-
-          <section className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Choose Your Role</h2>
-              <p className={styles.sectionSubtitle}>How you will enter the realm</p>
-            </div>
-            <div className={styles.roleGrid} role="radiogroup" aria-label="Choose your role">
-              <button
-                type="button"
-                className={role === 'participant' ? `${styles.roleCard} ${styles.roleCardActive}` : styles.roleCard}
-                onClick={() => setRole('participant')}
-                disabled={isLoading}
-                role="radio"
-                aria-checked={role === 'participant'}
-              >
-                <div className={styles.roleIcon} aria-hidden="true">
-                  <Shield />
+              {error && (
+                <div className={styles.error} role="alert">
+                  <span className={styles.errorTitle}>Unable to join</span>
+                  <span className={styles.errorMessage}>{error}</span>
                 </div>
-                <div className={styles.roleText}>
-                  <span className={styles.roleTitle}>Participant</span>
-                  <span className={styles.roleDescription}>Vote and take part in encounters</span>
-                </div>
-              </button>
-              <button
-                type="button"
-                className={role === 'observer' ? `${styles.roleCard} ${styles.roleCardActive}` : styles.roleCard}
-                onClick={() => setRole('observer')}
-                disabled={isLoading}
-                role="radio"
-                aria-checked={role === 'observer'}
-              >
-                <div className={styles.roleIcon} aria-hidden="true">
-                  <Eye />
-                </div>
-                <div className={styles.roleText}>
-                  <span className={styles.roleTitle}>Observer</span>
-                  <span className={styles.roleDescription}>Watch without voting</span>
-                </div>
-              </button>
-            </div>
-          </section>
-
-          <div className={styles.actions}>
-            <Button
-              onClick={() => handleJoin()}
-              disabled={isLoading || !realmInput.trim() || !displayName.trim()}
-              fullWidth
-              variant="ghost"
-              className={`${styles.primaryButton} normal-case text-base sm:text-lg tracking-[0.08em]`}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className={styles.spinner} />
-                  Joining...
-                </>
-              ) : (
-                'Join Realm'
               )}
-            </Button>
-          </div>
-        </form>
-      </motion.section>
 
-      <RecentRealmsList
-        realms={recentRealms}
-        onSelect={handleRecentSelect}
-        onForget={handleForgetRecent}
-        onClearAll={handleClearAllRecent}
-      />
+              <form className={styles.form} onSubmit={(e) => { e.preventDefault(); handleJoin(); }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
+                  <div className={styles.field}>
+                    <Input
+                      label="Realm Code or Link"
+                      helper="Paste an invite"
+                      value={realmInput}
+                      onChange={(e) => {
+                        setRealmInput(e.target.value);
+                        if (inputError) setInputError(null);
+                      }}
+                      onPaste={handlePaste}
+                      onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleJoin()}
+                      placeholder="Realm code..."
+                      disabled={isLoading}
+                      error={inputError || undefined}
+                      className="bg-black/20"
+                    />
+                  </div>
+
+                  <div className={styles.field}>
+                    <Input
+                      label="Display Name"
+                      helper="Your party alias"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      onBlur={handleNameBlur}
+                      onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleJoin()}
+                      placeholder="e.g. Archmage"
+                      disabled={isLoading}
+                      className="bg-black/20"
+                    />
+                  </div>
+                </div>
+
+                <section className={styles.section}>
+                  <SectionHeader 
+                      title="Your Identity" 
+                      subtitle="Who are you?" 
+                      className="mb-0"
+                  />
+                  <div className={styles.roleGrid} role="radiogroup" aria-label="Choose your role">
+                    <button
+                      type="button"
+                      className={role === 'participant' ? `${styles.roleCard} ${styles.roleCardActive}` : styles.roleCard}
+                      onClick={() => setRole('participant')}
+                      disabled={isLoading}
+                      role="radio"
+                      aria-checked={role === 'participant'}
+                    >
+                      <div className={styles.roleIcon} aria-hidden="true">
+                        <Shield />
+                      </div>
+                      <div className={styles.roleText}>
+                        <span className={styles.roleTitle}>Participant</span>
+                        <span className={styles.roleDescription}>Vote and take part in encounters</span>
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      className={role === 'observer' ? `${styles.roleCard} ${styles.roleCardActive}` : styles.roleCard}
+                      onClick={() => setRole('observer')}
+                      disabled={isLoading}
+                      role="radio"
+                      aria-checked={role === 'observer'}
+                    >
+                      <div className={styles.roleIcon} aria-hidden="true">
+                        <Eye />
+                      </div>
+                      <div className={styles.roleText}>
+                        <span className={styles.roleTitle}>Observer</span>
+                        <span className={styles.roleDescription}>Watch without voting</span>
+                      </div>
+                    </button>
+                  </div>
+                </section>
+
+                <div className="pt-4">
+                  <Button
+                    onClick={() => handleJoin()}
+                    disabled={isLoading || !realmInput.trim() || !displayName.trim()}
+                    fullWidth
+                    variant="primary"
+                    className="h-14 text-lg tracking-[0.2em] uppercase font-bold"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className={styles.spinner} />
+                        Joining...
+                      </>
+                    ) : (
+                      'Enter Realm'
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </Panel>
+        </motion.div>
+
+        <div className={styles.sideContent}>
+          <RecentRealmsList
+            realms={recentRealms}
+            onSelect={handleRecentSelect}
+            onForget={handleForgetRecent}
+            onClearAll={handleClearAllRecent}
+          />
+        </div>
+      </div>
 
       <PageFooter
         tipUrl={tipUrl}
         tipIsExternal={tipIsExternal}
-        className={styles.footer}
-        backLinkLabel="Back to Tavern"
-        onBackClick={() => navigate('/')}
+        className={styles.footer || ''}
       />
     </PageShell>
   );

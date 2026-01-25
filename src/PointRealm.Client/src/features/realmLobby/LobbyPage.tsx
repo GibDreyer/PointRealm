@@ -16,6 +16,8 @@ import { PageShell } from '../../components/shell/PageShell';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Panel } from '../../components/ui/Panel';
+import { RealmBackButton } from '../../components/ui/RealmBackButton';
+import { Button } from '../../components/Button';
 import styles from './lobby.module.css';
 
 function LobbySkeleton() {
@@ -124,7 +126,7 @@ export function TavernLobbyPage() {
                         title="Tavern"
                         subtitle="Realm Lobby"
                         size="panel"
-                        className={styles.header}
+                        className={styles.header || ''}
                     />
                     <div className="mt-2">
                         {status === 'disconnected' ? (
@@ -154,6 +156,8 @@ export function TavernLobbyPage() {
             reducedMotion={prefersReducedMotion}
             contentClassName={styles.page}
         >
+            <RealmBackButton to="/" />
+            
             {status !== 'connected' && (
                 <ConnectionBanner 
                     isConnecting={status === 'connecting' || status === 'reconnecting'} 
@@ -166,11 +170,11 @@ export function TavernLobbyPage() {
                     title="Tavern"
                     subtitle="Realm Lobby"
                     size="panel"
-                    className={styles.header}
+                    className={styles.header || ''}
                 />
 
                 <div className={styles.panelGrid}>
-                    <Panel className={`${styles.panel} ${styles.panelParty}`}>
+                    <Panel variant="realm" className={`${styles.panel} ${styles.panelParty}`}>
                         <div className={styles.panelHeader}>
                             <SectionHeader 
                                 title="Party" 
@@ -188,7 +192,7 @@ export function TavernLobbyPage() {
                                 </AnimatePresence>
 
                                 {snapshot.party.length === 0 && (
-                                    <Panel variant="subtle" className="py-12 text-center italic text-pr-text-muted">
+                                    <Panel variant="default" className="py-12 text-center italic text-pr-text-muted">
                                         <Info size={32} className="mx-auto mb-3 opacity-20" />
                                         <p>The tavern is empty. Only whispers of previous quests remain...</p>
                                     </Panel>
@@ -214,20 +218,23 @@ export function TavernLobbyPage() {
                 </div>
 
                 <div className={styles.footerRow}>
-                    <button
-                        type="button"
-                        className={`${styles.footerButton} px-6 py-3 rounded-[var(--pr-radius-md)] border border-pr-border/60 bg-pr-surface/40 text-pr-text-muted font-bold uppercase tracking-widest text-xs hover:text-pr-text hover:border-pr-border transition-all`}
+                    {/* Back button handled by RealmBackButton top-left, but 'Leave Realm' might be clearer here? 
+                        The original button was 'Back to Tavern'. keeping it for accessibility/clarity at bottom of flow
+                        but using Ghost variant of Button */}
+                    <Button
+                        variant="ghost"
+                        className="min-w-[180px] uppercase tracking-widest text-xs"
                         onClick={() => navigate('/')}
                     >
-                        Back to Tavern
-                    </button>
-                    <button
-                        type="button"
-                        className={`${styles.footerButton} px-6 py-3 rounded-[var(--pr-radius-md)] border border-pr-primary/40 bg-pr-primary/10 text-pr-primary font-bold uppercase tracking-widest text-xs hover:brightness-110 transition-all`}
+                        Index
+                    </Button>
+                    <Button
+                        variant="primary"
+                        className="min-w-[180px] uppercase tracking-widest text-xs"
                         onClick={() => realmCode && navigate(`/realm/${realmCode}`)}
                     >
                         {isGM ? 'Start Realm' : 'Join Realm'}
-                    </button>
+                    </Button>
                 </div>
             </div>
 

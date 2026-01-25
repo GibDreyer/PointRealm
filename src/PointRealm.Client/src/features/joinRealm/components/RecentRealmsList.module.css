@@ -62,8 +62,8 @@
   border: 1px solid color-mix(in srgb, var(--pr-border) 70%, transparent);
   background:
     linear-gradient(180deg,
-      color-mix(in srgb, var(--pr-surface) 80%, transparent) 0%,
-      color-mix(in srgb, var(--pr-surface) 92%, transparent) 100%),
+      color-mix(in srgb, var(--pr-surface) 95%, transparent) 0%,
+      color-mix(in srgb, var(--pr-surface) 98%, transparent) 100%),
     var(--pr-texture-surface-texture);
   background-size: cover;
   cursor: pointer;
@@ -100,18 +100,22 @@
   font-family: var(--pr-heading-font);
   font-size: 1rem;
   color: var(--pr-text);
+  letter-spacing: 0.02em;
 }
 
 .realmCode {
   font-size: 0.75rem;
-  letter-spacing: 0.2em;
+  font-weight: bold;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--pr-text-muted) 70%, var(--pr-text));
+  color: var(--pr-primary-cyan);
+  opacity: 0.8;
 }
 
 .meta {
   font-size: 0.75rem;
-  color: color-mix(in srgb, var(--pr-text-muted) 70%, var(--pr-text));
+  font-style: italic;
+  color: color-mix(in srgb, var(--pr-text-muted) 60%, var(--pr-text));
 }
 
 .actions {
