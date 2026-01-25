@@ -10,20 +10,24 @@ export interface Quest {
     id: string;
     title: string;
     description: string;
-    status: "Open" | "Sealed";
+    status: "Pending" | "Active" | "Completed" | "Open" | "Sealed";
     order: number;
     externalUrl?: string; // Optional, might be added later
     externalId?: string;
     sealedEstimate?: string; // For sealed quests
+    version?: number;
+    sealedOutcome?: number | null;
 }
 
 export interface PartyMember {
     id: string;
     name: string;
-    role: "GM" | "Member";
+    role: "GM" | "Member" | "Observer";
     status: "ready" | "choosing" | "disconnected";
     isOnline: boolean;
     hasVoted?: boolean; // Derived or explicit
+    isObserver?: boolean;
+    isBanned?: boolean;
 }
 
 export interface Vote {
@@ -37,11 +41,17 @@ export interface Encounter {
     votes: Record<string, string | null>; // memberId -> value (or null if masked)
     distribution: Record<string, number>;
     outcome?: number; // For sealed encounters
+    version?: number;
+    hasVoted?: Record<string, boolean>;
+    shouldHideVoteCounts?: boolean;
 }
 
 export interface RealmStateDto {
     realmCode: string;
     themeKey: string;
+    realmVersion?: number;
+    questLogVersion?: number;
+    encounterVersion?: number | null;
     settings: RealmSettings;
     partyRoster: {
         members: PartyMember[];

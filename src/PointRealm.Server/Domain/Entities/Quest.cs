@@ -18,6 +18,8 @@ public sealed class Quest : Entity
     public Guid RealmId { get; private set; }
     public string? ExternalId { get; private set; }
     public string? ExternalUrl { get; private set; }
+    public int Version { get; private set; }
+    public int? SealedOutcome { get; private set; }
 
     internal Quest(Guid realmId, string title, string description, int order, string? externalId = null, string? externalUrl = null) : base(Guid.NewGuid())
     {
@@ -57,5 +59,11 @@ public sealed class Quest : Entity
     {
         ExternalId = externalId;
         ExternalUrl = externalUrl;
+    }
+
+    public void SealOutcome(int outcome)
+    {
+        SealedOutcome = outcome;
+        Complete();
     }
 }

@@ -4,6 +4,9 @@ public class RealmStateDto
 {
     public string RealmCode { get; set; } = string.Empty;
     public string ThemeKey { get; set; } = string.Empty;
+    public int RealmVersion { get; set; }
+    public int QuestLogVersion { get; set; }
+    public int? EncounterVersion { get; set; }
     public RealmSettingsDto Settings { get; set; } = new();
     public QuestLogDto QuestLog { get; set; } = new();
     public PartyRosterDto PartyRoster { get; set; } = new();
@@ -13,6 +16,8 @@ public class RealmStateDto
 public class RealmSettingsDto
 {
     public RuneDeckDto? Deck { get; set; }
+    public string? DeckType { get; set; }
+    public List<string>? CustomDeckValues { get; set; }
     public bool AutoReveal { get; set; }
     public bool AllowAbstain { get; set; }
     public bool HideVoteCounts { get; set; }
@@ -30,6 +35,8 @@ public class QuestDto
     public string Description { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty; // Pending, Active, Completed
     public int Order { get; set; }
+    public int Version { get; set; }
+    public int? SealedOutcome { get; set; }
 }
 
 public class PartyRosterDto
@@ -44,6 +51,8 @@ public class PartyMemberDto
     public string Role { get; set; } = "Member"; // GM, Member
     public string Status { get; set; } = "disconnected"; // ready, choosing, disconnected
     public bool IsOnline { get; set; }
+    public bool IsObserver { get; set; }
+    public bool IsBanned { get; set; }
 }
 
 public class EncounterDto
@@ -53,6 +62,9 @@ public class EncounterDto
     public Dictionary<Guid, string?> Votes { get; set; } = new(); // MemberId -> Value (masked if hidden)
     public Dictionary<string, int> Distribution { get; set; } = new(); // Value -> Count (only valid when revealed)
     public int? Outcome { get; set; }
+    public int Version { get; set; }
+    public Dictionary<Guid, bool> HasVoted { get; set; } = new();
+    public bool ShouldHideVoteCounts { get; set; }
 }
 
 public class PartyPresenceDto

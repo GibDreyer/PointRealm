@@ -15,6 +15,8 @@ public sealed class QuestConfiguration : IEntityTypeConfiguration<Quest>
         builder.Property(x => x.Description).HasMaxLength(2000);
         builder.Property(x => x.ExternalId).HasMaxLength(100);
         builder.Property(x => x.ExternalUrl).HasMaxLength(500);
+        builder.Property(x => x.Version).IsConcurrencyToken().HasDefaultValue(0);
+        builder.Property(x => x.SealedOutcome);
 
         builder.HasIndex(x => new { x.RealmId, x.Order });
         builder.HasIndex(x => new { x.RealmId, x.ExternalId });

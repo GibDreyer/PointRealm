@@ -1,6 +1,23 @@
 import * as signalR from '@microsoft/signalr';
 import { buildConnection, ConnectionParams } from './connection';
-import type { HubClientEvents, HubServerMethods, RealtimeEventMap } from './types';
+import type {
+  HubClientEvents,
+  HubServerMethods,
+  RealtimeEventMap,
+  SetDisplayNameRequest,
+  SelectRuneRequest,
+  StartEncounterRequest,
+  RevealProphecyRequest,
+  ReRollFatesRequest,
+  SealOutcomeRequest,
+  AddQuestRequest,
+  UpdateQuestRequest,
+  DeleteQuestRequest,
+  ReorderQuestsRequest,
+  SetActiveQuestRequest,
+  JoinPresenceRequest,
+  LeavePresenceRequest,
+} from './types';
 
 type EventHandler<T> = (payload: T) => void;
 
@@ -174,50 +191,62 @@ export class RealmRealtimeClient {
     }
   }
 
-  async setDisplayName(name: string) {
-    await this.invoke('SetDisplayName', name);
+  async setDisplayName(request: SetDisplayNameRequest) {
+    return this.invoke('SetDisplayName', this.withCommandId(request));
   }
 
-  async selectRune(value: string) {
-    await this.invoke('SelectRune', value);
+  async joinPresence(request: JoinPresenceRequest = {}) {
+    return this.invoke('JoinPresence', this.withCommandId(request));
   }
 
-  async startEncounter(questId: string) {
-    await this.invoke('StartEncounter', questId);
+  async leavePresence(request: LeavePresenceRequest = {}) {
+    return this.invoke('LeavePresence', this.withCommandId(request));
   }
 
-  async revealProphecy() {
-    await this.invoke('RevealProphecy');
+  async selectRune(request: SelectRuneRequest) {
+    return this.invoke('SelectRune', this.withCommandId(request));
   }
 
-  async reRollFates() {
-    await this.invoke('ReRollFates');
+  async startEncounter(request: StartEncounterRequest) {
+    return this.invoke('StartEncounter', this.withCommandId(request));
   }
 
-  async sealOutcome(value: number) {
-    await this.invoke('SealOutcome', value);
+  async revealProphecy(request: RevealProphecyRequest) {
+    return this.invoke('RevealProphecy', this.withCommandId(request));
   }
 
-  async addQuest(title: string, description: string) {
-    return this.invoke('AddQuest', title, description);
+  async reRollFates(request: ReRollFatesRequest) {
+    return this.invoke('ReRollFates', this.withCommandId(request));
   }
 
-  async updateQuest(questId: string, title: string, description: string) {
-    return this.invoke('UpdateQuest', questId, title, description);
+  async sealOutcome(request: SealOutcomeRequest) {
+    return this.invoke('SealOutcome', this.withCommandId(request));
   }
 
-  async deleteQuest(questId: string) {
-    return this.invoke('DeleteQuest', questId);
+  async addQuest(request: AddQuestRequest) {
+    return this.invoke('AddQuest', this.withCommandId(request));
   }
 
-  async reorderQuests(newOrderKeys: string[]) {
-    return this.invoke('ReorderQuests', newOrderKeys);
+  async updateQuest(request: UpdateQuestRequest) {
+    return this.invoke('UpdateQuest', this.withCommandId(request));
+  }
+
+  async deleteQuest(request: DeleteQuestRequest) {
+    return this.invoke('DeleteQuest', this.withCommandId(request));
+  }
+
+  async reorderQuests(request: ReorderQuestsRequest) {
+    return this.invoke('ReorderQuests', this.withCommandId(request));
+  }
+
+  async setActiveQuest(request: SetActiveQuestRequest) {
+    return this.invoke('SetActiveQuest', this.withCommandId(request));
   }
 
   private async invoke<K extends keyof HubServerMethods>(
     method: K,
     ...args: Parameters<HubServerMethods[K]>
-  ) {
+  ): Promise<Awaited<ReturnType<HubServerMethods[K]>>> {
     if (!this.connection || !this.memberToken || !this.realmCode) {
       throw new Error('Connection not initialized.');
     }
@@ -225,6 +254,20 @@ export class RealmRealtimeClient {
       throw new Error('Connection is not ready.');
     }
     return this.connection.invoke(method, ...args);
+  }
+
+  private withCommandId<T extends { commandId?: string }>(request: T): T {
+    if (!request.commandId) {
+      return { ...request, commandId: this.generateCommandId() };
+    }
+    return request;
+  }
+
+  private generateCommandId() {
+    if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+      return crypto.randomUUID();
+    }
+    return `${Date.now().toString(16)}-${Math.random().toString(16).slice(2, 10)}`;
   }
 
   private async startConnectionWithRetry() {

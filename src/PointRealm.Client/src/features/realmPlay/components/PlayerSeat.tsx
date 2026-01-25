@@ -2,7 +2,9 @@
 import { motion } from 'framer-motion';
 import { cn } from '../../../lib/utils';
 import { PartyMember } from '../../../types/realm';
-import { Check, WifiOff } from 'lucide-react';
+import { Check, WifiOff, Crown, Eye } from 'lucide-react';
+
+
 
 interface PlayerSeatProps {
     member: PartyMember;
@@ -20,6 +22,9 @@ export function PlayerSeat({ member, vote, isRevealed, position, className }: Pl
     // If revealed, show the vote value (or ? if they didn't vote but were ready?? usually ready means voted)
     // If not revealed, but voted, show "face down" card
     // If not voted, show nothing or empty slot
+    const isGM = member.role === 'GM';
+    const isObserver = member.role === 'Observer';
+
     
     return (
         <div className={cn(
@@ -48,9 +53,18 @@ export function PlayerSeat({ member, vote, isRevealed, position, className }: Pl
                          )}
                     </motion.div>
                 ) : (
-                    <div className="absolute inset-0 rounded-lg border border-dashed border-pr-border/30 bg-white/5" />
+                    <div className="absolute inset-0 rounded-lg border border-dashed border-pr-border/30 bg-white/5 flex items-center justify-center">
+                        <span className="sr-only">Waiting...</span>
+                    </div>
                 )}
             </div>
+
+            {!hasVoted && !isRevealed && !isObserver && (
+                 <div className="text-[10px] text-pr-text-muted/60 animate-pulse font-medium tracking-wide">
+                     Waiting for vote...
+                 </div>
+            )}
+
 
             {/* Avatar & Name */}
             <div className={cn(
@@ -90,9 +104,19 @@ export function PlayerSeat({ member, vote, isRevealed, position, className }: Pl
                     <span className="font-medium text-pr-text/90 max-w-[80px] truncate leading-tight">
                         {member.name}
                     </span>
-                    {member.role === 'GM' && (
-                        <span className="text-[9px] uppercase tracking-wider text-pr-primary/80">GM</span>
+                    {isGM && (
+                        <div className="flex items-center gap-1 text-pr-primary/80">
+                            <Crown size={10} strokeWidth={2.5} />
+                            <span className="text-[9px] uppercase tracking-wider">GM</span>
+                        </div>
                     )}
+                    {isObserver && (
+                         <div className="flex items-center gap-1 text-pr-text-muted">
+                            <Eye size={10} strokeWidth={2.5} />
+                            <span className="text-[9px] uppercase tracking-wider">Spectator</span>
+                        </div>
+                    )}
+
                 </div>
             </div>
         </div>

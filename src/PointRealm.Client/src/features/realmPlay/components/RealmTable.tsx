@@ -5,7 +5,7 @@ import { Encounter, PartyMember, Quest } from '../../../types/realm';
 import { PlayerSeat } from './PlayerSeat';
 import { cn } from '../../../lib/utils';
 import { Button } from '../../../components/Button';
-import { RefreshCcw, Eye, ChartBar } from 'lucide-react';
+import { RefreshCcw, Eye, ChartBar, Link2, Check } from 'lucide-react';
 import { ProphecyReveal } from '../../reveal/ProphecyReveal';
 import { Dialog } from '../../../components/ui/Dialog';
 import { useProphecyStats } from '../../reveal/utils/statsHooks';
@@ -23,8 +23,8 @@ interface RealmTableProps {
     hideVoteCounts: boolean;
     actionsDisabled?: boolean;
     className?: string;
+    realmCode?: string; // Add realm code for copy link feature
 }
-
 export function RealmTable({ 
     quest, 
     encounter, 
@@ -60,7 +60,9 @@ export function RealmTable({
 
     const isRevealed = encounter?.isRevealed ?? false;
     const votes = encounter?.votes || {};
+    const voteCount = Object.keys(votes).length; // Use explicit vote count from encounter
     const readyCount = members.filter(m => m.status === 'ready').length;
+
 
     const { stats, consensusText, consensusColor } = useProphecyStats(
         encounter || { isRevealed: false, votes: {}, questId: '', distribution: {} }, 
@@ -122,26 +124,35 @@ export function RealmTable({
 
                                     {isGM && (
                                         <div className="flex gap-4 mt-4">
-                                            <Button
-                                                variant="secondary"
-                                                onClick={onReroll}
-                                                disabled={readyCount === 0 || actionsDisabled}
-                                                className="px-10 py-5 text-lg min-h-0 h-14"
-                                            >
-                                                <RefreshCcw size={18} className="mr-3" />
-                                                Reroll
-                                            </Button>
-                                            <Button
-                                                onClick={onReveal}
-                                                disabled={readyCount === 0 || actionsDisabled}
-                                                className="px-10 py-5 text-lg min-h-0 h-14"
-                                            >
-                                                <Eye size={18} className="mr-3" />
-                                                Reveal Cards
-                                            </Button>
+                                            {members.length <= 1 ? (
+                                                <div className="text-pr-text-muted italic opacity-70 border border-pr-border/30 bg-pr-surface/30 px-6 py-3 rounded-xl text-sm">
+                                                    It's lonely here among the echoes... Waiting for a party.
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <Button
+                                                        variant="secondary"
+                                                        onClick={onReroll}
+                                                        disabled={voteCount === 0 || actionsDisabled}
+                                                        className="px-10 py-5 text-lg min-h-0 h-14"
+                                                    >
+                                                        <RefreshCcw size={18} className="mr-3" />
+                                                        Reroll
+                                                    </Button>
+                                                    <Button
+                                                        onClick={onReveal}
+                                                        disabled={voteCount === 0 || actionsDisabled}
+                                                        className="px-10 py-5 text-lg min-h-0 h-14"
+                                                    >
+                                                        <Eye size={18} className="mr-3" />
+                                                        Reveal Cards
+                                                    </Button>
+                                                </>
+                                            )}
                                         </div>
                                     )}
                                 </>
+
                              ) : (
                                  <div className="w-full  flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-1000">
                                     <div className="flex flex-row items-center gap-6 w-full max-w-2xl px-4">

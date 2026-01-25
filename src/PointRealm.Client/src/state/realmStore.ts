@@ -28,11 +28,13 @@ function extractRevision(snapshot: RealmStateDto) {
     revision?: number;
     serverRevision?: number;
     sequence?: number;
+    realmVersion?: number;
   };
   return (
     anySnapshot.revision ??
     anySnapshot.serverRevision ??
     anySnapshot.sequence ??
+    anySnapshot.realmVersion ??
     undefined
   );
 }

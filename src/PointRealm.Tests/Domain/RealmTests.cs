@@ -13,7 +13,7 @@ public class RealmTests
         var settings = RealmSettings.Default();
         
         // Act
-        var result = Realm.Create("", "Dark", settings);
+        var result = Realm.Create("", "Dark", "theme", settings);
         
         // Assert
         Assert.True(result.IsFailure);
@@ -27,7 +27,7 @@ public class RealmTests
         var settings = RealmSettings.Default();
         
         // Act
-        var result = Realm.Create("test-realm", "Dark", settings);
+        var result = Realm.Create("test-realm", "Dark", "theme", settings);
         
         // Assert
         Assert.True(result.IsSuccess);
@@ -38,7 +38,7 @@ public class RealmTests
     public void AddQuest_Should_SetCurrentQuest_When_FirstQuestAdded()
     {
         // Arrange
-        var realm = Realm.Create("test", "theme", RealmSettings.Default()).Value;
+        var realm = Realm.Create("test", "theme", "theme", RealmSettings.Default()).Value;
         
         // Act
         realm.AddQuest("Test Quest", "Description");
@@ -53,7 +53,7 @@ public class RealmTests
     public void StartEncounter_Should_Fail_When_QuestNotFound()
     {
         // Arrange
-        var realm = Realm.Create("test", "theme", RealmSettings.Default()).Value;
+        var realm = Realm.Create("test", "theme", "theme", RealmSettings.Default()).Value;
         
         // Act
         var result = realm.StartEncounter(Guid.NewGuid());
@@ -67,7 +67,7 @@ public class RealmTests
     public void StartEncounter_Should_Succeed_When_QuestExists()
     {
         // Arrange
-        var realm = Realm.Create("test", "theme", RealmSettings.Default()).Value;
+        var realm = Realm.Create("test", "theme", "theme", RealmSettings.Default()).Value;
         realm.AddQuest("Test Quest", "Description");
         var questId = realm.CurrentQuestId!.Value;
         
@@ -84,7 +84,7 @@ public class RealmTests
     public void Encounter_Reveal_Should_Fail_IfAlreadyRevealed()
     {
         // Arrange
-        var realm = Realm.Create("test", "theme", RealmSettings.Default()).Value;
+        var realm = Realm.Create("test", "theme", "theme", RealmSettings.Default()).Value;
         realm.AddQuest("Test Quest", "Description");
         realm.StartEncounter(realm.CurrentQuestId!.Value);
         var encounter = realm.Encounters.First();
@@ -102,7 +102,7 @@ public class RealmTests
     public void Encounter_CastVote_Should_Fail_IfRevealed()
     {
         // Arrange
-        var realm = Realm.Create("test", "theme", RealmSettings.Default()).Value;
+        var realm = Realm.Create("test", "theme", "theme", RealmSettings.Default()).Value;
         realm.AddQuest("Test Quest", "Description");
         realm.StartEncounter(realm.CurrentQuestId!.Value);
         var encounter = realm.Encounters.First();

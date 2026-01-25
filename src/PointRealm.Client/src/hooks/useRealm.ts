@@ -85,6 +85,13 @@ export function useRealm(realmCode?: string): UseRealmResult {
     }
   }, [lastError?.code, navigate, realmCode]);
 
+  const requireVersion = (value: number | null | undefined, label: string) => {
+    if (value === undefined || value === null) {
+      throw new Error(`Missing ${label} version. Please wait for the realm to sync.`);
+    }
+    return value;
+  };
+
   const wrapAction = async (actionName: string, ...args: any[]) => {
     if (connectionStatus !== 'connected') {
       setLastError({
@@ -95,11 +102,16 @@ export function useRealm(realmCode?: string): UseRealmResult {
     }
     try {
       const method = actionName as keyof typeof client;
-      const handler = (client as Record<string, (...a: any[]) => Promise<void>>)[
-        method
-      ];
+      const handler = (client as Record<string, (...a: any[]) => Promise<any>>)[method];
       if (handler) {
-        await handler(...args);
+        const result = await handler(...args);
+        if (result?.success === false) {
+          setLastError({
+            code: result.error?.errorCode ?? 'action_failed',
+            message: result.error?.message ?? `Failed to invoke ${actionName}.`,
+          });
+          throw new Error(result.error?.message ?? `Failed to invoke ${actionName}.`);
+        }
       }
     } catch (err: any) {
       setLastError({
@@ -119,16 +131,64 @@ export function useRealm(realmCode?: string): UseRealmResult {
     connectionStatus,
     actions: {
       joinRealm: connect,
-      selectRune: (val) => wrapAction('selectRune', val),
-      startEncounter: (qId) => wrapAction('startEncounter', qId),
-      revealProphecy: () => wrapAction('revealProphecy'),
-      reRollFates: () => wrapAction('reRollFates'),
-      sealOutcome: (val) => wrapAction('sealOutcome', val),
-      addQuest: (t, d) => wrapAction('addQuest', t, d),
-      updateQuest: (id, t, d) => wrapAction('updateQuest', id, t, d),
-      deleteQuest: (id) => wrapAction('deleteQuest', id),
-      reorderQuests: (order) => wrapAction('reorderQuests', order),
-      setDisplayName: (name) => wrapAction('setDisplayName', name),
+      selectRune: (val) =>
+        wrapAction('selectRune', {
+          value: val,
+          encounterVersion: requireVersion(state?.encounter?.version ?? null, 'encounter'),
+        }),
+      startEncounter: (qId) => {
+        const quest = state?.questLog?.quests?.find((q) => q.id === qId);
+        return wrapAction('startEncounter', {
+          questId: qId,
+          realmVersion: requireVersion(state?.realmVersion ?? null, 'realm'),
+          questVersion: requireVersion(quest?.version ?? null, 'quest'),
+        });
+      },
+      revealProphecy: () =>
+        wrapAction('revealProphecy', {
+          encounterVersion: requireVersion(state?.encounter?.version ?? null, 'encounter'),
+        }),
+      reRollFates: () =>
+        wrapAction('reRollFates', {
+          encounterVersion: requireVersion(state?.encounter?.version ?? null, 'encounter'),
+        }),
+      sealOutcome: (val) =>
+        wrapAction('sealOutcome', {
+          finalValue: val,
+          encounterVersion: requireVersion(state?.encounter?.version ?? null, 'encounter'),
+        }),
+      addQuest: (t, d) =>
+        wrapAction('addQuest', {
+          title: t,
+          description: d,
+          questLogVersion: requireVersion(state?.questLogVersion ?? null, 'quest log'),
+        }),
+      updateQuest: (id, t, d) => {
+        const quest = state?.questLog?.quests?.find((q) => q.id === id);
+        return wrapAction('updateQuest', {
+          questId: id,
+          title: t,
+          description: d,
+          questVersion: requireVersion(quest?.version ?? null, 'quest'),
+        });
+      },
+      deleteQuest: (id) => {
+        const quest = state?.questLog?.quests?.find((q) => q.id === id);
+        return wrapAction('deleteQuest', {
+          questId: id,
+          questVersion: requireVersion(quest?.version ?? null, 'quest'),
+          questLogVersion: requireVersion(state?.questLogVersion ?? null, 'quest log'),
+        });
+      },
+      reorderQuests: (order) =>
+        wrapAction('reorderQuests', {
+          newOrder: order,
+          questLogVersion: requireVersion(state?.questLogVersion ?? null, 'quest log'),
+        }),
+      setDisplayName: (name) =>
+        wrapAction('setDisplayName', {
+          name,
+        }),
     },
     connect,
   };

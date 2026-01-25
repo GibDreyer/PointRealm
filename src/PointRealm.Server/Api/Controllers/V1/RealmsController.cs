@@ -176,8 +176,9 @@ public class RealmsController(
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var isHost = request.Role?.Equals("GM", StringComparison.OrdinalIgnoreCase) ?? false;
-            
-            member = PartyMember.Create(realm.Id, clientId, request.DisplayName, isHost, userId);
+            var isObserver = request.Role?.Equals("Observer", StringComparison.OrdinalIgnoreCase) ?? false;
+
+            member = PartyMember.Create(realm.Id, clientId, request.DisplayName, isHost, userId, isObserver);
             dbContext.PartyMembers.Add(member);
             
             try 
@@ -192,7 +193,7 @@ public class RealmsController(
             }
         }
 
-        var role = member.IsHost ? "GM" : (request.Role ?? "Participant");
+        var role = member.IsHost ? "GM" : (member.IsObserver ? "Observer" : (request.Role ?? "Participant"));
         var token = tokenService.GenerateToken(member.Id, realm.Id, role);
 
         return Ok(new JoinRealmResponse

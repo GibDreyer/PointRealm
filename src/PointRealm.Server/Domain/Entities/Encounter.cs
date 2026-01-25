@@ -17,6 +17,7 @@ public sealed class Encounter : Entity
     public Guid QuestId { get; private set; }
     public EncounterStatus Status { get; private set; }
     public IReadOnlyCollection<Vote> Votes => _votes.AsReadOnly();
+    public int Version { get; private set; }
     
     public int? Outcome { get; private set; }
 
@@ -69,10 +70,7 @@ public sealed class Encounter : Entity
     {
         if (Status != EncounterStatus.Revealed)
         {
-             // Optionally enforce that it must be revealed first, or auto-reveal. 
-             // Requirement says "SealOutcome(finalValue)". Let's assume it can seal from any state or just revealed.
-             // Usually seal outcome happens after reveal.
-             Status = EncounterStatus.Revealed;
+             return Result.Failure(new Error("Encounter.NotRevealed", "The encounter must be revealed before sealing an outcome."));
         }
 
         Outcome = outcome;

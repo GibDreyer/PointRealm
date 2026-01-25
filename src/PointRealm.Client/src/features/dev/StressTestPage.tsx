@@ -98,7 +98,16 @@ export function StressTestPage() {
             // 3. Create Quest & Start Encounter
             log("Adding Quest...");
             const questName = generateRandomQuestName();
-            let questId = await mainHub.invoke<string>("AddQuest", questName, "Testing load with " + botCount + " bots.");
+            if (!latestState?.questLogVersion) {
+                throw new Error("Missing quest log version.");
+            }
+            const addQuestResult = await mainHub.invoke<{ success: boolean; payload?: string }>("AddQuest", {
+                title: questName,
+                description: "Testing load with " + botCount + " bots.",
+                questLogVersion: latestState.questLogVersion,
+                commandId: crypto.randomUUID(),
+            });
+            let questId = addQuestResult?.payload;
             
             // Fallback: If AddQuest returned null, check the state
             if (!questId) {
@@ -116,7 +125,16 @@ export function StressTestPage() {
             }
 
             log(`Quest added: ${questId}. Starting encounter...`);
-            await mainHub.invoke("StartEncounter", questId);
+            const questVersion = (latestState?.questLog?.quests || []).find((q: any) => q.id === questId)?.version;
+            if (!latestState?.realmVersion || !questVersion) {
+                throw new Error("Missing realm or quest version.");
+            }
+            await mainHub.invoke("StartEncounter", {
+                questId,
+                realmVersion: latestState.realmVersion,
+                questVersion,
+                commandId: crypto.randomUUID(),
+            });
             log("Encounter Started.");
 
             // 4. Create Bots
@@ -171,7 +189,15 @@ export function StressTestPage() {
 
                 const val = botDeck[Math.floor(Math.random() * botDeck.length)];
                 try {
-                    await bot.invoke("SelectRune", val);
+                    const encounterVersion = latestState?.encounter?.version;
+                    if (!encounterVersion) {
+                        throw new Error("Missing encounter version.");
+                    }
+                    await bot.invoke("SelectRune", {
+                        value: val,
+                        encounterVersion,
+                        commandId: crypto.randomUUID(),
+                    });
                     votesCast++;
                     // log(`Bot voted ${val} after ${delayMs/1000}s`);
                 } catch (e) {

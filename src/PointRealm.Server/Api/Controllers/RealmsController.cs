@@ -34,7 +34,7 @@ public class RealmsController(PointRealmDbContext dbContext, RealmAuthorizationS
         if (userId is not null)
         {
              // Add creator as party member (Host)
-             var member = PartyMember.Create(result.Value.Id, request.ClientInstanceId ?? "web", "GM", true, userId);
+             var member = PartyMember.Create(result.Value.Id, request.ClientInstanceId ?? "web", "GM", true, userId, false);
              result.Value.AddMember(member);
         }
 
@@ -92,12 +92,13 @@ public class RealmsController(PointRealmDbContext dbContext, RealmAuthorizationS
             // Usually creator is Host. Joiners are Participants.
             // Request can ask for Observer.
             
-            member = PartyMember.Create(realm.Id, clientId, request.DisplayName ?? "Anonymous", false, userId);
+            var isObserver = string.Equals(request.Role, "observer", StringComparison.OrdinalIgnoreCase);
+            member = PartyMember.Create(realm.Id, clientId, request.DisplayName ?? "Anonymous", false, userId, isObserver);
             realm.AddMember(member);
             await dbContext.SaveChangesAsync();
         }
 
-        var role = member.IsHost ? "Host" : "Participant"; // Simple role mapping for now
+        var role = member.IsHost ? "Host" : (member.IsObserver ? "Observer" : "Participant"); // Simple role mapping for now
         var token = tokenService.GenerateToken(member.Id, realm.Id, role);
 
         return Ok(new LegacyJoinRealmResponse(token, member.Id, realm.Id, role));
@@ -134,5 +135,5 @@ public class RealmsController(PointRealmDbContext dbContext, RealmAuthorizationS
 }
 
 public record LegacyCreateRealmRequest(string Code, string Theme, string? ClientInstanceId);
-public record LegacyJoinRealmRequest(string? DisplayName);
+public record LegacyJoinRealmRequest(string? DisplayName, string? Role);
 public record LegacyJoinRealmResponse(string MemberToken, Guid MemberId, Guid RealmId, string Role);

@@ -9,8 +9,10 @@ import { PageShell } from '../../components/shell/PageShell';
 import { RealmSettingsDialog } from '../realmLobby/components/RealmSettingsDialog';
 import { RealmTable } from './components/RealmTable';
 import { RuneHand } from './components/RuneHand';
-import { Menu, Settings, X, LogOut } from 'lucide-react';
+import { Menu, Settings, X, LogOut, Link2, Check } from 'lucide-react';
+
 import styles from './realmScreen.module.css';
+
 
 export function RealmScreen() {
     const { code } = useParams<{ code: string }>();
@@ -20,7 +22,9 @@ export function RealmScreen() {
     const { state, loading, error, isConnected, connectionStatus, actions, connect } = useRealm(code);
     const [isQuestSidebarOpen, setQuestSidebarOpen] = useState(false);
     const [isSettingsOpen, setSettingsOpen] = useState(false);
+    const [copied, setCopied] = useState(false);
     const prefersReducedMotion = useReducedMotion() ?? false;
+
 
     useEffect(() => {
         if (error) {
@@ -63,8 +67,23 @@ export function RealmScreen() {
 
     const handleVote = async (value: string) => {
         if (!encounter || encounter.isRevealed) return;
+        
+        // If clicking the already selected vote, unselect it (send empty string)
+        if (myVote === value) {
+            await actions.selectRune("");
+            return;
+        }
+        
         await actions.selectRune(value);
     };
+
+    const handleCopyLink = async () => {
+        const url = window.location.href;
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
 
     const myVote = encounter?.votes && myMemberId ? encounter.votes[myMemberId] : null;
 
@@ -104,6 +123,14 @@ export function RealmScreen() {
                      </div>
 
                      <div className="pointer-events-auto flex items-center gap-2">
+                        <button
+                            onClick={handleCopyLink}
+                            className="p-3 bg-pr-surface/80 backdrop-blur border border-pr-border/50 rounded-xl hover:bg-pr-surface hover:border-pr-primary/50 transition-all text-pr-text-muted hover:text-pr-text shadow-lg relative group"
+                            title="Copy Realm Link"
+                        >
+                            {copied ? <Check size={24} className="text-green-500" /> : <Link2 size={24} />}
+                        </button>
+
                         {isGM && (
                             <button
                                 onClick={() => setSettingsOpen(true)}
@@ -139,6 +166,7 @@ export function RealmScreen() {
                         deckValues={getDeckValues()}
                         hideVoteCounts={settings.hideVoteCounts}
                         actionsDisabled={!isConnected}
+                        className="pb-32 sm:pb-40" // Add padding to avoid overlap with bottom hand
                      />
                 </main>
 

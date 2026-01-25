@@ -10,6 +10,7 @@ public sealed class EncounterConfiguration : IEntityTypeConfiguration<Encounter>
     {
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedNever();
+        builder.Property(x => x.Version).IsConcurrencyToken().HasDefaultValue(0);
 
         // Encounter links to Quest
         builder.HasOne<Quest>()

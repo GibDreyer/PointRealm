@@ -90,7 +90,7 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                             quest={quest}
                             onSealOutcome={onSealOutcome}
                             onReroll={onReroll}
-                            hideVoteCounts={settings.hideVoteCounts}
+                            hideVoteCounts={encounter.shouldHideVoteCounts ?? settings.hideVoteCounts}
                         />
                     </motion.div>
                 ) : (

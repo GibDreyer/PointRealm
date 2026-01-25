@@ -14,6 +14,8 @@ public sealed class Realm : Entity
     public string Code { get; private set; }
     public string Theme { get; private set; }
     public RealmSettings Settings { get; private set; }
+    public int Version { get; private set; }
+    public int QuestLogVersion { get; private set; }
     public Guid? CurrentQuestId { get; private set; }
     public Guid? CurrentEncounterId { get; private set; }
     public string? CreatedByUserId { get; private set; }
@@ -65,6 +67,7 @@ public sealed class Realm : Entity
     {
         var quest = new Quest(Id, title, description, _quests.Count + 1);
         _quests.Add(quest);
+        QuestLogVersion++;
         
         if (CurrentQuestId is null)
         {
@@ -88,7 +91,27 @@ public sealed class Realm : Entity
         var encounter = new Encounter(questId);
         _encounters.Add(encounter);
         CurrentEncounterId = encounter.Id;
+        CurrentQuestId = questId;
+        quest.Activate();
 
+        return Result.Success();
+    }
+
+    public Result SetActiveQuest(Guid questId)
+    {
+        var quest = _quests.FirstOrDefault(q => q.Id == questId);
+        if (quest is null)
+        {
+            return Result.Failure(new Error("Realm.QuestNotFound", "The specified quest was not found in this realm."));
+        }
+
+        CurrentQuestId = quest.Id;
+        if (quest.Status != QuestStatus.Completed)
+        {
+            quest.Activate();
+        }
+
+        QuestLogVersion++;
         return Result.Success();
     }
 
@@ -107,6 +130,7 @@ public sealed class Realm : Entity
         // Wait, I can only rely on what's available. 
         // I will assume I will add `UpdateDetails` to Quest.
         quest.UpdateDetails(title, description);
+        QuestLogVersion++;
         
         return Result.Success();
     }
@@ -120,6 +144,7 @@ public sealed class Realm : Entity
         }
 
         _quests.Remove(quest);
+        QuestLogVersion++;
         
         // If the deleted quest was determining the current quest, we might need to handle that.
         if (CurrentQuestId == questId)
@@ -134,7 +159,7 @@ public sealed class Realm : Entity
     {
         // Simple reordering logic
         // Verify all IDs exist
-        if (newOrder.Count != _quests.Count || !newOrder.All(id => _quests.Any(q => q.Id == id)))
+        if (newOrder.Count != _quests.Count || newOrder.Distinct().Count() != _quests.Count || !newOrder.All(id => _quests.Any(q => q.Id == id)))
         {
              return Result.Failure(new Error("Realm.InvalidQuestOrder", "The provided quest order is invalid."));
         }
@@ -146,6 +171,7 @@ public sealed class Realm : Entity
             quest.SetOrder(i + 1);
         }
 
+        QuestLogVersion++;
         return Result.Success();
     }
 }

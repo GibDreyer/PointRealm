@@ -17,6 +17,8 @@ public sealed class RealmConfiguration : IEntityTypeConfiguration<Realm>
 
         builder.Property(x => x.Code).IsRequired().HasMaxLength(50);
         builder.Property(x => x.Theme).HasMaxLength(100);
+        builder.Property(x => x.Version).IsConcurrencyToken().HasDefaultValue(0);
+        builder.Property(x => x.QuestLogVersion).IsConcurrencyToken().HasDefaultValue(0);
 
         builder.OwnsOne(x => x.Settings, settingsBuilder =>
         {

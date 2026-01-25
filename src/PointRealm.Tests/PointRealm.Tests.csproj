@@ -18,5 +18,7 @@
     <ProjectReference Include="..\PointRealm.Shared\PointRealm.Shared.csproj" />
     <ProjectReference Include="..\PointRealm.Server\Common\PointRealm.Server.Common.csproj" />
     <ProjectReference Include="..\PointRealm.Server\Domain\PointRealm.Server.Domain.csproj" />
+    <ProjectReference Include="..\PointRealm.Server\Infrastructure\PointRealm.Server.Infrastructure.csproj" />
+    <ProjectReference Include="..\PointRealm.Server\Api\PointRealm.Server.Api.csproj" />
   </ItemGroup>
 </Project>

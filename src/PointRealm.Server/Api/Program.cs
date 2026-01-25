@@ -1,4 +1,5 @@
 using PointRealm.Server.Api.Infrastructure;
+using PointRealm.Server.Api.Services;
 using PointRealm.Server.Api.Hubs;
 using PointRealm.Server.Application;
 using PointRealm.Server.Infrastructure;
@@ -15,6 +16,12 @@ builder.Services.AddOpenApi();
 builder.Services
     .AddApplication()
     .AddInfrastructure(builder.Configuration);
+
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<RealmStateMapper>();
+builder.Services.AddScoped<RealmCommandService>();
+builder.Services.AddScoped<IRealmBroadcaster, RealmBroadcaster>();
+builder.Services.AddScoped<ICommandDeduplicator, InMemoryCommandDeduplicator>();
 
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<PointRealm.Server.Infrastructure.Persistence.PointRealmDbContext>();
