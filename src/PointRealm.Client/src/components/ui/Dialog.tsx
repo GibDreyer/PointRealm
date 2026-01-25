@@ -10,10 +10,20 @@ interface DialogProps {
     subtitle?: string;
     children: React.ReactNode;
     className?: string;
+    contentClassName?: string;
     showCloseData?: boolean;
 }
 
-export function Dialog({ isOpen, onClose, title, subtitle, children, className, showCloseData = true }: DialogProps) {
+export function Dialog({ 
+    isOpen, 
+    onClose, 
+    title, 
+    subtitle, 
+    children, 
+    className, 
+    contentClassName,
+    showCloseData = true 
+}: DialogProps) {
     // Esc key to close
     React.useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
@@ -56,7 +66,7 @@ export function Dialog({ isOpen, onClose, title, subtitle, children, className, 
                     </div>
                 )}
 
-                <div className="flex-1 overflow-y-auto overflow-x-hidden p-6">
+                <div className={cn("flex-1 overflow-y-auto overflow-x-hidden p-6", contentClassName)}>
                     {children}
                 </div>
             </div>

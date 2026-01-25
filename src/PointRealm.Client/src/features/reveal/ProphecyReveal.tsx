@@ -20,6 +20,8 @@ interface ProphecyRevealProps {
   onReroll: () => void;
   className?: string;
   hideVoteCounts?: boolean;
+  minimal?: boolean;
+  panelVariant?: 'default' | 'glow' | 'realm';
 }
 
 const getNumericVote = (value: string | null) => {
@@ -38,6 +40,8 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
   onReroll,
   className,
   hideVoteCounts = false,
+  minimal = false,
+  panelVariant = 'default',
 }) => {
   const revealed = encounter.isRevealed;
   const prefersReducedMotion = useReducedMotion() ?? false;
@@ -134,27 +138,28 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
     <div className={`${styles.wrapper} ${className ?? ''}`}>
       <VignettePulse active={showVignette && !prefersReducedMotion} />
 
-      <Panel className={styles.panel} noPadding>
+      <Panel className={styles.panel} noPadding variant={panelVariant}>
         {/* Header with decorative elements */}
         <div className={styles.headerSection}>
-          <div className={styles.headerDecor}>
+          {!minimal && <div className={styles.headerDecor}>
             <div className={styles.decorLine} />
             <div className={styles.decorGem} />
             <div className={styles.decorLine} />
-          </div>
+          </div>}
           <motion.div 
             className={styles.header}
             initial={prefersReducedMotion ? {} : { opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <h1 className={styles.mainTitle}>Prophecy Revealed</h1>
-            <p className={styles.subtitle}>The runes have spoken</p>
+            <h1 className={styles.mainTitle}>{minimal ? 'The Prophecy' : 'Prophecy Revealed'}</h1>
+            {!minimal && <p className={styles.subtitle}>The runes have spoken</p>}
           </motion.div>
         </div>
 
         {/* Quest Banner */}
-        <motion.div 
+        {/* Quest Banner - Hide in minimal, or show simplified */}
+        {!minimal && <motion.div 
           className={styles.banner}
           initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -173,7 +178,7 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
               ✓ Sealed
             </motion.span>
           )}
-        </motion.div>
+        </motion.div>}
 
         {/* Suggested Oath - Prominent Center Display */}
         <motion.div 
@@ -186,10 +191,10 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
         </motion.div>
 
         {/* Main Content Grid */}
-        <div className={styles.grid}>
-          {/* Chart Section */}
+        <div className={minimal ? "grid grid-cols-1 sm:grid-cols-2 gap-4 h-full min-h-0" : styles.grid}>
+          {/* Chart Section - ALWAYS render, but compact if minimal */}
           <motion.div 
-            className={styles.chartSection}
+            className={minimal ? "min-h-0 overflow-visible" : styles.chartSection}
             initial={prefersReducedMotion ? {} : { opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -198,12 +203,13 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
               data={distribution} 
               revealed={revealed} 
               totalVotes={totalVotes}
+              compact={minimal}
             />
           </motion.div>
 
           {/* Party Votes Section */}
           <motion.div 
-            className={styles.votesSection}
+            className={minimal ? "min-h-0 overflow-y-auto" : styles.votesSection}
             initial={prefersReducedMotion ? {} : { opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}

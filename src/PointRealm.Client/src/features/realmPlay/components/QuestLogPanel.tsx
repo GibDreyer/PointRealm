@@ -4,6 +4,7 @@ import { Scroll, Plus, Settings } from 'lucide-react';
 import { SectionHeader } from '../../../components/ui/SectionHeader';
 import { Button } from '../../../components/Button';
 import { QuestListItem } from './QuestListItem';
+import { cn } from '../../../lib/utils';
 
 interface QuestLogPanelProps {
     quests: Quest[];
@@ -15,6 +16,7 @@ interface QuestLogPanelProps {
     onReorder?: (newOrder: string[]) => void;
     onEdit?: (quest: Quest) => void;
     onDelete?: (id: string) => void;
+    minimal?: boolean;
 }
 
 export function QuestLogPanel({ 
@@ -23,18 +25,25 @@ export function QuestLogPanel({
     isGM, 
     onAddQuest, 
     onSelectQuest, 
-    onOpenSettings 
+    onOpenSettings,
+    minimal = false
 }: QuestLogPanelProps) {
     const [isEditing, setIsEditing] = useState(false);
 
     return (
         <div className="flex flex-col h-full">
-            <header className="px-6 pt-6 pb-4 border-b border-pr-border/10 flex items-center justify-between bg-black/40">
-                <SectionHeader
+            <header className={cn("px-6 pt-6 pb-4 border-b border-pr-border/10 flex items-center justify-between", minimal ? "bg-transparent" : "bg-black/40")}>
+                {!minimal && <SectionHeader
                     title="Quest Log"
                     subtitle="Active encounters"
                     className="mb-0"
-                />
+                />}
+                {minimal && (
+                    <div className="flex flex-col">
+                        <h3 className="text-sm font-bold text-pr-primary uppercase tracking-widest">Quests</h3>
+                        <p className="text-[10px] text-pr-text-muted">Manage active encounters</p>
+                    </div>
+                )}
                 {isGM && (
                     <div className="flex items-center gap-2">
                         {isEditing && (

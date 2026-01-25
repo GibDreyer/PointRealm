@@ -12,19 +12,22 @@ interface VoteChartProps {
   data: ChartDataItem[];
   revealed: boolean;
   totalVotes: number;
+  compact?: boolean;
 }
 
 export const VoteChart: React.FC<VoteChartProps> = ({
   data,
   revealed,
   totalVotes,
+  compact = false,
 }) => {
   const prefersReducedMotion = useReducedMotion() ?? false;
   
   const maxCount = useMemo(() => Math.max(...data.map(d => d.count), 1), [data]);
   
-  // Calculate statistics
+  // ... stats calculation code remains same ...
   const stats = useMemo(() => {
+    // ... same logic ...
     if (!data.length) return null;
     
     const numericData = data
@@ -33,17 +36,14 @@ export const VoteChart: React.FC<VoteChartProps> = ({
     
     if (!numericData.length) return null;
     
-    // Weighted average
     const totalWeight = numericData.reduce((sum, d) => sum + d.count, 0);
     const weightedSum = numericData.reduce((sum, d) => sum + d.value * d.count, 0);
     const average = weightedSum / totalWeight;
     
-    // Mode (most common)
     const mode = numericData.length > 0 
       ? numericData.reduce((maxItem, d) => d.count > maxItem.count ? d : maxItem, numericData[0]!)
       : undefined;
     
-    // Range
     const values = numericData.map(d => d.value);
     const min = Math.min(...values);
     const max = values.length > 0 ? Math.max(...values) : min;
@@ -60,7 +60,7 @@ export const VoteChart: React.FC<VoteChartProps> = ({
   if (!revealed || data.length === 0) {
     return (
       <div className={styles.wrapper}>
-        <SectionHeader title="Vote Analysis" subtitle="Results" className="mb-0" />
+        {!compact && <SectionHeader title="Vote Analysis" subtitle="Results" className="mb-0" />}
         <div className={styles.empty}>
           <div className={styles.emptyIcon}>📊</div>
           <div className={styles.emptyText}>Awaiting revelation...</div>
@@ -70,38 +70,34 @@ export const VoteChart: React.FC<VoteChartProps> = ({
   }
 
   return (
-    <div className={styles.wrapper}>
-      <SectionHeader title="Vote Analysis" subtitle="Results" className="mb-0" />
+    <div className={compact ? "flex flex-col gap-4 w-full h-full" : styles.wrapper}>
+      {!compact && <SectionHeader title="Vote Analysis" subtitle="Results" className="mb-0" />}
       
       {/* Stats Row */}
       {stats && (
         <motion.div 
-          className={styles.statsRow}
+          className={compact ? "grid grid-cols-3 gap-2" : styles.statsRow}
           initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <div className={styles.statCard}>
-            <div className={styles.statValue}>{stats.average}</div>
-            <div className={styles.statLabel}>Average</div>
+          <div className={compact ? "bg-black/20 rounded p-2 text-center border border-white/5" : styles.statCard}>
+            <div className={compact ? "text-xl font-bold text-pr-primary leading-none" : styles.statValue}>{stats.average}</div>
+            <div className={compact ? "text-[10px] uppercase tracking-wider text-pr-text-muted mt-1" : styles.statLabel}>AVG</div>
           </div>
-          <div className={styles.statCard}>
-            <div className={styles.statValue}>{stats.mode}</div>
-            <div className={styles.statLabel}>Mode</div>
+          <div className={compact ? "bg-black/20 rounded p-2 text-center border border-white/5" : styles.statCard}>
+            <div className={compact ? "text-xl font-bold text-pr-primary leading-none" : styles.statValue}>{stats.mode}</div>
+            <div className={compact ? "text-[10px] uppercase tracking-wider text-pr-text-muted mt-1" : styles.statLabel}>MODE</div>
           </div>
-          <div className={styles.statCard}>
-            <div className={styles.statValue}>{stats.spread}</div>
-            <div className={styles.statLabel}>Spread</div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={styles.statValue}>{totalVotes}</div>
-            <div className={styles.statLabel}>Votes</div>
+          <div className={compact ? "bg-black/20 rounded p-2 text-center border border-white/5" : styles.statCard}>
+            <div className={compact ? "text-xl font-bold text-pr-text leading-none" : styles.statValue}>{totalVotes}</div>
+            <div className={compact ? "text-[10px] uppercase tracking-wider text-pr-text-muted mt-1" : styles.statLabel}>VOTES</div>
           </div>
         </motion.div>
       )}
       
       {/* Bar Chart */}
-      <div className={styles.chartContainer}>
+      <div className={compact ? "flex-1 min-h-0 overflow-y-auto pr-2" : styles.chartContainer}>
         <div className={styles.chart}>
           {data.map((item, index) => {
             const percentage = (item.count / maxCount) * 100;

@@ -1,180 +1,82 @@
+
 .page {
   height: 100vh;
   width: 100%;
-  display: flex;
-  justify-content: center;
-  padding: clamp(1.25rem, 3vw, 2.75rem);
-  box-sizing: border-box;
+  position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .shell {
-  width: min(100%, 1600px);
-  display: flex;
-  flex-direction: column;
-  gap: clamp(1rem, 2vw, 1.6rem);
   flex: 1;
-  height: 100%;
-  min-height: 0;
-}
-
-.layout {
-  display: grid;
-  grid-template-columns: 320px minmax(0, 1fr) 56px;
-  gap: clamp(1rem, 2vw, 2rem);
-  align-items: stretch;
-  flex: 1;
-  min-height: 0;
-}
-
-.center {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
   position: relative;
-  min-height: 0;
-}
-
-
-
-.questPanel {
-  min-height: 100%;
-  overflow: hidden;
-}
-
-.rightColumn {
-  position: relative;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.partyDock {
-  width: 56px;
-  min-height: 100%;
-  padding: 0.75rem 0.4rem;
-  border-radius: var(--pr-radius-lg);
-  border: 1px solid color-mix(in srgb, var(--pr-border) 70%, transparent);
-  background: color-mix(in srgb, var(--pr-surface) 85%, transparent);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.partyDockButton {
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--pr-secondary) 45%, var(--pr-border));
-  background: color-mix(in srgb, var(--pr-secondary) 12%, transparent);
-  color: color-mix(in srgb, var(--pr-secondary) 80%, var(--pr-text));
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.25s ease-out;
-}
-
-.partyDockButton:hover {
-  filter: brightness(1.05);
-  border-color: color-mix(in srgb, var(--pr-secondary) 70%, var(--pr-border));
-}
-
-.partyDockStat {
   width: 100%;
-  padding: 0.4rem 0.25rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--pr-border) 70%, transparent);
-  background: color-mix(in srgb, var(--pr-bg) 80%, transparent);
-  color: color-mix(in srgb, var(--pr-text-muted) 80%, var(--pr-text));
-  font-size: 0.62rem;
-  text-align: center;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-
-.partyPanel {
-  position: absolute;
-  top: 0;
-  right: 0;
   height: 100%;
-  width: min(320px, 88vw);
-  z-index: 20;
-}
-
-.mobileControls {
-  display: none;
-  gap: 0.75rem;
-  justify-content: space-between;
-}
-
-.mobileButton {
-  flex: 1;
-  height: 40px;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--pr-border) 70%, transparent);
-  background: color-mix(in srgb, var(--pr-surface) 75%, transparent);
-  color: color-mix(in srgb, var(--pr-text-muted) 80%, var(--pr-text));
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-weight: 600;
-}
-
-.drawerOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(4, 6, 9, 0.6);
-  backdrop-filter: blur(6px);
-  z-index: 50;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.drawer {
-  width: min(96vw, 520px);
-  max-height: 85vh;
-  border-radius: var(--pr-radius-xl) var(--pr-radius-xl) 0 0;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--pr-border) 70%, transparent);
-  background: color-mix(in srgb, var(--pr-surface) 90%, transparent);
-  box-shadow: var(--pr-shadow-soft);
 }
 
-@media (max-width: 1024px) {
-  .layout {
-    grid-template-columns: 240px minmax(0, 1fr) 56px;
-  }
-}
-
-@media (max-width: 960px) {
-  .layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .questPanel,
-  .rightColumn {
-    display: none;
-  }
-
-  .mobileControls {
-    display: flex;
-  }
-}
-
-@media (max-width: 640px) {
-  .page {
-    padding: 1rem;
-  }
-
-  .drawer {
+/* Base Layout Container */
+.mainContainer {
+    position: relative;
     width: 100%;
-    border-radius: var(--pr-radius-lg) var(--pr-radius-lg) 0 0;
-  }
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
 }
 
-@media (min-width: 961px) {
-  .drawerOverlay {
-    display: none;
+/* Sidebar for Quests */
+.sidebar {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    bottom: 20px;
+    width: 320px;
+    background: color-mix(in srgb, var(--pr-surface) 90%, transparent);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--pr-border);
+    border-radius: var(--pr-radius-xl);
+    z-index: 30;
+    box-shadow: var(--pr-shadow-lg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.sidebarToggle {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    z-index: 25;
+    background: var(--pr-surface);
+    border: 1px solid var(--pr-border);
+    color: var(--pr-text-muted);
+    border-radius: 8px;
+    padding: 8px;
+    transition: all 0.2s;
+}
+
+.sidebarToggle:hover {
+    color: var(--pr-text);
+    background: var(--pr-bg);
+}
+
+.settingsButton {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    z-index: 25;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .sidebar {
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 85vw;
+      border-radius: 0 20px 20px 0;
   }
 }
