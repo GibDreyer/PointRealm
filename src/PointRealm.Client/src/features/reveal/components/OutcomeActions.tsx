@@ -1,6 +1,4 @@
 ﻿import React from 'react';
-import { Button } from '@/components/Button';
-import { RuneChip } from '@/components/ui/RuneChip';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import styles from './OutcomeActions.module.css';
 import { cn } from '@/lib/utils';
@@ -30,40 +28,42 @@ export const OutcomeActions: React.FC<OutcomeActionsProps> = ({
     <div className={styles.container}>
       <div className={styles.row}>
         <SectionHeader title="Seal the Outcome" subtitle="Final estimate" className="mb-0" />
-        <Button
-          variant="ghost"
+        <button
+          type="button"
           className={styles.rerollButton}
           onClick={onReroll}
           disabled={isSealed}
         >
           Re-roll the Fates
-        </Button>
+        </button>
       </div>
 
       {isGM && (
         <div className={styles.chipRow}>
           {sealOptions.map((val) => (
-            <RuneChip
+            <button
               key={val}
               type="button"
-              active={sealingValue === val}
+              className={cn(
+                styles.sealChip,
+                sealingValue === val && styles.sealChipActive,
+                sealingValue === val && styles.loadingChip
+              )}
               onClick={() => onSealOutcome(val)}
               disabled={isSealed || !!sealingValue}
-              className={cn(sealingValue === val && styles.loadingChip)}
             >
-              {sealingValue === val ? 'Sealing…' : val}
-            </RuneChip>
+              {sealingValue === val ? '...' : val}
+            </button>
           ))}
           {deckValues.filter(v => !isNumericValue(v)).map((val) => (
-            <RuneChip
+            <button
               key={val}
               type="button"
-              active={false}
+              className={cn(styles.sealChip, styles.disabledChip)}
               disabled
-              className={styles.disabledChip}
             >
               {val}
-            </RuneChip>
+            </button>
           ))}
         </div>
       )}

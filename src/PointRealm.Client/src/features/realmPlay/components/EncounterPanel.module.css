@@ -223,15 +223,18 @@
 .voteTray {
   position: sticky;
   bottom: 0;
-  padding: 1rem clamp(1rem, 2vw, 1.6rem);
-  border-radius: var(--pr-radius-xl);
-  border: 1px solid color-mix(in srgb, var(--pr-border) 70%, transparent);
-  background: transparent;
-  backdrop-filter: blur(0px); /* rely purely on surrounding shell */
-  box-shadow: none;
-  /* Instead of a tray, it's just a container now. The cards will float. */
-  border: none;
-  padding: 0;
+  padding: 1.25rem clamp(1.25rem, 3vw, 2rem);
+  border-radius: 16px;
+  border: 1px solid var(--pr-surface-border);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--pr-surface-slate) 85%, transparent) 0%,
+    color-mix(in srgb, var(--pr-bg-dark) 90%, transparent) 100%
+  );
+  backdrop-filter: blur(12px);
+  box-shadow: 
+    0 -4px 24px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .voteHeader {
@@ -304,7 +307,8 @@
   }
 
   .voteTray {
-    padding: 0.85rem 0.85rem 0.95rem;
+    padding: 1rem 1rem 1.1rem;
+    border-radius: 12px;
   }
 
   .voteScroller {

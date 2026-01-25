@@ -1,7 +1,5 @@
 import React from 'react';
-import { Panel } from '@/components/ui/Panel';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { RuneChip } from '@/components/ui/RuneChip';
 import styles from './SuggestedOathPanel.module.css';
 
 interface SuggestedOathPanelProps {
@@ -16,18 +14,22 @@ export const SuggestedOathPanel: React.FC<SuggestedOathPanelProps> = ({
   if (!suggestion) return null;
 
   return (
-    <Panel className={className}>
+    <div className={`${styles.wrapper} ${className ?? ''}`}>
       <div className={styles.panel}>
-        <SectionHeader title="Suggested Oath" subtitle="Median/Mode suggestion" className="mb-0" />
+        <SectionHeader 
+          title="Suggested Oath" 
+          subtitle="Median/Mode suggestion" 
+          className="mb-0 text-center" 
+        />
         <div className={styles.chipWrap}>
-          <RuneChip type="button" active className={styles.glow}>
+          <div className={styles.runeValue}>
             {suggestion.value}
-          </RuneChip>
+          </div>
         </div>
         <div className={styles.helper}>
-          {suggestion.kind === 'median' ? 'A steady middle path.' : 'The party’s most chosen rune.'}
+          {suggestion.kind === 'median' ? 'A steady middle path.' : "The party's most chosen rune."}
         </div>
       </div>
-    </Panel>
+    </div>
   );
 };

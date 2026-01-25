@@ -1,8 +1,6 @@
 ﻿import React, { useMemo, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { Panel } from '@/components/ui/Panel';
-import { RuneChip } from '@/components/ui/RuneChip';
 import { cn } from '@/lib/utils';
 import styles from './PartyVotesList.module.css';
 
@@ -67,14 +65,10 @@ export const PartyVotesList: React.FC<PartyVotesListProps> = ({
           data-flip={shouldFlip ? 'true' : 'false'}
         >
           <div className={styles.flipFace}>
-            <RuneChip type="button" active={false} disabled className={styles.valueChip}>
-              —
-            </RuneChip>
+            <div className={styles.valueChip}>—</div>
           </div>
           <div className={`${styles.flipFace} ${styles.flipBack}`}>
-            <RuneChip type="button" active={false} disabled className={styles.valueChip}>
-              {value}
-            </RuneChip>
+            <div className={styles.valueChip}>{value}</div>
           </div>
         </motion.div>
       </div>
@@ -106,10 +100,8 @@ export const PartyVotesList: React.FC<PartyVotesListProps> = ({
           const displayValue = revealed ? (member.voteValue ?? '—') : '—';
 
           return (
-            <Panel
+            <div
               key={member.id}
-              variant="subtle"
-              noPadding
               className={cn(
                 styles.row,
                 isMin && styles.rowMin,
@@ -119,7 +111,7 @@ export const PartyVotesList: React.FC<PartyVotesListProps> = ({
               <div className={styles.rowBadge}>{member.name.substring(0, 2).toUpperCase()}</div>
               <div className={styles.name}>{member.name}</div>
               <FlipChip value={displayValue} shown={revealed} />
-            </Panel>
+            </div>
           );
         })}
       </div>

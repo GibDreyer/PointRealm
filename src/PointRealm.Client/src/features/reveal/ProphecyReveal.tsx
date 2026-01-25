@@ -5,7 +5,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { Panel } from '@/components/ui/Panel';
 import { useToast } from '@/components/ui/ToastSystem';
 import { PartyVotesList } from './components/PartyVotesList';
-import { RuneDistributionList } from './components/RuneDistributionList';
+import { VoteChart } from './components/VoteChart';
 import { SuggestedOathPanel } from './components/SuggestedOathPanel';
 import { OutcomeActions } from './components/OutcomeActions';
 import { VignettePulse } from './components/VignettePulse';
@@ -93,9 +93,13 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
     });
 
     return deckValues
-      .filter((val) => counts[val])
-      .map((val) => ({ value: val, count: counts[val] }));
+      .filter((val) => counts[val] !== undefined)
+      .map((val) => ({ value: val, count: counts[val] ?? 0 }));
   }, [encounter.votes, deckValues, revealed]);
+
+  const totalVotes = useMemo(() => {
+    return Object.values(encounter.votes).filter(v => v).length;
+  }, [encounter.votes]);
 
   const suggestion = useMemo(() => {
     if (!revealed) return null;
@@ -115,9 +119,14 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
     }
 
     const mid = Math.floor(numericVotes.length / 2);
-    const median = numericVotes.length % 2 === 0
-      ? (numericVotes[mid - 1] + numericVotes[mid]) / 2
-      : numericVotes[mid];
+    const midPrev = numericVotes[mid - 1];
+    const midVal = numericVotes[mid];
+    
+    if (midVal === undefined) return null;
+    
+    const median = numericVotes.length % 2 === 0 && midPrev !== undefined
+      ? (midPrev + midVal) / 2
+      : midVal;
 
     return { kind: 'median' as const, value: median.toString() };
   }, [revealed, voteRows]);
@@ -127,18 +136,33 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
       <VignettePulse active={showVignette && !prefersReducedMotion} />
 
       <Panel className={styles.panel} noPadding>
-        <div className={styles.header}>
-          <SectionHeader
-            title="Reveal the Prophecy"
-            subtitle="Encounter Results"
-            align="center"
-            className="mb-0"
-          />
+        {/* Header with decorative elements */}
+        <div className={styles.headerSection}>
+          <div className={styles.headerDecor}>
+            <div className={styles.decorLine} />
+            <div className={styles.decorGem} />
+            <div className={styles.decorLine} />
+          </div>
+          <motion.div 
+            className={styles.header}
+            initial={prefersReducedMotion ? {} : { opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <h1 className={styles.mainTitle}>Prophecy Revealed</h1>
+            <p className={styles.subtitle}>The runes have spoken</p>
+          </motion.div>
         </div>
 
-        <div className={styles.banner}>
-          <span>Current Quest (Issue)</span>
-          <strong>{quest?.title ?? 'Unknown Quest'}</strong>
+        {/* Quest Banner */}
+        <motion.div 
+          className={styles.banner}
+          initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          <span className={styles.bannerLabel}>Quest</span>
+          <strong className={styles.bannerTitle}>{quest?.title ?? 'Unknown Quest'}</strong>
           {quest?.externalId && <span className={styles.bannerId}>{quest.externalId}</span>}
           {encounter.outcome !== undefined && encounter.outcome !== null && (
             <motion.span
@@ -147,29 +171,61 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
             >
-              Bound by Oath
+              ✓ Sealed
             </motion.span>
           )}
-        </div>
+        </motion.div>
 
+        {/* Suggested Oath - Prominent Center Display */}
+        <motion.div 
+          className={styles.oathSection}
+          initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <SuggestedOathPanel suggestion={suggestion} />
+        </motion.div>
+
+        {/* Main Content Grid */}
         <div className={styles.grid}>
-          <div>
+          {/* Chart Section */}
+          <motion.div 
+            className={styles.chartSection}
+            initial={prefersReducedMotion ? {} : { opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <VoteChart 
+              data={distribution} 
+              revealed={revealed} 
+              totalVotes={totalVotes}
+            />
+          </motion.div>
+
+          {/* Party Votes Section */}
+          <motion.div 
+            className={styles.votesSection}
+            initial={prefersReducedMotion ? {} : { opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
             <PartyVotesList
               rows={voteRows}
               deckValues={deckValues}
               revealed={revealed}
               hideVoteCounts={hideVoteCounts}
             />
-          </div>
-
-          <div className={styles.rightColumn}>
-            <SuggestedOathPanel suggestion={suggestion} />
-            <RuneDistributionList distribution={distribution} revealed={revealed} />
-          </div>
+          </motion.div>
         </div>
 
+        {/* Actions Section */}
         {revealed && (
-          <div className={styles.actionsRow}>
+          <motion.div 
+            className={styles.actionsRow}
+            initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.5 }}
+          >
             <OutcomeActions
               deckValues={deckValues}
               isGM={isGM}
@@ -178,7 +234,7 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
               onReroll={onReroll}
               onSealOutcome={handleSeal}
             />
-          </div>
+          </motion.div>
         )}
       </Panel>
     </div>

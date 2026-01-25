@@ -1,7 +1,5 @@
 ﻿import React from 'react';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { Panel } from '@/components/ui/Panel';
-import { RuneChip } from '@/components/ui/RuneChip';
 import styles from './RuneDistributionList.module.css';
 
 export interface DistributionItem {
@@ -23,16 +21,16 @@ export const RuneDistributionList: React.FC<RuneDistributionListProps> = ({
   return (
     <div className={styles.section}>
       <SectionHeader title="Rune Distribution" subtitle="Summary" className="mb-0" />
-      <Panel variant="subtle" className="p-4">
+      <div className={styles.wrapper}>
         {!revealed || distribution.length === 0 ? (
           <div className={styles.empty}>No distribution available</div>
         ) : (
-          <div className="space-y-3">
+          <div className={styles.list}>
             {distribution.map((item) => (
               <div key={item.value} className={styles.row}>
-                <RuneChip type="button" active={false} disabled>
+                <div className={styles.runeLabel}>
                   {item.value}
-                </RuneChip>
+                </div>
                 <div className={styles.bar}>
                   <div
                     className={styles.barFill}
@@ -44,7 +42,7 @@ export const RuneDistributionList: React.FC<RuneDistributionListProps> = ({
             ))}
           </div>
         )}
-      </Panel>
+      </div>
     </div>
   );
 };
