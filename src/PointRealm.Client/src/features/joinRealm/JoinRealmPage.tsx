@@ -231,9 +231,9 @@ export function JoinRealmPage() {
 
                 <section className={styles.section}>
                   <SectionHeader 
-                      title="Your Identity" 
-                      subtitle="Who are you?" 
-                      className="mb-0"
+                      title="Role" 
+                      subtitle="Choose your archetype" 
+                      className="mb-2"
                   />
                   <div className={styles.roleGrid} role="radiogroup" aria-label="Choose your role">
                     <button

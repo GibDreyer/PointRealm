@@ -9,7 +9,7 @@
 }
 
 .shell {
-  width: min(100%, 1200px);
+  width: min(100%, 1600px);
   display: flex;
   flex-direction: column;
   gap: clamp(1rem, 2vw, 1.6rem);
@@ -20,8 +20,8 @@
 
 .layout {
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr) 56px;
-  gap: clamp(1rem, 2vw, 1.6rem);
+  grid-template-columns: 320px minmax(0, 1fr) 56px;
+  gap: clamp(1rem, 2vw, 2rem);
   align-items: stretch;
   flex: 1;
   min-height: 0;

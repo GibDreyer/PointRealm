@@ -23,12 +23,12 @@ export const RealmShell: React.FC<RealmShellProps> = ({
 
       {/* Main Content Container */}
       <main className={cn(
-        "relative z-10 w-full min-h-screen flex flex-col items-center",
+        "relative z-10 w-full max-h-[100vh] pad-0 min-h-screen flex flex-col items-center",
         "p-4 sm:p-6 lg:p-8", 
         className
       )}>
         {/* Max width wrapper */}
-        <div className="w-full max-w-6xl flex-1 flex flex-col">
+        <div className="w-full flex-1 flex flex-col">
           <motion.div
             // key={location.pathname} // Disable key-based remounting for now to avoid jumpiness during nav inside same layout
             initial={{ opacity: 0 }}

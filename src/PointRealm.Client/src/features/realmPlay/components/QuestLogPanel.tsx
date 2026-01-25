@@ -28,15 +28,13 @@ export function QuestLogPanel({
     const [isEditing, setIsEditing] = useState(false);
 
     return (
-        <div className="flex flex-col h-full" style={{ padding: '.5rem' }}>
-            <header className="px-8 pt-16 pb-8 border-b border-pr-border/10 flex items-center justify-between bg-black/40">
-                <div className="flex flex-col gap-1">
-                    <SectionHeader
-                        title="Quest Log"
-                        subtitle="Current Ordeals"
-                        className="mb-0 [&_h2]:text-[12px] [&_h2]:tracking-[0.5em] [&_h2]:text-pr-secondary-gold"
-                    />
-                </div>
+        <div className="flex flex-col h-full">
+            <header className="px-6 pt-6 pb-4 border-b border-pr-border/10 flex items-center justify-between bg-black/40">
+                <SectionHeader
+                    title="Quest Log"
+                    subtitle="Active encounters"
+                    className="mb-0"
+                />
                 {isGM && (
                     <div className="flex items-center gap-2">
                         {isEditing && (
@@ -69,7 +67,7 @@ export function QuestLogPanel({
             </header>
             
             <div className="flex-1 overflow-y-auto custom-scrollbar">
-                <div className="p-6 pb-8">
+                <div className="p-4 pb-6">
                     {quests.length === 0 ? (
                         <div className="text-center py-16 text-pr-text-muted/50 flex flex-col items-center gap-3">
                             <Scroll size={32} className="opacity-30" />
@@ -84,7 +82,7 @@ export function QuestLogPanel({
                             )}
                         </div>
                     ) : (
-                        <div className="flex flex-col gap-5" style={{ padding: '.5rem', marginTop: '.125rem' }}>
+                        <div className="flex flex-col gap-4 px-1 mt-1">
                             {quests.map((quest) => (
                                 <QuestListItem
                                     key={quest.id}

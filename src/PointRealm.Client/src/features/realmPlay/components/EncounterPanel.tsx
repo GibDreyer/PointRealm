@@ -184,7 +184,7 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                     className={styles.voteTray}
                 >
                     <div className={styles.voteHeader}>
-                        <SectionHeader title="Choose Your Rune" subtitle="Vote" className="mb-0" />
+                        <SectionHeader title="Cast Your Rune" subtitle="Make your estimation" className="mb-0" />
                     </div>
                     <div className={styles.voteScroller}>
                         {deckValues.map((val: string) => (

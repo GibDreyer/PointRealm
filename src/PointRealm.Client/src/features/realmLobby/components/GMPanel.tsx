@@ -43,7 +43,7 @@ export function GMPanel({ activeQuestId, quests, onManageSettings, gmName, class
                 <SectionHeader 
                     title="Game Master" 
                     subtitle="Facilitator" 
-                    className="mb-0"
+                    className="mb-2"
                 />
             </div>
 

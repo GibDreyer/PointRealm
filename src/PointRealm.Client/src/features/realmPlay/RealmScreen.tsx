@@ -177,6 +177,7 @@ export function RealmScreen() {
                                             currentMemberId={myMemberId || ""}
                                             hideVoteCounts={settings.hideVoteCounts}
                                             encounterStatus={encounter?.isRevealed ? 'revealed' : (encounter ? 'voting' : 'idle')}
+                                            onClose={() => setPartyOpen(false)}
                                         />
                                     </Panel>
                                 </motion.aside>
@@ -242,6 +243,7 @@ export function RealmScreen() {
                                 currentMemberId={myMemberId || ""}
                                 hideVoteCounts={settings.hideVoteCounts}
                                 encounterStatus={encounter?.isRevealed ? 'revealed' : (encounter ? 'voting' : 'idle')}
+                                onClose={() => setPartyOpen(false)}
                             />
                         </motion.div>
                     </motion.div>

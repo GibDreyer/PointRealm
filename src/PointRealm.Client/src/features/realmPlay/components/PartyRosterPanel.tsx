@@ -1,4 +1,5 @@
 import { AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 import { PartyMember } from '../../../types/realm';
 import { RealmPortalCard } from '../../realmLobby/components/RealmPortalCard';
 import { SectionHeader } from '../../../components/ui/SectionHeader';
@@ -9,13 +10,15 @@ interface PartyRosterPanelProps {
     currentMemberId: string;
     hideVoteCounts: boolean;
     encounterStatus?: 'idle' | 'voting' | 'revealed' | 'sealed';
+    onClose?: () => void;
 }
 
 export function PartyRosterPanel({ 
     members, 
     currentMemberId, 
     hideVoteCounts, 
-    encounterStatus 
+    encounterStatus,
+    onClose
 }: PartyRosterPanelProps) {
     const sortedMembers = [...members].sort((a, b) => {
         if (a.role === 'GM' && b.role !== 'GM') return -1;
@@ -27,12 +30,21 @@ export function PartyRosterPanel({
 
     return (
         <div className="flex flex-col h-full">
-            <header className="p-5 border-b border-pr-border/20 bg-pr-surface/40">
+            <header className="px-6 pt-6 pb-4 border-b border-pr-border/10 bg-black/40 flex items-center justify-between">
                 <SectionHeader
                     title="Party"
-                    subtitle="Presence"
-                    className="mb-0 [&_h2]:text-lg"
+                    subtitle="Travelers in your realm"
+                    className="mb-0"
                 />
+                {onClose && (
+                    <button 
+                        onClick={onClose}
+                        className="p-1 text-pr-text-muted hover:text-pr-text hover:bg-white/5 rounded-full transition-colors"
+                        aria-label="Close party panel"
+                    >
+                        <X size={18} />
+                    </button>
+                )}
             </header>
 
             <div className="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar">
