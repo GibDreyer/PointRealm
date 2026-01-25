@@ -204,26 +204,30 @@ public class RealmHub : Hub<IRealmClient>
         await SendRealmStateAsync(realm.Id);
     }
 
-    public async Task AddQuest(string title, string description)
+    public async Task<Guid> AddQuest(string title, string description)
     {
         var (realm, member) = await GetCallerContextAsync();
         EnsureGM(member);
-
+        
         var result = realm.AddQuest(title, description);
         if (result.IsFailure) throw new HubException(result.Error.Description);
-
+        
         try
         {
             await _dbContext.SaveChangesAsync();
             await SendRealmStateAsync(realm.Id);
+            return result.Value;
         }
-        catch (DbUpdateConcurrencyException ex)
+        catch (DbUpdateConcurrencyException)
         {
             // If we hit concurrency, try refreshing from DB and retrying once
             _dbContext.Entry(realm).Reload();
-            realm.AddQuest(title, description);
+            var retryResult = realm.AddQuest(title, description);
+            if (retryResult.IsFailure) throw new HubException(retryResult.Error.Description);
+            
             await _dbContext.SaveChangesAsync();
             await SendRealmStateAsync(realm.Id);
+            return retryResult.Value;
         }
     }
 

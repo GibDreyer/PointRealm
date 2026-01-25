@@ -61,7 +61,7 @@ public sealed class Realm : Entity
         _members.Add(member);
     }
 
-    public Result AddQuest(string title, string description)
+    public Result<Guid> AddQuest(string title, string description)
     {
         var quest = new Quest(Id, title, description, _quests.Count + 1);
         _quests.Add(quest);
@@ -72,7 +72,7 @@ public sealed class Realm : Entity
             quest.Activate();
         }
 
-        return Result.Success();
+        return quest.Id;
     }
 
     public Result StartEncounter(Guid questId)
