@@ -8,6 +8,7 @@ import { VoteChart } from './components/VoteChart';
 import { SuggestedOathPanel } from './components/SuggestedOathPanel';
 import { OutcomeActions } from './components/OutcomeActions';
 import { VignettePulse } from './components/VignettePulse';
+import { useProphecyStats, getNumericVote } from './utils/statsHooks';
 import styles from './ProphecyReveal.module.css';
 
 interface ProphecyRevealProps {
@@ -24,11 +25,7 @@ interface ProphecyRevealProps {
   panelVariant?: 'default' | 'glow' | 'realm';
 }
 
-const getNumericVote = (value: string | null) => {
-  if (!value) return null;
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : null;
-};
+// getNumericVote moved to statsHooks.ts
 
 export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
   encounter,
@@ -77,32 +74,12 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
     }
   };
 
-  const voteRows = useMemo(() => {
-    return partyRoster
-      .filter(member => member.status !== 'disconnected')
-      .map(member => ({
-        id: member.id,
-        name: member.name,
-        voteValue: revealed ? encounter.votes[member.id] ?? null : null,
-      }));
-  }, [partyRoster, encounter.votes, revealed]);
-
-  const distribution = useMemo(() => {
-    if (!revealed) return [];
-    const counts: Record<string, number> = {};
-    Object.values(encounter.votes).forEach((val) => {
-      if (!val) return;
-      counts[val] = (counts[val] || 0) + 1;
-    });
-
-    return deckValues
-      .filter((val) => counts[val] !== undefined)
-      .map((val) => ({ value: val, count: counts[val] ?? 0 }));
-  }, [encounter.votes, deckValues, revealed]);
-
-  const totalVotes = useMemo(() => {
-    return Object.values(encounter.votes).filter(v => v).length;
-  }, [encounter.votes]);
+  const {
+    voteRows,
+    distribution,
+    totalVotes,
+    spread,
+  } = useProphecyStats(encounter, partyRoster, deckValues);
 
   const suggestion = useMemo(() => {
     if (!revealed) return null;
@@ -134,29 +111,14 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
     return { kind: 'median' as const, value: median.toString() };
   }, [revealed, voteRows]);
 
-  const spread = useMemo(() => {
-    if (!revealed) return null;
-    const numericVotes = voteRows
-      .map(row => getNumericVote(row.voteValue))
-      .filter((val): val is number => val !== null);
-    
-    if (numericVotes.length < 2) return null;
-    return Math.max(...numericVotes) - Math.min(...numericVotes);
-  }, [revealed, voteRows]);
-
   return (
     <div className={`${styles.wrapper} ${className ?? ''}`}>
       <VignettePulse active={showVignette && !prefersReducedMotion} />
 
       <Panel className={styles.panel} noPadding variant={panelVariant}>
+        {/* Header Section */}
         <div className={styles.topRow}>
-          {/* Header with decorative elements */}
           <div className={styles.headerSection}>
-            {!minimal && <div className={styles.headerDecor}>
-              <div className={styles.decorLine} />
-              <div className={styles.decorGem} />
-              <div className={styles.decorLine} />
-            </div>}
             <motion.div 
               className={styles.header}
               initial={prefersReducedMotion ? {} : { opacity: 0, x: -20 }}
@@ -168,92 +130,68 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
             </motion.div>
           </div>
 
-          {/* Suggested Oath - Now on the right */}
+          {/* Suggested Oath / Suggestion (Top Right) */}
           <motion.div 
             className={styles.oathSection}
-            initial={prefersReducedMotion ? {} : { opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <SuggestedOathPanel suggestion={suggestion} />
+             <SuggestedOathPanel suggestion={suggestion} />
           </motion.div>
         </div>
 
-        {/* Quest Banner */}
-        {!minimal && <motion.div 
-          className={styles.banner}
-          initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-        >
-          <span className={styles.bannerLabel}>Quest</span>
-          <strong className={styles.bannerTitle}>{quest?.title ?? 'Unknown Quest'}</strong>
-          {quest?.externalId && <span className={styles.bannerId}>{quest.externalId}</span>}
-          {encounter.outcome !== undefined && encounter.outcome !== null && (
-            <motion.span
-              className={styles.stamp}
-              initial={{ opacity: 0, scale: 0.9, rotate: prefersReducedMotion ? 0 : -6 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-            >
-              ✓ Sealed
-            </motion.span>
-          )}
-        </motion.div>}
-
-        {/* Main Content Grid */}
-        <div className={minimal ? "p-4 grid grid-cols-1 sm:grid-cols-2 gap-6 h-full min-h-0" : styles.grid}>
-          {/* Chart Section - ALWAYS render, but compact if minimal */}
+        {/* Quest Banner - Always Visible */}
+        {!minimal && (
           <motion.div 
-            className={minimal ? "min-h-0 overflow-visible" : styles.chartSection}
-            initial={prefersReducedMotion ? {} : { opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            className={styles.banner}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
           >
-            <VoteChart 
-              data={distribution} 
-              revealed={revealed} 
-              totalVotes={totalVotes}
-              compact={minimal}
-            />
-          </motion.div>
-
-          {/* Party Votes Section */}
-          <motion.div 
-            className={minimal ? "min-h-0 overflow-y-auto" : styles.votesSection}
-            initial={prefersReducedMotion ? {} : { opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <PartyVotesList
-              rows={voteRows}
-              deckValues={deckValues}
-              revealed={revealed}
-              hideVoteCounts={hideVoteCounts}
-              compact={minimal}
-              spread={spread}
-            />
-          </motion.div>
-        </div>
-
-        {/* Actions Section - GM Only */}
-        {revealed && isGM && (
-          <motion.div 
-            className={styles.actionsRow}
-            initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.5 }}
-          >
-            <OutcomeActions
-              deckValues={deckValues}
-              isGM={isGM}
-              isSealed={encounter.outcome !== undefined && encounter.outcome !== null}
-              sealingValue={sealingValue}
-              onReroll={onReroll}
-              onSealOutcome={handleSeal}
-            />
+            <span className={styles.bannerLabel}>Quest</span>
+            <strong className={styles.bannerTitle}>{quest?.title ?? 'Unknown Quest'}</strong>
+            {quest?.externalId && <span className={styles.bannerId}>{quest.externalId}</span>}
+            {encounter.outcome !== undefined && encounter.outcome !== null && (
+               <span className={styles.stamp}>✓ Sealed</span>
+            )}
           </motion.div>
         )}
+
+        <div className="relative min-h-[400px] flex flex-col p-6">
+           <div className={minimal ? "grid grid-cols-1 sm:grid-cols-2 gap-6 h-full min-h-0" : styles.grid}>
+              <div className={minimal ? "min-h-0 overflow-visible" : styles.chartSection}>
+                <VoteChart 
+                  data={distribution} 
+                  revealed={revealed} 
+                  totalVotes={totalVotes}
+                  compact={minimal}
+                  spread={spread}
+                />
+              </div>
+              <div className={minimal ? "min-h-0 overflow-y-auto" : styles.votesSection}>
+                <PartyVotesList
+                  rows={voteRows}
+                  deckValues={deckValues}
+                  revealed={revealed}
+                  hideVoteCounts={hideVoteCounts}
+                  compact={minimal}
+                />
+              </div>
+            </div>
+            
+            {/* Actions (GM Only) */}
+            {revealed && isGM && (
+              <div className={styles.actionsRow}>
+                <OutcomeActions
+                  deckValues={deckValues}
+                  isGM={isGM}
+                  isSealed={encounter.outcome !== undefined && encounter.outcome !== null}
+                  sealingValue={sealingValue}
+                  onReroll={onReroll}
+                  onSealOutcome={handleSeal}
+                />
+              </div>
+            )}
+        </div>
       </Panel>
     </div>
   );

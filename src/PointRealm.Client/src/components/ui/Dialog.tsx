@@ -49,15 +49,21 @@ export function Dialog({
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-pr-primary to-transparent opacity-50" />
 
                 {(title || showCloseData) && (
-                    <div className="p-5 border-b border-pr-border/30 flex items-center justify-between shrink-0">
-                        {title ? (
+                    <div className={cn(
+                        "flex items-center justify-between shrink-0 relative",
+                        title ? "p-5 border-b border-pr-border/30" : "p-0"
+                    )}>
+                        {title && (
                             <SectionHeader title={title} subtitle={subtitle || ""} className="mb-0" />
-                        ) : <div />}
+                        )}
                         
                         {showCloseData && (
                             <button 
                                 onClick={onClose} 
-                                className="p-2 text-pr-text-muted hover:text-pr-text hover:bg-pr-surface-2 rounded-full transition-all"
+                                className={cn(
+                                    "text-pr-text-muted hover:text-pr-text hover:bg-pr-surface-2 rounded-full transition-all z-50",
+                                    title ? "p-2" : "absolute top-4 right-4 p-2 bg-black/20 backdrop-blur-sm"
+                                )}
                                 aria-label="Close"
                             >
                                 <X size={20} />
@@ -66,7 +72,7 @@ export function Dialog({
                     </div>
                 )}
 
-                <div className={cn("flex-1 overflow-y-auto overflow-x-hidden p-6", contentClassName)}>
+                <div className={cn("flex-1 overflow-y-auto overflow-x-hidden", title ? "p-6" : "p-0", contentClassName)}>
                     {children}
                 </div>
             </div>

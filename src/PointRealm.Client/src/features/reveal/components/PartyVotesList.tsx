@@ -2,7 +2,6 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { cn } from '@/lib/utils';
-import { ConsensusIndicator } from './ConsensusIndicator';
 import styles from './PartyVotesList.module.css';
 
 export interface PartyVoteRow {
@@ -17,7 +16,6 @@ interface PartyVotesListProps {
   revealed: boolean;
   hideVoteCounts?: boolean;
   compact?: boolean;
-  spread?: number | null;
 }
 
 type SortMode = 'rune' | 'name';
@@ -34,7 +32,6 @@ export const PartyVotesList: React.FC<PartyVotesListProps> = ({
   revealed,
   hideVoteCounts = false,
   compact = false,
-  spread = null,
 }) => {
   const prefersReducedMotion = useReducedMotion() ?? false;
   const [sortMode, setSortMode] = useState<SortMode>('rune');
@@ -124,10 +121,6 @@ export const PartyVotesList: React.FC<PartyVotesListProps> = ({
           );
         })}
       </div>
-
-      {revealed && spread !== null && spread !== undefined && (
-        <ConsensusIndicator spread={spread} className="mt-2" />
-      )}
     </div>
   );
 };

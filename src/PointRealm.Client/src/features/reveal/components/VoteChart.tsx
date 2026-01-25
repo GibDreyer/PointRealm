@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { cn } from '@/lib/utils';
+import { ConsensusIndicator } from './ConsensusIndicator';
 import styles from './VoteChart.module.css';
 
 export interface ChartDataItem {
@@ -14,6 +15,7 @@ interface VoteChartProps {
   revealed: boolean;
   totalVotes: number;
   compact?: boolean;
+  spread?: number | null;
 }
 
 export const VoteChart: React.FC<VoteChartProps> = ({
@@ -21,6 +23,7 @@ export const VoteChart: React.FC<VoteChartProps> = ({
   revealed,
   totalVotes,
   compact = false,
+  spread = null,
 }) => {
   const prefersReducedMotion = useReducedMotion() ?? false;
   
@@ -106,7 +109,7 @@ export const VoteChart: React.FC<VoteChartProps> = ({
       )}
       
       {/* Bar Chart */}
-      <div className={compact ? "flex-1 min-h-0 overflow-y-auto pr-2" : styles.chartContainer}>
+      <div className={compact ? "flex-1 min-h-0 pr-2" : styles.chartContainer}>
         <div className={styles.chart}>
           {data.map((item, index) => {
             const percentage = (item.count / maxCount) * 100;
@@ -148,6 +151,9 @@ export const VoteChart: React.FC<VoteChartProps> = ({
         </div>
       </div>
       
+      {revealed && spread !== null && spread !== undefined && (
+        <ConsensusIndicator spread={spread} className="mt-2" />
+      )}
     </div>
   );
 };
