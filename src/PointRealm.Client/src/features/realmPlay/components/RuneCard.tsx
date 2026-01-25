@@ -55,9 +55,9 @@ export function RuneCard({ value, isSelected, disabled, onClick, className }: Ru
                 {!isSpecial && (
                     <motion.div 
                         initial={false}
-                        animate={{ opacity: isSelected ? 0.7 : 0.2 }}
+                        animate={{ opacity: isSelected ? 0.9 : 0.3 }}
                         className={cn(
-                            "absolute bottom-4 text-[8px] font-bold uppercase tracking-[0.35em] transition-colors duration-300",
+                            "absolute bottom-3 text-[9px] font-bold uppercase tracking-[0.35em] transition-colors duration-300 pointer-events-none",
                             isSelected ? "text-pr-primary" : "text-pr-text-muted"
                         )}
                     >
@@ -65,6 +65,11 @@ export function RuneCard({ value, isSelected, disabled, onClick, className }: Ru
                     </motion.div>
                 )}
             </div>
+
+            <div className={cn(
+                "absolute inset-0 border border-transparent transition-all duration-300",
+                isSelected && "border-pr-primary/50 shadow-[inset_0_0_20px_rgba(6,182,212,0.15)]"
+            )} />
 
             <AnimatePresence>
                 {isSelected && (

@@ -10,6 +10,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { PageShell } from '../../components/shell/PageShell';
 import { Users } from 'lucide-react';
 import { RealmSettingsDialog } from '../realmLobby/components/RealmSettingsDialog';
+import { Panel } from '../../components/ui/Panel';
 import styles from './realmScreen.module.css';
 
 export function RealmScreen() {
@@ -62,8 +63,9 @@ export function RealmScreen() {
     const me = partyRoster.members.find(m => m.id === myMemberId);
     const isGM = me?.role === 'GM';
     
-    const activeQuest = questLog.quests.find(q => q.id === encounter?.questId) || 
-                       questLog.quests.find(q => q.status === "Open"); 
+    const activeQuest = encounter 
+        ? questLog.quests.find(q => q.id === encounter.questId)
+        : (questLog.quests.find(q => q.status === "Open") || questLog.quests[0]); 
 
     const handleVote = async (value: string) => {
         if (!encounter || encounter.isRevealed) return;
@@ -102,18 +104,20 @@ export function RealmScreen() {
                         initial={{ x: -16, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 0.25, ease: "easeOut" }}
-                        className={`${styles.questPanel} ${styles.panelSurface}`}
+                        className={styles.questPanel}
                     >
-                        <QuestLogPanel
-                            quests={questLog.quests}
-                            activeQuestId={encounter?.questId || undefined}
-                            isGM={!!isGM}
-                            onAddQuest={() => setQuestModalOpen(true)}
-                            onOpenSettings={() => setSettingsOpen(true)}
-                            onSelectQuest={(id) => {
-                                 if(isGM) actions.startEncounter(id);
-                            }}
-                        />
+                        <Panel variant="realm" className="h-full overflow-hidden flex flex-col">
+                            <QuestLogPanel
+                                quests={questLog.quests}
+                                activeQuestId={encounter?.questId || undefined}
+                                isGM={!!isGM}
+                                onAddQuest={() => setQuestModalOpen(true)}
+                                onOpenSettings={() => setSettingsOpen(true)}
+                                onSelectQuest={(id) => {
+                                     if(isGM) actions.startEncounter(id);
+                                }}
+                            />
+                        </Panel>
                     </motion.aside>
 
                     {/* Center Panel: Encounter */}
@@ -129,6 +133,7 @@ export function RealmScreen() {
                             onVote={handleVote}
                             onReroll={() => actions.reRollFates()}
                             onReveal={() => actions.revealProphecy()}
+                            onStartEncounter={(id) => actions.startEncounter(id)}
                             onSealOutcome={async (val) => {
                                 const numeric = Number(val);
                                 if (Number.isFinite(numeric)) {
@@ -164,14 +169,16 @@ export function RealmScreen() {
                                     animate={{ x: 0, opacity: 1 }}
                                     exit={{ x: 24, opacity: 0 }}
                                     transition={{ duration: 0.25, ease: "easeOut" }}
-                                    className={`${styles.partyPanel} ${styles.panelSurface}`}
+                                    className={styles.partyPanel}
                                 >
-                                    <PartyRosterPanel 
-                                        members={partyRoster.members}
-                                        currentMemberId={myMemberId || ""}
-                                        hideVoteCounts={settings.hideVoteCounts}
-                                        encounterStatus={encounter?.isRevealed ? 'revealed' : (encounter ? 'voting' : 'idle')}
-                                    />
+                                    <Panel variant="realm" className="h-full overflow-hidden flex flex-col">
+                                        <PartyRosterPanel 
+                                            members={partyRoster.members}
+                                            currentMemberId={myMemberId || ""}
+                                            hideVoteCounts={settings.hideVoteCounts}
+                                            encounterStatus={encounter?.isRevealed ? 'revealed' : (encounter ? 'voting' : 'idle')}
+                                        />
+                                    </Panel>
                                 </motion.aside>
                             )}
                         </AnimatePresence>

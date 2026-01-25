@@ -102,7 +102,7 @@ class RealmHub {
       });
   }
   
-  public async invoke(methodName: string, ...args: any[]) {
+  public async invoke<T = any>(methodName: string, ...args: any[]): Promise<T> {
       if (!this.connection) {
           throw new Error("Cannot invoke: Connection not started. Call connect(token) first.");
       }
@@ -111,7 +111,7 @@ class RealmHub {
            throw new Error("Connection exists but not started.");
       }
       await this.startedPromise;
-      return this.connection.invoke(methodName, ...args);
+      return this.connection.invoke<T>(methodName, ...args);
   }
   
   public get state() {

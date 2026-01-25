@@ -30,3 +30,21 @@ export function generateRandomRealmName(): string {
   
   return `${adj} ${noun}`;
 }
+
+const QUEST_ACTIONS = [
+  "Slay", "Retrieve", "Find", "Defeat", "Escort", "Discover", "Explore", "Protect",
+  "Assassinate", "Deliver", "Recover", "Cleanse", "Investigate", "Secure"
+];
+
+const QUEST_TARGETS = [
+  "the Dragon", "the Lost Rune", "the Goblin King", "the Ancient Relic",
+  "the Enchanted Forest", "the Merchant", "the Rat King", "the Cursed Sword",
+  "the Hidden Path", "the Dark Cave", "the Stolen Gold", "the Mystic Portal",
+  "the Shadow Beast", "the Holy Grail"
+];
+
+export function generateRandomQuestName(): string {
+  const action = QUEST_ACTIONS[Math.floor(Math.random() * QUEST_ACTIONS.length)];
+  const target = QUEST_TARGETS[Math.floor(Math.random() * QUEST_TARGETS.length)];
+  return `${action} ${target}`;
+}

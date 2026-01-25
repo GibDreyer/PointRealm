@@ -5,7 +5,7 @@ import * as z from "zod";
 import { useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, Eye, EyeOff, Loader2, UserX, Sparkles } from "lucide-react";
-import { generateRandomRealmName } from "@/lib/realmNames";
+import { generateRandomRealmName, generateRandomQuestName } from "@/lib/realmNames";
 import { SummoningCircle } from "@/components/ui/SummoningCircle";
 
 import { useTheme } from "@/theme/ThemeProvider";
@@ -156,6 +156,21 @@ export function CreateRealmPage() {
       sessionStorage.setItem(`pointrealm:v1:realm:${realmCode}:memberId`, joinResponse.memberId);
 
       await hub.connect(joinResponse.memberToken);
+      
+      // Add a default fun quest
+      const questName = generateRandomQuestName();
+      try {
+        // We invoke directly on hub since we are in the creation flow
+        // The backend method 'AddQuest' usually returns the new quest ID
+        const questId = await hub.invoke<string>("AddQuest", questName, "Your journey begins here. Cast your runes to estimate the complexity of this task.");
+        if (questId) {
+          // Immediately start the encounter so the creator lands in a voting state
+          await hub.invoke("StartEncounter", questId);
+        }
+      } catch (err) {
+        console.error("Failed to add default quest:", err);
+      }
+
       setThemeKey(data.themeKey);
       navigate(`/realm/${realmCode}`);
 

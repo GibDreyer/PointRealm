@@ -35,16 +35,7 @@
   min-height: 0;
 }
 
-.panelSurface {
-  border-radius: var(--pr-radius-lg);
-  border: 1px solid color-mix(in srgb, var(--pr-border) 70%, transparent);
-  background:
-    linear-gradient(180deg,
-      color-mix(in srgb, var(--pr-surface) 82%, transparent) 0%,
-      color-mix(in srgb, var(--pr-surface) 92%, transparent) 100%),
-    var(--pr-texture-surface-texture);
-  box-shadow: var(--pr-shadow-soft);
-}
+
 
 .questPanel {
   min-height: 100%;

@@ -18,10 +18,11 @@ interface EncounterPanelProps {
     onVote: (value: string) => void;
     onReroll: () => void;
     onReveal: () => void;
+    onStartEncounter: (questId: string) => void;
     onSealOutcome: (value: string) => Promise<void>;
 }
 
-export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, canVote, myVote, onVote, onReroll, onReveal, onSealOutcome }: EncounterPanelProps) {
+export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, canVote, myVote, onVote, onReroll, onReveal, onStartEncounter, onSealOutcome }: EncounterPanelProps) {
     if (!quest) {
         return (
             <div className={styles.noQuest}>
@@ -30,11 +31,10 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                     animate={{ opacity: 1, scale: 1 }}
                     className="max-w-md w-full"
                 >
-                    <Panel variant="subtle" className="py-14 px-10 border-pr-border/30 text-center">
+                    <Panel variant="realm" className="py-14 px-10 border-pr-border/30 text-center">
                         <SectionHeader
                             title="Quiet Realm"
                             subtitle={isGM ? "Select a quest from the log to begin an encounter." : "Wait for the Game Master to initiate the ordeal."}
-                            align="center"
                         />
                     </Panel>
                 </motion.div>
@@ -100,32 +100,49 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                             <div className={styles.tableGlow} />
                             {isGM && (
                                 <div className={styles.centerCluster}>
-                                    <motion.button
-                                        type="button"
-                                        whileHover={!rerollDisabled ? { y: -2 } : {}}
-                                        whileTap={!rerollDisabled ? { scale: 0.98 } : {}}
-                                        transition={{ duration: 0.2, ease: "easeInOut" }}
-                                        onClick={onReroll}
-                                        disabled={rerollDisabled}
-                                        className={styles.rerollButton}
-                                    >
-                                        Re-roll the Fates
-                                    </motion.button>
-                                    <span className={styles.rerollSubtitle}>Clear votes and revote</span>
-                                    <motion.button
-                                        type="button"
-                                        whileHover={!revealDisabled ? { y: -2 } : {}}
-                                        whileTap={!revealDisabled ? { scale: 0.98 } : {}}
-                                        transition={{ duration: 0.2, ease: "easeInOut" }}
-                                        onClick={onReveal}
-                                        disabled={revealDisabled}
-                                        className={styles.revealButton}
-                                    >
-                                        Reveal Prophecy
-                                    </motion.button>
-                                    <span className={styles.revealSubtitle}>
-                                        {settings.hideVoteCounts ? 'Votes are hidden' : `${readyCount} ready`}
-                                    </span>
+                                    {encounter ? (
+                                        <>
+                                            <motion.button
+                                                type="button"
+                                                whileHover={!rerollDisabled ? { y: -2 } : {}}
+                                                whileTap={!rerollDisabled ? { scale: 0.98 } : {}}
+                                                transition={{ duration: 0.2, ease: "easeInOut" }}
+                                                onClick={onReroll}
+                                                disabled={rerollDisabled}
+                                                className={styles.rerollButton}
+                                            >
+                                                Re-roll the Fates
+                                            </motion.button>
+                                            <span className={styles.rerollSubtitle}>Clear votes and revote</span>
+                                            <motion.button
+                                                type="button"
+                                                whileHover={!revealDisabled ? { y: -2 } : {}}
+                                                whileTap={!revealDisabled ? { scale: 0.98 } : {}}
+                                                transition={{ duration: 0.2, ease: "easeInOut" }}
+                                                onClick={onReveal}
+                                                disabled={revealDisabled}
+                                                className={styles.revealButton}
+                                            >
+                                                Reveal Prophecy
+                                            </motion.button>
+                                            <span className={styles.revealSubtitle}>
+                                                {settings.hideVoteCounts ? 'Votes are hidden' : `${readyCount} ready`}
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <div className="flex flex-col items-center gap-2">
+                                            <motion.button
+                                                type="button"
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                                onClick={() => onStartEncounter(quest.id)}
+                                                className={cn(styles.revealButton, "!bg-pr-primary !text-pr-bg px-8")}
+                                            >
+                                                Begin Quest
+                                            </motion.button>
+                                            <span className={styles.revealSubtitle}>Commence the ritual</span>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -167,7 +184,7 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                     className={styles.voteTray}
                 >
                     <div className={styles.voteHeader}>
-                        <SectionHeader title="Choose Your Rune" subtitle="Vote" align="center" className="mb-0" />
+                        <SectionHeader title="Choose Your Rune" subtitle="Vote" className="mb-0" />
                     </div>
                     <div className={styles.voteScroller}>
                         {deckValues.map((val: string) => (
@@ -177,7 +194,7 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                                 isSelected={myVote === val}
                                 disabled={!canVote}
                                 onClick={() => onVote(val)}
-                                className={styles.voteCard}
+                                className={styles.voteCard || ""}
                             />
                         ))}
                     </div>
