@@ -59,6 +59,7 @@ export function useRealm(realmCode?: string): UseRealmResult {
       try {
         const clientId = getClientId();
         await client.connect({ realmCode: code, memberToken: token, clientId });
+        await client.joinPresence();
       } catch (err: any) {
         setLastError({
           code: 'connection_failed',
@@ -74,6 +75,7 @@ export function useRealm(realmCode?: string): UseRealmResult {
     if (!realmCode) return;
     connect(realmCode);
     return () => {
+      client.leavePresence().catch(() => undefined);
       client.disconnect().catch(() => undefined);
     };
   }, [realmCode, connect, client]);
@@ -92,6 +94,9 @@ export function useRealm(realmCode?: string): UseRealmResult {
     return value;
   };
 
+  const resolveEncounterVersion = () =>
+    state?.encounter?.version ?? state?.encounterVersion ?? null;
+
   const wrapAction = async (actionName: string, ...args: any[]) => {
     if (connectionStatus !== 'connected') {
       setLastError({
@@ -102,9 +107,13 @@ export function useRealm(realmCode?: string): UseRealmResult {
     }
     try {
       const method = actionName as keyof typeof client;
-      const handler = (client as Record<string, (...a: any[]) => Promise<any>>)[method];
-      if (handler) {
-        const result = await handler(...args);
+      // We must call it as client[method](...args) or bind it to preserve 'this' context logic
+      // Casting to any to allow dynamic invocation but ensuring context
+      const handler = (client as any)[method];
+      
+      if (typeof handler === 'function') {
+        const result = await handler.call(client, ...args);
+
         if (result?.success === false) {
           setLastError({
             code: result.error?.errorCode ?? 'action_failed',
@@ -134,7 +143,7 @@ export function useRealm(realmCode?: string): UseRealmResult {
       selectRune: (val) =>
         wrapAction('selectRune', {
           value: val,
-          encounterVersion: requireVersion(state?.encounter?.version ?? null, 'encounter'),
+          encounterVersion: requireVersion(resolveEncounterVersion(), 'encounter'),
         }),
       startEncounter: (qId) => {
         const quest = state?.questLog?.quests?.find((q) => q.id === qId);
@@ -146,16 +155,16 @@ export function useRealm(realmCode?: string): UseRealmResult {
       },
       revealProphecy: () =>
         wrapAction('revealProphecy', {
-          encounterVersion: requireVersion(state?.encounter?.version ?? null, 'encounter'),
+          encounterVersion: requireVersion(resolveEncounterVersion(), 'encounter'),
         }),
       reRollFates: () =>
         wrapAction('reRollFates', {
-          encounterVersion: requireVersion(state?.encounter?.version ?? null, 'encounter'),
+          encounterVersion: requireVersion(resolveEncounterVersion(), 'encounter'),
         }),
       sealOutcome: (val) =>
         wrapAction('sealOutcome', {
           finalValue: val,
-          encounterVersion: requireVersion(state?.encounter?.version ?? null, 'encounter'),
+          encounterVersion: requireVersion(resolveEncounterVersion(), 'encounter'),
         }),
       addQuest: (t, d) =>
         wrapAction('addQuest', {

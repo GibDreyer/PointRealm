@@ -1,19 +1,17 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { hub } from '../../realtime/hub';
-import { getClientId } from '../../lib/storage';
 import { RealmBackground } from '../../components/ui/RealmBackground';
 import { BackButton } from '../../components/ui/BackButton';
 import { PageShell } from '../../components/shell/PageShell';
 import { useReducedMotion } from 'framer-motion';
+import { useRealm } from '../../hooks/useRealm';
 
 export function PlayPage() {
     const params = useParams<{ code: string }>();
     const realmCode = params.code;
     const navigate = useNavigate();
 
-    const [state, setState] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+    const { state, loading } = useRealm(realmCode);
     const prefersReducedMotion = useReducedMotion() ?? false;
 
     const connect = useCallback(async () => {
@@ -21,43 +19,12 @@ export function PlayPage() {
         const token = sessionStorage.getItem(`pointrealm:v1:realm:${realmCode}:token`);
         if (!token) {
             navigate(`/join?realmCode=${realmCode}`);
-            return;
-        }
-
-        try {
-            const clientId = getClientId();
-            await hub.connect(token, clientId);
-            // In play mode, we immediately want the full state
-            // JoinRealm usually triggers a broadcast, but we can also invoke GetState if we had it
-            await hub.invoke('JoinRealm', realmCode);
-        } catch (err) {
-            console.error(err);
         }
     }, [realmCode, navigate]);
 
     useEffect(() => {
         if (!realmCode) return;
-
-        hub.on('RealmStateUpdated', (data) => {
-            console.log("Play State Update", data);
-            setState(data);
-            setLoading(false);
-        });
-
-        // Even in play mode, we might receive the initial snapshot which confirms we're in
-        hub.on('RealmSnapshot', (data) => {
-            if (!data.activeEncounterId) {
-                // If there's no encounter, maybe we should go back to lobby
-                // navigate(`/realm/${realmCode}/lobby`);
-            }
-        });
-
         connect();
-
-        return () => {
-            hub.off('RealmStateUpdated', () => {});
-            hub.off('RealmSnapshot', () => {});
-        };
     }, [realmCode, connect]);
 
     if (loading && !state) {

@@ -164,7 +164,6 @@ export function CreateRealmPage() {
       // Add a default fun quest
       const questName = generateRandomQuestName();
       try {
-        // We invoke directly on hub since we are in the creation flow
         // The backend method 'AddQuest' usually returns the new quest ID
         const questId = await client.addQuest(questName, "Your journey begins here. Cast your runes to estimate the complexity of this task.");
         if (questId) {

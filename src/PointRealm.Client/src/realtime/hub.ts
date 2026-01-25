@@ -8,6 +8,7 @@ export class RealmHub {
   private currentMemberToken: string | null = null;
   private currentClientId: string | null = null;
   private listeners: Map<string, ((...args: any[]) => void)[]> = new Map();
+  private connectionHandlersAttached = false;
 
   public async connect(memberToken: string, clientId?: string) {
     if (this.connection && 
@@ -38,19 +39,7 @@ export class RealmHub {
       .build();
     
     this.reattachListeners();
-
-    this.connection.onclose((error) => {
-        console.error("SignalR connection closed", error);
-        this.startedPromise = null;
-    });
-
-    this.connection.onreconnecting(() => {
-        console.log("SignalR reconnecting...");
-    });
-
-    this.connection.onreconnected(() => {
-        console.log("SignalR reconnected");
-    });
+    this.attachConnectionLifecycleHandlers();
 
     this.startedPromise = this.connection.start().catch((err) => {
          console.error("Error starting SignalR connection:", err);
@@ -66,6 +55,7 @@ export class RealmHub {
     if (this.connection) {
         await this.connection.stop();
         this.connection = null;
+        this.connectionHandlersAttached = false;
     }
   }
 
@@ -75,7 +65,7 @@ export class RealmHub {
     }
     this.listeners.get(methodName)!.push(newMethod);
     
-    if (this.connection) {
+    if (this.connection && !this.isLifecycleEvent(methodName)) {
         this.connection.on(methodName, newMethod);
     }
   }
@@ -88,7 +78,7 @@ export class RealmHub {
             methods.splice(index, 1);
         }
     }
-    if (this.connection) {
+    if (this.connection && !this.isLifecycleEvent(methodName)) {
         this.connection.off(methodName, method);
     }
   }
@@ -96,10 +86,41 @@ export class RealmHub {
   private reattachListeners() {
       if (!this.connection) return;
       this.listeners.forEach((methods, event) => {
+          if (this.isLifecycleEvent(event)) return;
           methods.forEach(method => {
               this.connection!.on(event, method);
           });
       });
+  }
+
+  private attachConnectionLifecycleHandlers() {
+      if (!this.connection || this.connectionHandlersAttached) return;
+      this.connectionHandlersAttached = true;
+
+      this.connection.onclose((error) => {
+          console.error("SignalR connection closed", error);
+          this.startedPromise = null;
+          this.emitLifecycleEvent('close', error);
+      });
+
+      this.connection.onreconnecting((error) => {
+          console.log("SignalR reconnecting...");
+          this.emitLifecycleEvent('reconnecting', error);
+      });
+
+      this.connection.onreconnected((connectionId) => {
+          console.log("SignalR reconnected");
+          this.emitLifecycleEvent('reconnected', connectionId);
+      });
+  }
+
+  private isLifecycleEvent(methodName: string) {
+      return methodName === 'reconnecting' || methodName === 'reconnected' || methodName === 'close';
+  }
+
+  private emitLifecycleEvent(methodName: string, ...args: any[]) {
+      const methods = this.listeners.get(methodName) ?? [];
+      methods.forEach((handler) => handler(...args));
   }
   
   public async invoke<T = any>(methodName: string, ...args: any[]): Promise<T> {

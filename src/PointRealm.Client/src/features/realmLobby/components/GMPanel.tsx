@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Crown } from 'lucide-react';
-import { hub } from '../../../realtime/hub';
 import { Panel } from '../../../components/ui/Panel';
 import { Button } from '../../../components/Button';
 import { SectionHeader } from '../../../components/ui/SectionHeader';
@@ -8,6 +7,7 @@ import { QuestManagementDialog } from './QuestManagementDialog';
 import styles from '../lobby.module.css';
 import { cn } from '../../../lib/utils';
 import { useRealmStore } from '../../../state/realmStore';
+import { useRealmClient } from '@/app/providers/RealtimeProvider';
 
 interface Props {
     activeQuestId: string | undefined;
@@ -22,6 +22,7 @@ export function GMPanel({ activeQuestId, quests, onManageSettings, gmName, class
     const [isManaging, setIsManaging] = useState(false);
     const realmVersion = useRealmStore((s) => s.realmSnapshot?.realmVersion ?? null);
     const questLog = useRealmStore((s) => s.realmSnapshot?.questLog?.quests ?? []);
+    const client = useRealmClient();
 
     useEffect(() => {
         if (activeQuestId) {
@@ -39,11 +40,10 @@ export function GMPanel({ activeQuestId, quests, onManageSettings, gmName, class
                 console.warn("Missing realm or quest version for StartEncounter.");
                 return;
             }
-            hub.invoke("StartEncounter", {
+            client.startEncounter({
                 questId: selectedQuestId,
                 realmVersion,
                 questVersion: quest.version,
-                commandId: createCommandId(),
             }).catch(console.error);
         }
     };
@@ -120,11 +120,4 @@ export function GMPanel({ activeQuestId, quests, onManageSettings, gmName, class
             />
         </Panel>
     );
-}
-
-function createCommandId() {
-    if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-        return crypto.randomUUID();
-    }
-    return `${Date.now().toString(16)}-${Math.random().toString(16).slice(2, 10)}`;
 }

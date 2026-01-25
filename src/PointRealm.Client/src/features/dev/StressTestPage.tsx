@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { api } from "@/api/client";
-import { RealmHub, hub as mainHub } from "@/realtime/hub";
+import { RealmRealtimeClient } from "@/realtime/realmClient";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/ui/Input";
 import { PageShell } from "@/components/shell/PageShell";
@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { generateRandomRealmName, generateRandomQuestName, generateBotName } from "@/lib/realmNames";
 import { ThemePicker } from "@/features/createRealm/components/ThemePicker";
 import { useTheme } from "@/theme/ThemeProvider";
+import { getClientId } from "@/lib/storage";
 
 export function StressTestPage() {
     // Extra safety check in case route leaks
@@ -50,7 +51,8 @@ export function StressTestPage() {
         setIsRunning(true);
         setStatus([]);
         setRealmCode(null);
-        const bots: RealmHub[] = [];
+        const bots: RealmRealtimeClient[] = [];
+        let mainClient: RealmRealtimeClient | null = null;
 
         try {
             // 1. Create Realm
@@ -87,10 +89,12 @@ export function StressTestPage() {
             // Setup state listener to catch updates
             let latestState: any = null;
             const handleStateUpdate = (state: any) => { latestState = state; };
-            mainHub.on('RealmStateUpdated', handleStateUpdate);
 
-            await mainHub.connect(gmJoin.memberToken);
-            await mainHub.invoke("JoinRealm", code);
+            const gmClientId = getClientId();
+            mainClient = new RealmRealtimeClient({ clientId: gmClientId });
+            const unsubscribeState = mainClient.on('realmStateUpdated', handleStateUpdate);
+
+            await mainClient.connect({ realmCode: code, memberToken: gmJoin.memberToken, clientId: gmClientId });
             
             // Wait a moment for join to settle
             await new Promise(r => setTimeout(r, 500));
@@ -101,11 +105,10 @@ export function StressTestPage() {
             if (!latestState?.questLogVersion) {
                 throw new Error("Missing quest log version.");
             }
-            const addQuestResult = await mainHub.invoke<{ success: boolean; payload?: string }>("AddQuest", {
+            const addQuestResult = await mainClient.addQuest({
                 title: questName,
                 description: "Testing load with " + botCount + " bots.",
                 questLogVersion: latestState.questLogVersion,
-                commandId: crypto.randomUUID(),
             });
             let questId = addQuestResult?.payload;
             
@@ -129,11 +132,10 @@ export function StressTestPage() {
             if (!latestState?.realmVersion || !questVersion) {
                 throw new Error("Missing realm or quest version.");
             }
-            await mainHub.invoke("StartEncounter", {
+            await mainClient.startEncounter({
                 questId,
                 realmVersion: latestState.realmVersion,
                 questVersion,
-                commandId: crypto.randomUUID(),
             });
             log("Encounter Started.");
 
@@ -142,7 +144,7 @@ export function StressTestPage() {
             for (let i = 0; i < botCount; i++) {
                 const botName = generateBotName();
                 const botClientId = `bot-${i}-${Date.now()}`;
-                const botHub = new RealmHub();
+                const botClient = new RealmRealtimeClient({ clientId: botClientId });
                 
                 // Join API - Use fetch directly to avoid picking up the GM's auth token
                 const apiBase = import.meta.env.VITE_API_BASE_URL || '/api';
@@ -163,10 +165,9 @@ export function StressTestPage() {
                 const botJoin = await joinRes.json();
                 
                 // Connect SignalR
-                await botHub.connect(botJoin.memberToken, botClientId);
-                await botHub.invoke("JoinRealm", code);
+                await botClient.connect({ realmCode: code, memberToken: botJoin.memberToken, clientId: botClientId });
                 
-                bots.push(botHub);
+                bots.push(botClient);
                 log(`${botName} joined.`);
                 
                 await new Promise(r => setTimeout(r, 100)); 
@@ -193,10 +194,9 @@ export function StressTestPage() {
                     if (!encounterVersion) {
                         throw new Error("Missing encounter version.");
                     }
-                    await bot.invoke("SelectRune", {
+                    await bot.selectRune({
                         value: val,
                         encounterVersion,
-                        commandId: crypto.randomUUID(),
                     });
                     votesCast++;
                     // log(`Bot voted ${val} after ${delayMs/1000}s`);
@@ -208,12 +208,16 @@ export function StressTestPage() {
             log(`${votesCast} bots voted! Verification complete.`);
             
             // Clean up listener
-            mainHub.off('RealmStateUpdated', handleStateUpdate);
+            unsubscribeState();
 
         } catch (err: any) {
             console.error(err);
             log(`ERROR: ${err.message}`);
         } finally {
+            await Promise.all(bots.map((bot) => bot.disconnect().catch(() => undefined)));
+            if (mainClient) {
+                await mainClient.disconnect().catch(() => undefined);
+            }
             setIsRunning(false);
         }
     };

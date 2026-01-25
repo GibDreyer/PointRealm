@@ -3,9 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Info } from 'lucide-react';
 
-import { getClientId } from '../../lib/storage';
 import { useTheme } from '../../theme/ThemeProvider';
-import { hub } from '../../realtime/hub';
+import { useRealmClient } from '@/app/providers/RealtimeProvider';
 import { LobbySnapshot } from './types';
 import { PartyMemberCard } from './components/PartyMemberCard';
 import { RealmPortalCard } from './components/RealmPortalCard';
@@ -42,6 +41,7 @@ export function TavernLobbyPage() {
 
     const navigate = useNavigate();
     const { setThemeKey } = useTheme();
+    const client = useRealmClient();
     const prefersReducedMotion = useReducedMotion() ?? false;
 
     const [snapshot, setSnapshot] = useState<LobbySnapshot | null>(null);
@@ -58,15 +58,14 @@ export function TavernLobbyPage() {
 
         try {
             setStatus('connecting');
-            const clientId = getClientId();
-            await hub.connect(token, clientId);
-            await hub.invoke('JoinRealm', realmCode);
+            await client.connect({ realmCode, memberToken: token });
+            await client.joinPresence();
             setStatus('connected');
         } catch (err) {
             console.error("Lobby Connection Failed:", err);
             setStatus('disconnected');
         }
-    }, [realmCode, navigate]);
+    }, [realmCode, navigate, client]);
 
     useEffect(() => {
         if (!realmCode) {
@@ -90,29 +89,24 @@ export function TavernLobbyPage() {
             }
         };
 
-        const onReconnecting = () => setStatus('reconnecting');
-        const onReconnected = () => {
-            hub.invoke('JoinRealm', realmCode).catch(console.error);
-            setStatus('connected');
-        };
-        const onClose = () => setStatus('disconnected');
-
-        hub.on('RealmSnapshot', onSnapshot);
-        hub.on('RealmStateUpdated', onStateUpdated);
-        hub.on('reconnecting', onReconnecting);
-        hub.on('reconnected', onReconnected);
-        hub.on('close', onClose);
+        const unsubscribeSnapshot = client.on('realmSnapshot', onSnapshot);
+        const unsubscribeState = client.on('realmStateUpdated', onStateUpdated);
+        const unsubscribeStatus = client.on('connectionStatusChanged', (nextStatus) => {
+            if (nextStatus === 'connected') {
+                client.joinPresence().catch(console.error);
+            }
+            setStatus(nextStatus === 'error' ? 'disconnected' : nextStatus);
+        });
 
         connectToRealm();
 
         return () => {
-            hub.off('RealmSnapshot', onSnapshot);
-            hub.off('RealmStateUpdated', onStateUpdated);
-            hub.off('reconnecting', onReconnecting);
-            hub.off('reconnected', onReconnected);
-            hub.off('close', onClose);
+            client.leavePresence().catch(() => undefined);
+            unsubscribeSnapshot();
+            unsubscribeState();
+            unsubscribeStatus();
         };
-    }, [realmCode, connectToRealm, setThemeKey, navigate]);
+    }, [realmCode, connectToRealm, setThemeKey, navigate, client]);
 
     if (!snapshot) {
         return (

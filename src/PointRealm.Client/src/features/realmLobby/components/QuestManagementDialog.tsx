@@ -3,8 +3,8 @@ import { Plus, Info } from 'lucide-react';
 import { Button } from '../../../components/Button';
 import { Dialog } from '../../../components/ui/Dialog';
 import { Tooltip } from '../../../components/ui/Tooltip';
-import { hub } from '../../../realtime/hub';
 import { useRealmStore } from '../../../state/realmStore';
+import { useRealmClient } from '@/app/providers/RealtimeProvider';
 
 interface Props {
     isOpen: boolean;
@@ -17,6 +17,7 @@ export function QuestManagementDialog({ isOpen, onClose, quests, activeQuestId }
     const [newQuestTitle, setNewQuestTitle] = useState("");
     const [isCreating, setIsCreating] = useState(false);
     const questLogVersion = useRealmStore((s) => s.realmSnapshot?.questLogVersion ?? null);
+    const client = useRealmClient();
 
     // If we have an active quest, select it. otherwise select first.
     // Actually, this dialog manages the LIST and CREATION, but "Begin Encounter" uses the selection in GMPanel?
@@ -38,11 +39,10 @@ export function QuestManagementDialog({ isOpen, onClose, quests, activeQuestId }
             return;
         }
         try {
-            await hub.invoke("AddQuest", {
+            await client.addQuest({
                 title: newQuestTitle.trim(),
                 description: "",
                 questLogVersion,
-                commandId: createCommandId(),
             });
             setNewQuestTitle("");
             setIsCreating(false);
@@ -126,13 +126,6 @@ export function QuestManagementDialog({ isOpen, onClose, quests, activeQuestId }
             </div>
         </Dialog>
     );
-}
-
-function createCommandId() {
-    if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-        return crypto.randomUUID();
-    }
-    return `${Date.now().toString(16)}-${Math.random().toString(16).slice(2, 10)}`;
 }
 
 import { cn } from '../../../lib/utils';

@@ -20,6 +20,8 @@ export function RealmScreen() {
     
     // We use the 'code' from params for hook
     const { state, loading, error, isConnected, connectionStatus, actions, connect } = useRealm(code);
+    // undefined = no local override (use server), null = explicitly clear/abstain, string = value
+    const [localVote, setLocalVote] = useState<string | null | undefined>(undefined);
     const [isQuestSidebarOpen, setQuestSidebarOpen] = useState(false);
     const [isSettingsOpen, setSettingsOpen] = useState(false);
     const [copied, setCopied] = useState(false);
@@ -31,6 +33,27 @@ export function RealmScreen() {
             console.error("Realm Error:", error);
         }
     }, [error]);
+
+    const encounter = state?.encounter ?? null;
+
+    // Auth Check: myMemberId from session storage
+    const myMemberId = code ? sessionStorage.getItem(`pointrealm:v1:realm:${code}:memberId`) : null;
+
+    useEffect(() => {
+        if (!encounter || encounter.isRevealed) {
+            setLocalVote(undefined);
+            return;
+        }
+        // If server says we haven't voted, sync local state to undefined (or null)
+        if (myMemberId && encounter.hasVoted && encounter.hasVoted[myMemberId] === false) {
+             // Only reset if we think we HAVE voted (localVote is not null/undefined)
+             // casting to string check to differentiate from undefined
+             if (typeof localVote === 'string') {
+                 setLocalVote(undefined); 
+             }
+        }
+    }, [encounter?.version, encounter?.isRevealed, encounter?.hasVoted, myMemberId]);
+
 
     // Handle initial loading or missing state
     if (loading || !state) {
@@ -54,28 +77,48 @@ export function RealmScreen() {
         );
     }
 
-    const { settings, partyRoster, questLog, encounter } = state;
+    const { settings, partyRoster, questLog } = state;
     
-    // Auth Check: myMemberId from session storage
-    const myMemberId = code ? sessionStorage.getItem(`pointrealm:v1:realm:${code}:memberId`) : null; 
     const me = partyRoster.members.find(m => m.id === myMemberId);
     const isGM = me?.role === 'GM';
+    const isObserver = me?.role === 'Observer' || me?.isObserver;
     
     const activeQuest = encounter 
         ? questLog.quests.find(q => q.id === encounter.questId)
         : (questLog.quests.find(q => q.status === "Open") || questLog.quests[0]); 
 
     const handleVote = async (value: string) => {
-        if (!encounter || encounter.isRevealed) return;
-        
-        // If clicking the already selected vote, unselect it (send empty string)
-        if (myVote === value) {
-            await actions.selectRune("");
+        console.log("HandleVote called with:", value);
+        if (!encounter || encounter.isRevealed) {
+            console.log("Voting blocked: encounter missing or revealed");
             return;
         }
+
         
-        await actions.selectRune(value);
+        // Calculate the effective current vote to check for toggle
+        // We use myVote derived variable logic here:
+        const currentVote = localVote !== undefined ? (localVote ?? null) : (serverVote ?? null);
+
+        // If clicking the same card (vote is same as current), it's a toggle OFF
+        if (currentVote === value) {
+             setLocalVote(null); // Optimistic clear
+             try {
+                 await actions.selectRune(""); // Send empty/null to clear
+             } catch {
+                 setLocalVote(undefined); // Revert to server state on error
+             }
+             return;
+        }
+        
+        // New vote
+        setLocalVote(value); // Optimistic set
+        try {
+            await actions.selectRune(value);
+        } catch {
+            setLocalVote(undefined); // Revert to server state on error
+        }
     };
+
 
     const handleCopyLink = async () => {
         const url = window.location.href;
@@ -85,7 +128,9 @@ export function RealmScreen() {
     };
 
 
-    const myVote = encounter?.votes && myMemberId ? encounter.votes[myMemberId] : null;
+    const serverVote = encounter?.votes && myMemberId ? encounter.votes[myMemberId] : null;
+    // Prioritize localVote if it is not undefined (meaning user interacted)
+    const myVote = localVote !== undefined ? (localVote ?? null) : (serverVote ?? null);
 
     const getDeckValues = () => {
         if (settings.deckType === 'FIBONACCI') return ['1', '2', '3', '5', '8', '13', '21', '?', 'coffee'];
@@ -94,7 +139,16 @@ export function RealmScreen() {
         return ['1', '2', '3', '5', '8', '13', '?', 'coffee'];
     };
 
+    const disabledReason = !me ? "member_not_found" 
+        : isObserver ? "is_observer" 
+        : !isConnected ? "not_connected" 
+        : null;
+    
+    // Log disabled status periodically or on interaction? Better on render if logic changes
+    // console.log("Can vote?", !disabledReason, disabledReason, { meId: myMemberId, isGM });
+
     return (
+
         <PageShell
             backgroundDensity="low"
             backgroundVariant="realm"
@@ -175,8 +229,16 @@ export function RealmScreen() {
                     <RuneHand 
                         options={getDeckValues()}
                         selectedValue={myVote || null}
-                        disabled={!me || me.role === 'GM' || !isConnected} // GM can vote? Usually no.
-                        onVote={handleVote}
+                        disabled={!!disabledReason} // GM allowed to vote, Observers not.
+                        onVote={(val) => {
+                            if (disabledReason) {
+                                console.warn("Vote blocked by disabled state:", disabledReason);
+                                return;
+                            }
+                            console.log("RuneHand onVote triggered:", val);
+                            handleVote(val);
+                        }}
+
                     />
                 )}
 

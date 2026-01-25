@@ -38,7 +38,14 @@ export function RuneCard({
     
     const handleClick = () => {
         if (disabled) return;
-        if (!isCardSelected) play('select');
+        if (!isCardSelected) {
+            try {
+                play('select');
+            } catch (e) {
+                console.warn("Sound play failed", e);
+            }
+        }
+
         onClick?.();
         onSelect?.(value);
     };

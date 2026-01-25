@@ -38,30 +38,19 @@ export function RealmTable({
     actionsDisabled = false,
     className 
 }: RealmTableProps) {
-    // We need to distribute members around the table
-    // Simplest approach: Top, Bottom, Left, Right
-    // But table is in center. bottom is reserved for "me" (the user) usually in poker apps, but here RuneHand is there.
-    // So "Me" shouldn't necessarily be on the table visual if I have my hand below?
-    // Actually, in the reference image, the user IS at the table essentially (or the camera is looking at the table).
-    // Let's seat everyone around the rect.
-    
-    // Sort members to put current user at bottom? Or just stable sort.
-    // The reference image has avatars floating around a central rect.
-    
-    // Let's Split members into groups for positioning
     const total = members.length;
-    
-    // Actually, let's do Top/Bottom/Left/Right for better spread if many users
-    // For now, simpler top/bottom rows or circular distribution?
-    // Rectangular table suggests top/bottom/sides.
     
     const topRow = members.slice(0, Math.ceil(total/2));
     const bottomRow = members.slice(Math.ceil(total/2));
 
     const isRevealed = encounter?.isRevealed ?? false;
     const votes = encounter?.votes || {};
-    const voteCount = Object.keys(votes).length; // Use explicit vote count from encounter
-    const readyCount = members.filter(m => m.status === 'ready').length;
+    const hasVoted = encounter?.hasVoted || {};
+    const hasVotedCount = Object.values(hasVoted).filter(Boolean).length;
+    const voteCount = hasVotedCount > 0 ? hasVotedCount : Object.keys(votes).length;
+    const readyCount = hasVotedCount > 0
+        ? hasVotedCount
+        : members.filter(m => m.status === 'ready').length;
 
 
     const { stats, consensusText, consensusColor } = useProphecyStats(
