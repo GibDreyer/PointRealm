@@ -12,8 +12,8 @@ class FakeConnection {
     this.state = HubConnectionState.Disconnected;
   });
   invoke = vi.fn(async () => undefined);
-  on = vi.fn((_event: string, _handler: (...args: unknown[]) => void) => undefined);
-  off = vi.fn((_event: string) => undefined);
+  on = vi.fn(() => undefined);
+  off = vi.fn(() => undefined);
   onreconnecting = vi.fn((handler: () => void) => {
     this.reconnectingHandler = handler;
   });

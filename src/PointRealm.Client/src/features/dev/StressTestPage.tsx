@@ -10,7 +10,7 @@ import { generateRandomRealmName, generateRandomQuestName, generateBotName } fro
 import { ThemePicker } from "@/features/createRealm/components/ThemePicker";
 import { useTheme } from "@/theme/ThemeProvider";
 import { getClientId } from "@/lib/storage";
-import type { Quest, RealmStateDto } from "@/types/realm";
+import type { RealmStateDto } from "@/types/realm";
 
 const getErrorMessage = (error: unknown) => {
     if (!error || typeof error !== "object") return "Unknown error";
