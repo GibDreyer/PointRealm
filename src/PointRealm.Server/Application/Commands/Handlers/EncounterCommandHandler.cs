@@ -161,6 +161,10 @@ public class EncounterCommandHandler(
                 if (commandId.HasValue) deduplicator.StoreResult(memberId, commandId.Value, result);
                 await broadcaster.BroadcastRealmStateAsync(realmId);
             }
+            else if (result.Error?.ErrorCode == "STALE_STATE")
+            {
+                await broadcaster.SendRealmStateToConnectionAsync(clientId, realmId);
+            }
             
             return result;
         }
@@ -168,6 +172,7 @@ public class EncounterCommandHandler(
         {
              if (ex.GetType().Name.Contains("Concurrency") || ex.Message.Contains("concurrency"))
              {
+                 await broadcaster.SendRealmStateToConnectionAsync(clientId, realmId);
                  await broadcaster.BroadcastRealmStateAsync(realmId);
                  return CreateStaleError();
              }
