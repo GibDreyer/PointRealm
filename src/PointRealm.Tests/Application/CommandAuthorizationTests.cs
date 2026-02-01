@@ -23,12 +23,14 @@ public class CommandAuthorizationTests
         var repository = new FakeRealmRepository { Realm = realm };
         var handler = new EncounterCommandHandler(repository, new FakeRealmBroadcaster(), new FakeCommandDeduplicator());
 
+        var quest = realm.Quests.First();
         var result = await handler.HandleAsync(new StartEncounterCommand(
             member.Id,
             realm.Id,
             "client-member",
-            realm.Quests.First().Id,
-            realm.Version));
+            quest.Id,
+            realm.Version,
+            quest.Version));
 
         result.Success.Should().BeFalse();
         result.Error.Should().NotBeNull();
