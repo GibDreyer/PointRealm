@@ -91,13 +91,13 @@ export function ConfirmDialog({
                             <div className="flex gap-3 w-full mt-2">
                                 <button
                                     onClick={onClose}
-                                    className="flex-1 py-2 rounded-lg border border-border hover:bg-surfaceElevated transition-colors text-sm"
+                                    className="flex-1 py-2 rounded-lg border border-border hover:bg-surfaceElevated transition-colors text-sm pr-interactive"
                                 >
                                     {cancelText}
                                 </button>
                                 <button
                                     onClick={onConfirm}
-                                    className={`flex-1 py-2 rounded-lg ${styles.button} text-white font-bold transition-colors text-sm`}
+                                    className={`flex-1 py-2 rounded-lg ${styles.button} text-white font-bold transition-colors text-sm pr-interactive`}
                                 >
                                     {confirmText}
                                 </button>
