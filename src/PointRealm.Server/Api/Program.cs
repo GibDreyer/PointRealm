@@ -21,6 +21,16 @@ builder.Services
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IRealmBroadcaster, RealmBroadcaster>();
 builder.Services.AddScoped<ICommandDeduplicator, InMemoryCommandDeduplicator>();
+builder.Services.AddScoped<IAuthSessionService, AuthSessionService>();
+builder.Services.AddScoped<IAuthPasswordService, AuthPasswordService>();
+builder.Services.AddScoped<IAuthProfileService, AuthProfileService>();
+builder.Services.AddScoped<IRealmCreationService, RealmCreationService>();
+builder.Services.AddScoped<IRealmSummaryService, RealmSummaryService>();
+builder.Services.AddScoped<IRealmMembershipService, RealmMembershipService>();
+builder.Services.AddScoped<IRealmSettingsApiService, RealmSettingsApiService>();
+builder.Services.AddScoped<IUserRealmsService, UserRealmsService>();
+builder.Services.AddScoped<IRealmHistoryApiService, RealmHistoryApiService>();
+builder.Services.AddScoped<IQuestCsvApiService, QuestCsvApiService>();
 
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<PointRealm.Server.Infrastructure.Persistence.PointRealmDbContext>();
