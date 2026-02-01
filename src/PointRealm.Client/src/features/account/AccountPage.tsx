@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Panel } from "@/components/ui/Panel";
 import { useToast } from "@/components/ui/ToastSystem";
+import { Tooltip } from "@/components/ui/Tooltip";
 import {
   clearAuthToken,
   clearAuthUser,
@@ -111,12 +112,16 @@ export function AccountPage() {
               Create an account to keep your realms and profile details in sync across devices.
             </p>
             <div className="mt-8 flex flex-col gap-3">
-              <Button variant="primary" onClick={() => navigate("/auth/login")}>
-                Sign In
-              </Button>
-              <Button variant="secondary" onClick={() => navigate("/auth/register")}>
-                Create Account
-              </Button>
+              <Tooltip content="Sign in to sync your profile across devices.">
+                <Button variant="primary" onClick={() => navigate("/auth/login")}>
+                  Sign In
+                </Button>
+              </Tooltip>
+              <Tooltip content="Create a new account to save your profile.">
+                <Button variant="secondary" onClick={() => navigate("/auth/register")}>
+                  Create Account
+                </Button>
+              </Tooltip>
             </div>
           </Panel>
         </div>
@@ -143,6 +148,7 @@ export function AccountPage() {
               <form className="mt-6 space-y-4" onSubmit={handleSave}>
                 <Input
                   label="Display name"
+                  tooltip="This is how others will see you in realms."
                   type="text"
                   value={displayName}
                   onChange={(event) => setDisplayName(event.target.value)}
@@ -150,6 +156,7 @@ export function AccountPage() {
                 />
                 <Input
                   label="Profile image URL"
+                  tooltip="Paste a link to a public avatar image."
                   type="url"
                   value={profileImageUrl}
                   onChange={(event) => setProfileImageUrl(event.target.value)}
@@ -163,14 +170,18 @@ export function AccountPage() {
                   />
                 )}
                 {error && <p className="text-xs text-pr-danger/80">{error}</p>}
-                <Button type="submit" variant="primary" fullWidth disabled={isSaving}>
-                  {isSaving ? "Saving..." : "Save Profile"}
-                </Button>
+                <Tooltip content="Save your updated profile details.">
+                  <Button type="submit" variant="primary" fullWidth disabled={isSaving}>
+                    {isSaving ? "Saving..." : "Save Profile"}
+                  </Button>
+                </Tooltip>
               </form>
               <div className="mt-6">
-                <Button variant="ghost" fullWidth onClick={handleLogout}>
-                  Sign Out
-                </Button>
+                <Tooltip content="Sign out and return to the tavern.">
+                  <Button variant="ghost" fullWidth onClick={handleLogout}>
+                    Sign Out
+                  </Button>
+                </Tooltip>
               </div>
             </>
           )}

@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Panel } from "@/components/ui/Panel";
 import { useToast } from "@/components/ui/ToastSystem";
 import { setAuthToken, setAuthUser } from "@/lib/storage/auth";
+import { Tooltip } from "@/components/ui/Tooltip";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -49,6 +50,7 @@ export function LoginPage() {
           <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
             <Input
               label="Email"
+              tooltip="Use the email address tied to your account."
               type="email"
               autoComplete="email"
               value={email}
@@ -58,6 +60,7 @@ export function LoginPage() {
             />
             <Input
               label="Password"
+              tooltip="Enter your account password."
               type="password"
               autoComplete="current-password"
               value={password}
@@ -65,19 +68,23 @@ export function LoginPage() {
               placeholder="••••••••"
               required
             />
-            <label className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-pr-text-muted">
-              <input
-                type="checkbox"
-                className="w-4 h-4 rounded border-pr-border bg-pr-bg text-pr-primary focus:ring-pr-primary"
-                checked={rememberMe}
-                onChange={(event) => setRememberMe(event.target.checked)}
-              />
-              Remember me
-            </label>
+            <Tooltip content="Keep you signed in on this device.">
+              <label className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-pr-text-muted">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 rounded border-pr-border bg-pr-bg text-pr-primary focus:ring-pr-primary"
+                  checked={rememberMe}
+                  onChange={(event) => setRememberMe(event.target.checked)}
+                />
+                Remember me
+              </label>
+            </Tooltip>
             {error && <p className="text-xs text-pr-danger/80">{error}</p>}
-            <Button type="submit" variant="primary" fullWidth disabled={isSubmitting}>
-              {isSubmitting ? "Entering..." : "Sign In"}
-            </Button>
+            <Tooltip content="Sign in and open your account vault.">
+              <Button type="submit" variant="primary" fullWidth disabled={isSubmitting}>
+                {isSubmitting ? "Entering..." : "Sign In"}
+              </Button>
+            </Tooltip>
           </form>
           <div className="mt-6 text-center text-xs text-pr-text-muted">
             New to PointRealm?{" "}

@@ -45,6 +45,29 @@
   opacity: 0.75;
 }
 
+.labelRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tooltipButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pr-text-dim);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.tooltipButton:hover,
+.tooltipButton:focus-visible {
+  color: var(--pr-text-primary);
+}
+
 .helper {
   font-size: 0.8rem;
   color: var(--pr-text-dim);

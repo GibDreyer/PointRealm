@@ -61,6 +61,7 @@ export const GMControls: React.FC<GMControlsProps> = ({
                icon={<PlayCircle size={18} />}
                label="Begin Encounter"
                sub="Start a new round"
+               tooltip="Launch a new voting round for the active quest."
                onClick={() => handleAction('start', onStartEncounter)}
                loading={loading === 'start'}
                disabled={!!disabledReason}
@@ -73,6 +74,7 @@ export const GMControls: React.FC<GMControlsProps> = ({
               icon={<Eye size={18} />}
               label="Reveal Prophecy"
               sub="Show all votes"
+              tooltip="Reveal all submitted votes to the table."
               onClick={() => handleAction('reveal', onReveal)}
               loading={loading === 'reveal'}
               disabled={!!disabledReason}
@@ -86,6 +88,7 @@ export const GMControls: React.FC<GMControlsProps> = ({
                 icon={<RefreshCw size={18} />}
                 label="Re-roll Fates"
                 sub="Clear and restart"
+                tooltip="Clear votes and restart the encounter."
                 onClick={() => setShowConfirmReroll(true)}
                 disabled={!!loading}
                 variant="danger"
