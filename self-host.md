@@ -35,6 +35,9 @@ If you want to expose PointRealm via Cloudflare Tunnel:
 
 The tunnel container depends on the `pointrealm` service and will start automatically with the profile.
 
+For hardening guidance (DNS setup, origin access restrictions, and Access policies), see
+[`ops/self-host.md`](ops/self-host.md).
+
 ## Configuration notes
 
 - `POINTREALM_DB_PATH` defaults to `/app/data` in `docker-compose.yml` and is mounted from `./data`.
