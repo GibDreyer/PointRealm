@@ -8,6 +8,8 @@ export interface PartyVoteRow {
   id: string;
   name: string;
   avatarEmoji?: string | null;
+  profileImageUrl?: string | null;
+  profileEmoji?: string | null;
   voteValue: string | null;
 }
 
@@ -105,7 +107,8 @@ export const PartyVotesList: React.FC<PartyVotesListProps> = ({
           const isMin = numeric !== null && minVote !== null && numeric === minVote;
           const isMax = numeric !== null && maxVote !== null && numeric === maxVote;
           const displayValue = revealed ? (member.voteValue ?? '—') : '—';
-          const avatarEmoji = member.avatarEmoji?.trim();
+          const avatarImageUrl = member.profileImageUrl?.trim();
+          const avatarEmoji = member.avatarEmoji?.trim() ?? member.profileEmoji?.trim();
 
           return (
             <div
@@ -117,7 +120,15 @@ export const PartyVotesList: React.FC<PartyVotesListProps> = ({
               )}
             >
               <div className={styles.rowBadge}>
-                {avatarEmoji ?? member.name.substring(0, 2).toUpperCase()}
+                {avatarImageUrl ? (
+                  <img
+                    src={avatarImageUrl}
+                    alt={`${member.name} avatar`}
+                    className={styles.avatarImage}
+                  />
+                ) : (
+                  avatarEmoji ?? member.name.substring(0, 2).toUpperCase()
+                )}
               </div>
               <div className={styles.name}>{member.name}</div>
               <FlipChip value={displayValue} shown={revealed} />

@@ -16,7 +16,8 @@ interface MemberCardProps {
 export function MemberCard({ member, isSelf }: MemberCardProps) {
     const isGM = member.role === 'GM';
     const isOnline = member.isOnline;
-    const avatarEmoji = member.avatarEmoji?.trim();
+    const avatarImageUrl = member.profileImageUrl?.trim();
+    const avatarEmoji = member.avatarEmoji?.trim() ?? member.profileEmoji?.trim();
     
     const statusText = !isOnline
         ? 'Disconnected'
@@ -43,7 +44,13 @@ export function MemberCard({ member, isSelf }: MemberCardProps) {
                         isSelf ? "bg-pr-primary/5 border-pr-primary/40 text-pr-primary" :
                         "bg-pr-surface/60 border-pr-border/30 text-pr-text-muted/70"
                     )}>
-                        {avatarEmoji ? (
+                        {avatarImageUrl ? (
+                            <img
+                                src={avatarImageUrl}
+                                alt={`${member.name} avatar`}
+                                className="h-full w-full rounded-full object-cover"
+                            />
+                        ) : avatarEmoji ? (
                             <span className="text-lg" aria-label={`${member.name} avatar`}>
                                 {avatarEmoji}
                             </span>

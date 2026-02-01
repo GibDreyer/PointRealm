@@ -17,6 +17,8 @@ export interface PartyMember {
     memberId: string;
     displayName: string;
     avatarEmoji?: string | null;
+    profileImageUrl?: string | null;
+    profileEmoji?: string | null;
     classBadgeKey?: string;
     presence: "Online" | "Offline";
     voteState: "NotVoting" | "Choosing" | "LockedIn";

@@ -6,4 +6,5 @@ public sealed class ApplicationUser : IdentityUser
 {
     public string? DisplayName { get; set; }
     public string? ProfileImageUrl { get; set; }
+    public string? ProfileEmoji { get; set; }
 }
