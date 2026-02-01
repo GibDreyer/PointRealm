@@ -6,6 +6,8 @@ using PointRealm.Server.Domain.Entities;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Configuration;
 using PointRealm.Server.Infrastructure.Services;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace PointRealm.Server.Infrastructure;
 
@@ -36,13 +38,20 @@ public static class DependencyInjection
                 var memberTokenSection = configuration.GetSection(MemberTokenSettings.SectionName);
                 var memberTokenSettings = memberTokenSection.Get<MemberTokenSettings>();
                 
-                string keyStr = memberTokenSettings?.Key ?? configuration["MemberToken:Key"] ?? "default_security_key_for_development_only_12345";
-                var key = System.Text.Encoding.ASCII.GetBytes(keyStr);
+                string memberKeyStr = memberTokenSettings?.Key ?? configuration["MemberToken:Key"] ?? "default_security_key_for_development_only_12345";
+                var userTokenSection = configuration.GetSection(UserTokenSettings.SectionName);
+                var userTokenSettings = userTokenSection.Get<UserTokenSettings>();
+                string userKeyStr = userTokenSettings?.Key ?? configuration["UserToken:Key"] ?? memberKeyStr;
+                var keyBytes = new[] { memberKeyStr, userKeyStr }
+                    .Where(key => !string.IsNullOrWhiteSpace(key))
+                    .Distinct()
+                    .Select(key => new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)))
+                    .ToArray();
 
                 options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(key),
+                    IssuerSigningKeyResolver = (_, _, _, _) => keyBytes,
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ValidateLifetime = true
@@ -79,7 +88,9 @@ public static class DependencyInjection
         });
         
         services.Configure<MemberTokenSettings>(configuration.GetSection(MemberTokenSettings.SectionName));
+        services.Configure<UserTokenSettings>(configuration.GetSection(UserTokenSettings.SectionName));
         services.AddScoped<MemberTokenService>();
+        services.AddScoped<UserTokenService>();
         services.AddScoped<RealmAuthorizationService>();
         services.AddScoped<RealmCodeGenerator>();
         services.AddScoped<QuestCsvService>();

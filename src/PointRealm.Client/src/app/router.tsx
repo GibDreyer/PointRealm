@@ -5,6 +5,7 @@ import { LandingPage } from "@/features/landing/LandingPage";
 import { CreateRealmPage } from "@/features/createRealm/CreateRealmPage";
 import { JoinRealmPage } from "@/features/joinRealm/JoinRealmPage";
 
+import { AccountPage } from "@/features/account/AccountPage";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { RegisterPage } from "@/features/auth/RegisterPage";
 import { ErrorPage } from "@/components/ErrorPage";
@@ -54,6 +55,10 @@ export const router = createBrowserRouter([
       {
         path: "auth/register",
         element: <RegisterPage />,
+      },
+      {
+        path: "account",
+        element: <AccountPage />,
       },
     ],
   },

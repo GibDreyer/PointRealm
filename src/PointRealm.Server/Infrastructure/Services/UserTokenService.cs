@@ -1,0 +1,52 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using PointRealm.Server.Domain.Entities;
+
+namespace PointRealm.Server.Infrastructure.Services;
+
+public record UserTokenResult(string AccessToken, DateTime ExpiresAt);
+
+public class UserTokenService(IOptions<UserTokenSettings> settings, IOptions<MemberTokenSettings> memberSettings)
+{
+    private readonly UserTokenSettings _settings = settings.Value;
+    private readonly MemberTokenSettings _memberSettings = memberSettings.Value;
+    private const string DefaultKey = "default_security_key_for_development_only_12345";
+
+    public UserTokenResult GenerateToken(ApplicationUser user)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var keyValue = string.IsNullOrWhiteSpace(_settings.Key) ? _memberSettings.Key : _settings.Key;
+        if (string.IsNullOrWhiteSpace(keyValue))
+        {
+            keyValue = DefaultKey;
+        }
+        var key = Encoding.ASCII.GetBytes(keyValue);
+
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, user.Id),
+            new(ClaimTypes.Email, user.Email ?? string.Empty),
+            new("token_type", "user")
+        };
+
+        if (!string.IsNullOrWhiteSpace(user.DisplayName))
+        {
+            claims.Add(new("displayName", user.DisplayName));
+        }
+
+        var expiresAt = DateTime.UtcNow.AddHours(_settings.ExpirationHours);
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(claims),
+            Expires = expiresAt,
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return new UserTokenResult(tokenHandler.WriteToken(token), expiresAt);
+    }
+}
