@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PointRealm.Server.Domain.Entities;
@@ -40,7 +41,12 @@ public class AuthController(
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var result = await signInManager.PasswordSignInAsync(request.Email, request.Password, request.RememberMe, lockoutOnFailure: false);
+        var result = await signInManager.PasswordSignInAsync(request.Email, request.Password, request.RememberMe, lockoutOnFailure: true);
+
+        if (result.IsLockedOut)
+        {
+            return StatusCode(StatusCodes.Status423Locked, new { message = "Account is locked. Try again later or reset your password." });
+        }
 
         if (result.Succeeded)
         {
@@ -55,6 +61,37 @@ public class AuthController(
         }
 
         return Unauthorized();
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        var user = await userManager.FindByEmailAsync(request.Email);
+        if (user is null || !await userManager.IsEmailConfirmedAsync(user))
+        {
+            return Ok(new { message = "If the account exists, a reset link will be sent." });
+        }
+
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+        return Ok(new PasswordResetTokenResponse(user.Email ?? request.Email, token));
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        var user = await userManager.FindByEmailAsync(request.Email);
+        if (user is null)
+        {
+            return Ok(new { message = "If the account exists, the password has been reset." });
+        }
+
+        var result = await userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+        if (!result.Succeeded)
+        {
+            return BadRequest(result.Errors);
+        }
+
+        return Ok(new { message = "Password has been reset." });
     }
 
     [HttpPost("logout")]
@@ -105,6 +142,9 @@ public class AuthController(
 
 public record RegisterRequest(string Email, string Password, string? DisplayName);
 public record LoginRequest(string Email, string Password, bool RememberMe);
+public record ForgotPasswordRequest(string Email);
+public record ResetPasswordRequest(string Email, string Token, string NewPassword);
+public record PasswordResetTokenResponse(string Email, string Token);
 public record UpdateProfileRequest(string? DisplayName, string? ProfileImageUrl);
 public record UserProfileResponse(string Id, string Email, string? DisplayName, string? ProfileImageUrl);
 public record AuthTokenResponse(string AccessToken, DateTime ExpiresAt, UserProfileResponse User);

@@ -26,6 +26,18 @@ public static class DependencyInjection
         services.AddIdentity<ApplicationUser, IdentityRole>()
             .AddEntityFrameworkStores<PointRealmDbContext>()
             .AddDefaultTokenProviders();
+        services.Configure<IdentityOptions>(options =>
+        {
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequiredLength = 12;
+            options.Password.RequiredUniqueChars = 4;
+            options.Lockout.AllowedForNewUsers = true;
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+            options.Lockout.MaxFailedAccessAttempts = 5;
+        });
 
         services.AddAuthentication(options =>
             {
@@ -38,10 +50,14 @@ public static class DependencyInjection
                 var memberTokenSection = configuration.GetSection(MemberTokenSettings.SectionName);
                 var memberTokenSettings = memberTokenSection.Get<MemberTokenSettings>();
                 
-                string memberKeyStr = memberTokenSettings?.Key ?? configuration["MemberToken:Key"] ?? "default_security_key_for_development_only_12345";
+                string memberKeyStr = memberTokenSettings?.Key ?? configuration["MemberToken:Key"] ?? string.Empty;
                 var userTokenSection = configuration.GetSection(UserTokenSettings.SectionName);
                 var userTokenSettings = userTokenSection.Get<UserTokenSettings>();
                 string userKeyStr = userTokenSettings?.Key ?? configuration["UserToken:Key"] ?? memberKeyStr;
+                if (string.IsNullOrWhiteSpace(memberKeyStr) || string.IsNullOrWhiteSpace(userKeyStr))
+                {
+                    throw new InvalidOperationException("MemberToken and UserToken signing keys must be configured.");
+                }
                 var keyBytes = new[] { memberKeyStr, userKeyStr }
                     .Where(key => !string.IsNullOrWhiteSpace(key))
                     .Distinct()

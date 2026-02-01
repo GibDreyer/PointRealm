@@ -13,7 +13,6 @@ public class UserTokenService(IOptions<UserTokenSettings> settings, IOptions<Mem
 {
     private readonly UserTokenSettings _settings = settings.Value;
     private readonly MemberTokenSettings _memberSettings = memberSettings.Value;
-    private const string DefaultKey = "default_security_key_for_development_only_12345";
 
     public UserTokenResult GenerateToken(ApplicationUser user)
     {
@@ -21,7 +20,7 @@ public class UserTokenService(IOptions<UserTokenSettings> settings, IOptions<Mem
         var keyValue = string.IsNullOrWhiteSpace(_settings.Key) ? _memberSettings.Key : _settings.Key;
         if (string.IsNullOrWhiteSpace(keyValue))
         {
-            keyValue = DefaultKey;
+            throw new InvalidOperationException("User token signing key is not configured.");
         }
         var key = Encoding.ASCII.GetBytes(keyValue);
 
