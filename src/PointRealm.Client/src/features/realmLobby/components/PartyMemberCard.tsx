@@ -19,6 +19,7 @@ const getIcon = (key?: string) => {
 
 export function PartyMemberCard({ member }: Props) {
     const isOffline = member.presence === 'Offline';
+    const avatarEmoji = member.avatarEmoji?.trim();
     
     let statusText = "Ready";
     let statusClasses = "text-pr-success";
@@ -66,7 +67,15 @@ export function PartyMemberCard({ member }: Props) {
                         ? "bg-pr-bg border-pr-border/20 text-pr-text-muted/40" 
                         : "bg-pr-bg border-pr-border/40 text-pr-text-muted/80"
                 )}>
-                    {member.isGM ? <Crown size={20} className="text-pr-text-muted/80" /> : getIcon(member.classBadgeKey)}
+                    {avatarEmoji ? (
+                        <span className="text-lg" aria-label={`${member.displayName} avatar`}>
+                            {avatarEmoji}
+                        </span>
+                    ) : member.isGM ? (
+                        <Crown size={20} className="text-pr-text-muted/80" />
+                    ) : (
+                        getIcon(member.classBadgeKey)
+                    )}
                 </div>
                 
                 {/* Name */}

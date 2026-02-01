@@ -15,6 +15,7 @@ public sealed class PartyMemberConfiguration : IEntityTypeConfiguration<PartyMem
 
         builder.Property(x => x.ClientInstanceId).IsRequired().HasMaxLength(100);
         builder.Property(x => x.Name).IsRequired().HasMaxLength(100);
+        builder.Property(x => x.AvatarEmoji).HasMaxLength(16);
         builder.Property(x => x.IsObserver).HasDefaultValue(false);
         builder.Property(x => x.IsBanned).HasDefaultValue(false);
         builder.Property(x => x.IsOnline).HasDefaultValue(true);

@@ -28,6 +28,7 @@ interface UseRealmResult {
     deleteQuest: (questId: string) => Promise<void>;
     reorderQuests: (newOrderKeys: string[]) => Promise<void>;
     setDisplayName: (name: string) => Promise<void>;
+    setAvatarEmoji: (emoji: string) => Promise<void>;
   };
   connect: (code: string) => Promise<void>;
 }
@@ -206,6 +207,10 @@ export function useRealm(realmCode?: string): UseRealmResult {
       setDisplayName: (name) =>
         wrapAction('setDisplayName', {
           name,
+        }),
+      setAvatarEmoji: (emoji) =>
+        wrapAction('setAvatarEmoji', {
+          emoji,
         }),
     },
     connect,

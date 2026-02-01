@@ -103,6 +103,9 @@ public class RealmHub : Hub<IRealmClient>
     public async Task<CommandResultDto> SetDisplayName(SetDisplayNameRequest request)
         => await _commandService.SetDisplayNameAsync(await GetCommandContextAsync(), request);
 
+    public async Task<CommandResultDto> SetAvatarEmoji(SetAvatarEmojiRequest request)
+        => await _commandService.SetAvatarEmojiAsync(await GetCommandContextAsync(), request);
+
     public async Task<CommandResultDto> JoinPresence(JoinPresenceRequest request)
         => await _commandService.JoinPresenceAsync(await GetCommandContextAsync(), request);
 

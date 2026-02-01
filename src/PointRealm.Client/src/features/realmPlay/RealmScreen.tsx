@@ -9,7 +9,9 @@ import { PageShell } from '../../components/shell/PageShell';
 import { RealmSettingsDialog } from '../realmLobby/components/RealmSettingsDialog';
 import { RealmTable } from './components/RealmTable';
 import { RuneHand } from './components/RuneHand';
-import { Menu, Settings, X, LogOut, Link2, Check } from 'lucide-react';
+import { Menu, Settings, X, LogOut, Link2, Check, Smile } from 'lucide-react';
+import { Dialog } from '../../components/ui/Dialog';
+import { EmojiPicker } from '../../components/ui/EmojiPicker';
 
 import styles from './realmScreen.module.css';
 
@@ -24,6 +26,7 @@ export function RealmScreen() {
     const [localVote, setLocalVote] = useState<string | null | undefined>(undefined);
     const [isQuestSidebarOpen, setQuestSidebarOpen] = useState(false);
     const [isSettingsOpen, setSettingsOpen] = useState(false);
+    const [isEmojiPickerOpen, setEmojiPickerOpen] = useState(false);
     const [copied, setCopied] = useState(false);
     const prefersReducedMotion = useReducedMotion() ?? false;
 
@@ -82,6 +85,7 @@ export function RealmScreen() {
     const me = partyRoster.members.find(m => m.id === myMemberId);
     const isGM = me?.role === 'GM';
     const isObserver = me?.role === 'Observer' || me?.isObserver;
+    const currentEmoji = me?.avatarEmoji ?? null;
     
     const activeQuest = encounter 
         ? questLog.quests.find(q => q.id === encounter.questId)
@@ -125,6 +129,15 @@ export function RealmScreen() {
         await navigator.clipboard.writeText(url);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+    };
+
+    const handleAvatarEmojiSelect = async (emoji: string) => {
+        try {
+            await actions.setAvatarEmoji(emoji);
+            setEmojiPickerOpen(false);
+        } catch {
+            // Errors are surfaced via realm store.
+        }
     };
 
 
@@ -183,6 +196,19 @@ export function RealmScreen() {
                             title="Copy Realm Link"
                         >
                             {copied ? <Check size={24} className="text-green-500" /> : <Link2 size={24} />}
+                        </button>
+                        <button
+                            onClick={() => setEmojiPickerOpen(true)}
+                            className="p-3 bg-pr-surface/80 backdrop-blur border border-pr-border/50 rounded-xl hover:bg-pr-surface hover:border-pr-primary/50 transition-all text-pr-text-muted hover:text-pr-text shadow-lg"
+                            title="Choose emoji avatar"
+                        >
+                            {currentEmoji ? (
+                                <span className="text-lg" aria-label="Current avatar emoji">
+                                    {currentEmoji}
+                                </span>
+                            ) : (
+                                <Smile size={24} />
+                            )}
                         </button>
 
                         {isGM && (
@@ -297,6 +323,18 @@ export function RealmScreen() {
                     onClose={() => setSettingsOpen(false)}
                 />
             )}
+            <Dialog
+                isOpen={isEmojiPickerOpen}
+                onClose={() => setEmojiPickerOpen(false)}
+                title="Choose Your Sigil"
+                subtitle="Pick an emoji avatar"
+            >
+                <EmojiPicker
+                    selectedEmoji={currentEmoji}
+                    onSelect={handleAvatarEmojiSelect}
+                    disabled={!isConnected}
+                />
+            </Dialog>
         </PageShell>
     );
 }

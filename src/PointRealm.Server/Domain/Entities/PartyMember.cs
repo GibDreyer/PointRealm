@@ -12,6 +12,7 @@ public sealed class PartyMember : Entity
     public bool IsOnline { get; private set; }
     public Guid RealmId { get; private set; }
     public string? UserId { get; private set; }
+    public string? AvatarEmoji { get; private set; }
 
     // Navigation property
     public Realm Realm { get; private set; } = null!;
@@ -38,6 +39,11 @@ public sealed class PartyMember : Entity
     public void UpdateName(string name)
     {
         Name = name;
+    }
+
+    public void UpdateAvatarEmoji(string? emoji)
+    {
+        AvatarEmoji = string.IsNullOrWhiteSpace(emoji) ? null : emoji.Trim();
     }
 
     public void SetObserver(bool isObserver)

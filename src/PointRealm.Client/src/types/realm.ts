@@ -22,6 +22,7 @@ export interface Quest {
 export interface PartyMember {
     id: string;
     name: string;
+    avatarEmoji?: string | null;
     role: "GM" | "Member" | "Observer";
     status: "ready" | "choosing" | "disconnected";
     isOnline: boolean;
