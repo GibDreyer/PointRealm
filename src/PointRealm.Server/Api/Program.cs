@@ -21,6 +21,8 @@ builder.Services
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IRealmBroadcaster, RealmBroadcaster>();
 builder.Services.AddScoped<ICommandDeduplicator, InMemoryCommandDeduplicator>();
+builder.Services.AddScoped<IAuthApiService, AuthApiService>();
+builder.Services.AddScoped<IRealmApiService, RealmApiService>();
 
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<PointRealm.Server.Infrastructure.Persistence.PointRealmDbContext>();
