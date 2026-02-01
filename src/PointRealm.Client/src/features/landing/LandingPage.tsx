@@ -69,6 +69,22 @@ export const LandingPage: React.FC = () => {
           </motion.div>
         </motion.div>
         <motion.div
+          className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, ease: easeOut, delay: 0.18 }}
+        >
+          <Button variant="ghost" onClick={() => navigate('/auth/login')}>
+            Sign In
+          </Button>
+          <Button variant="ghost" onClick={() => navigate('/auth/register')}>
+            Create Account
+          </Button>
+          <Button variant="ghost" onClick={() => navigate('/account')}>
+            View Account
+          </Button>
+        </motion.div>
+        <motion.div
           className={styles.footerWrap}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

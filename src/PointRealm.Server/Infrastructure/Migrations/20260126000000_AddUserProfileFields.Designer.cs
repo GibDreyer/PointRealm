@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PointRealm.Server.Infrastructure.Persistence;
 
@@ -10,9 +11,11 @@ using PointRealm.Server.Infrastructure.Persistence;
 namespace PointRealm.Server.Infrastructure.Migrations
 {
     [DbContext(typeof(PointRealmDbContext))]
-    partial class PointRealmDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260126000000_AddUserProfileFields")]
+    partial class AddUserProfileFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.2");
@@ -205,40 +208,34 @@ namespace PointRealm.Server.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
-
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("PointRealm.Server.Domain.Entities.Encounter", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("Outcome")
-                        .HasColumnType("INTEGER");
+                    b.Property<Guid>("EncounterStatusId")
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("QuestId")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("RealmId")
+                    b.Property<Guid>("RealmId")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("INTEGER");
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(0);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EncounterStatusId");
 
                     b.HasIndex("QuestId");
 
@@ -247,40 +244,49 @@ namespace PointRealm.Server.Infrastructure.Migrations
                     b.ToTable("Encounters");
                 });
 
+            modelBuilder.Entity("PointRealm.Server.Domain.Entities.EncounterStatus", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EncounterStatuses");
+                });
+
             modelBuilder.Entity("PointRealm.Server.Domain.Entities.PartyMember", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ClientInstanceId")
                         .IsRequired()
-                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsBanned")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(false);
 
                     b.Property<bool>("IsHost")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsObserver")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(false);
+                        .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsOnline")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(true);
+                    b.Property<DateTime>("JoinedAt")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("RealmId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
@@ -288,8 +294,7 @@ namespace PointRealm.Server.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RealmId", "ClientInstanceId")
-                        .IsUnique();
+                    b.HasIndex("RealmId");
 
                     b.ToTable("PartyMembers");
                 });
@@ -297,49 +302,35 @@ namespace PointRealm.Server.Infrastructure.Migrations
             modelBuilder.Entity("PointRealm.Server.Domain.Entities.Quest", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ExternalId")
-                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ExternalUrl")
-                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("INTEGER");
 
                     b.Property<Guid>("RealmId")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("SealedOutcome")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Status")
+                    b.Property<int>("SortOrder")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(0);
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RealmId", "ExternalId");
-
-                    b.HasIndex("RealmId", "Order");
+                    b.HasIndex("RealmId");
 
                     b.ToTable("Quests");
                 });
@@ -347,11 +338,11 @@ namespace PointRealm.Server.Infrastructure.Migrations
             modelBuilder.Entity("PointRealm.Server.Domain.Entities.Realm", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")
@@ -360,29 +351,14 @@ namespace PointRealm.Server.Infrastructure.Migrations
                     b.Property<string>("CreatedByUserId")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("CurrentEncounterId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("CurrentQuestId")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("QuestLogVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(0);
-
                     b.Property<string>("Theme")
                         .IsRequired()
-                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(0);
 

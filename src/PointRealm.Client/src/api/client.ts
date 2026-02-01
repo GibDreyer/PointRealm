@@ -1,6 +1,7 @@
 
 
 import { getClientId } from '../lib/storage/identity';
+import { getAuthToken } from '../lib/storage/auth';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
@@ -23,6 +24,13 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     const token = sessionStorage.getItem(`pointrealm:v1:realm:${code}:token`);
     if (token) {
       authHeader = { 'Authorization': `Bearer ${token}` };
+    }
+  }
+
+  if (!('Authorization' in authHeader)) {
+    const authToken = getAuthToken();
+    if (authToken) {
+      authHeader = { 'Authorization': `Bearer ${authToken}` };
     }
   }
 
