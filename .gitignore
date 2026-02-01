@@ -43,3 +43,4 @@ pnpm-debug.log*
 Thumbs.db
 .vs/
 Mockups/Landing_page.png
+src/PointRealm.Server/Api/data/pointrealm.db

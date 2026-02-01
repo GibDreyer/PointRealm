@@ -252,13 +252,13 @@ namespace PointRealm.Server.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("AvatarEmoji")
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ClientInstanceId")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("AvatarEmoji")
-                        .HasMaxLength(16)
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsBanned")
