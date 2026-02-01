@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authApi } from "@/api/auth";
 import { ApiError } from "@/api/client";
 import { Button } from "@/components/Button";
 import { PageShell } from "@/components/shell/PageShell";
@@ -9,11 +8,13 @@ import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Panel } from "@/components/ui/Panel";
 import { useToast } from "@/components/ui/ToastSystem";
-import { setAuthToken, setAuthUser } from "@/lib/storage/auth";
 import { Tooltip } from "@/components/ui/Tooltip";
+
+import { useAuth } from "./AuthContext";
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,9 +28,7 @@ export function LoginPage() {
     setError(null);
 
     try {
-      const response = await authApi.login({ email, password, rememberMe });
-      setAuthToken(response.accessToken);
-      setAuthUser(response.user);
+      await login({ email, password, rememberMe });
       toast("Welcome back!", "success");
       navigate("/account");
     } catch (err) {

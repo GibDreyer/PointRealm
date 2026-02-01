@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SoundToggle } from '@/components/SoundToggle';
+import { AccountStatus } from '@/components/ui/AccountStatus';
 
 interface RealmShellProps {
   children: React.ReactNode;
@@ -43,6 +44,7 @@ export const RealmShell: React.FC<RealmShellProps> = ({
           
           <div className="flex items-center gap-4">
             <SoundToggle />
+            <AccountStatus />
             {rightSlot}
           </div>
         </div>

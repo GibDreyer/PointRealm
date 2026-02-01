@@ -3,6 +3,7 @@ import { useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { FantasySky3D } from '@/components/backgrounds/FantasySky3D';
 import { useTheme } from '@/theme/ThemeProvider';
+import { AccountStatus } from '@/components/ui/AccountStatus';
 
 interface PageShellProps {
   children: React.ReactNode;
@@ -48,6 +49,7 @@ export const PageShell: React.FC<PageShellProps> = ({
           <div className="magical-border" />
         </>
       )}
+      <AccountStatus className="fixed top-8 right-8" />
       <main className={cn("relative z-10 min-h-screen w-full", contentClassName)}>
         {children}
       </main>
