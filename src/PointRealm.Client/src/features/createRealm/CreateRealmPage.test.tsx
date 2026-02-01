@@ -4,6 +4,7 @@ import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '../../theme/ThemeProvider';
 import { api } from '../../api/client';
+import { AuthProvider } from '../auth/AuthContext';
 
 const mockClient = {
   connect: vi.fn().mockResolvedValue(undefined),
@@ -39,9 +40,11 @@ describe('CreateRealmPage', () => {
   const renderComponent = () => {
     return render(
       <BrowserRouter>
-        <ThemeProvider>
-          <CreateRealmPage />
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            <CreateRealmPage />
+          </ThemeProvider>
+        </AuthProvider>
       </BrowserRouter>
     );
   };
