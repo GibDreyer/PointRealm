@@ -83,6 +83,8 @@ app.UseExceptionHandler();
 
 app.UseWebSockets();
 app.UseCors();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -90,5 +92,6 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHub<RealmHub>("/hubs/realm");
 app.MapHealthChecks("/health");
+app.MapFallbackToFile("index.html");
 
 app.Run();
