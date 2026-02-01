@@ -11,7 +11,7 @@ namespace PointRealm.Server.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class RealmsController(PointRealmDbContext dbContext, RealmAuthorizationService authService, MemberTokenService tokenService) : ControllerBase
+public class RealmsController(PointRealmDbContext dbContext, IRealmAuthorizationService authService, MemberTokenService tokenService) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] LegacyCreateRealmRequest request)
@@ -109,7 +109,7 @@ public class RealmsController(PointRealmDbContext dbContext, RealmAuthorizationS
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         
-        // Use RealmAuthorizationService
+        // Use realm authorization service
         // Allow if user is GM (Owner or Host Member)
         
         // Note: For anonymous GM (e.g. joined as Host with ClientInstanceId but no Auth), handling is trickier.

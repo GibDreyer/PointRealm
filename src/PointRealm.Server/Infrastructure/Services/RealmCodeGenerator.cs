@@ -6,7 +6,7 @@ namespace PointRealm.Server.Infrastructure.Services;
 /// <summary>
 /// Service for generating short, collision-resistant realm join codes.
 /// </summary>
-public class RealmCodeGenerator(PointRealmDbContext dbContext)
+public class RealmCodeGenerator(PointRealmDbContext dbContext) : IRealmCodeGenerator
 {
     private const string Alphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"; // Excluding 0, O, 1, I for readability
     private const int CodeLength = 6;

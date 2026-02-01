@@ -80,9 +80,9 @@ public static class DependencyInjection
         
         services.Configure<MemberTokenSettings>(configuration.GetSection(MemberTokenSettings.SectionName));
         services.AddScoped<MemberTokenService>();
-        services.AddScoped<RealmAuthorizationService>();
-        services.AddScoped<RealmCodeGenerator>();
-        services.AddScoped<QuestCsvService>();
+        services.AddScoped<IRealmAuthorizationService, RealmAuthorizationService>();
+        services.AddScoped<IRealmCodeGenerator, RealmCodeGenerator>();
+        services.AddScoped<IQuestCsvService, QuestCsvService>();
 
         return services;
     }

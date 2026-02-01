@@ -10,7 +10,7 @@ namespace PointRealm.Server.Infrastructure.Services;
 /// <summary>
 /// Service for parsing and generating CSV files for quest import/export.
 /// </summary>
-public class QuestCsvService
+public class QuestCsvService : IQuestCsvService
 {
     private readonly CsvConfiguration _csvConfig;
 
