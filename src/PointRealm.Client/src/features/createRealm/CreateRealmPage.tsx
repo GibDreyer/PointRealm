@@ -14,6 +14,7 @@ import { api } from "@/api/client";
 import { useRealmClient } from "@/app/providers/RealtimeProvider";
 import { getClientId } from "@/lib/storage";
 import { updateProfile, getProfile, STORAGE_KEYS } from "@/lib/storage";
+import { useRealmStore } from "@/state/realmStore";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/ui/Input";
 import { PageShell } from "@/components/shell/PageShell";
@@ -170,11 +171,32 @@ export function CreateRealmPage() {
       // Add a default fun quest
       const questName = generateRandomQuestName();
       try {
-        // The backend method 'AddQuest' usually returns the new quest ID
-        const questId = await client.addQuest(questName, "Your journey begins here. Cast your runes to estimate the complexity of this task.");
-        if (questId) {
-          // Immediately start the encounter so the creator lands in a voting state
-          await client.startEncounter(questId);
+        await client.requestFullSnapshot();
+        const snapshot = useRealmStore.getState().realmSnapshot;
+        const questLogVersion = snapshot?.questLogVersion;
+
+        if (!questLogVersion) {
+          console.warn("Quest log version not available yet; skipping default quest.");
+        } else {
+          const addQuestResult = await client.addQuest({
+            title: questName,
+            description: "Your journey begins here. Cast your runes to estimate the complexity of this task.",
+            questLogVersion,
+          });
+          const questId = addQuestResult.success ? addQuestResult.payload : undefined;
+
+          if (questId) {
+            const latestSnapshot = useRealmStore.getState().realmSnapshot;
+            const questVersion = latestSnapshot?.questLog?.quests.find((q) => q.id === questId)?.version;
+            const realmVersion = latestSnapshot?.realmVersion;
+
+            if (questVersion && realmVersion) {
+              // Immediately start the encounter so the creator lands in a voting state
+              await client.startEncounter({ questId, realmVersion, questVersion });
+            } else {
+              console.warn("Missing quest or realm version; skipping auto-start.");
+            }
+          }
         }
       } catch (err) {
         console.error("Failed to add default quest:", err);

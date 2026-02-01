@@ -11,11 +11,11 @@ export type RealmServerEvent =
 
 export interface RealmStoreState {
   connectionStatus: ConnectionStatus;
-  lastError?: RealmStoreError;
-  realmSnapshot?: RealmStateDto;
-  presence?: PartyRosterDto;
-  encounter?: EncounterDto | null;
-  serverRevision?: number;
+  lastError: RealmStoreError | undefined;
+  realmSnapshot: RealmStateDto | undefined;
+  presence: PartyRosterDto | undefined;
+  encounter: EncounterDto | null | undefined;
+  serverRevision: number | undefined;
   applyServerSnapshot: (snapshot: RealmStateDto) => void;
   applyServerEvent: (event: RealmServerEvent) => void;
   setConnectionStatus: (status: ConnectionStatus) => void;

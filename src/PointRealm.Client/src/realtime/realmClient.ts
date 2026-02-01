@@ -141,7 +141,6 @@ export class RealmRealtimeClient {
     this.setStatus('connecting');
 
     this.connection = this.buildConnectionFn({
-      baseUrl: undefined,
       realmCode,
       memberToken,
       clientId: normalizedClientId,
@@ -175,11 +174,14 @@ export class RealmRealtimeClient {
 
   async switchRealm(newRealmCode: string, newMemberToken: string) {
     await this.disconnect();
-    return this.connect({
+    const params: ConnectParams = {
       realmCode: newRealmCode,
       memberToken: newMemberToken,
-      clientId: this.clientId ?? undefined,
-    });
+    };
+    if (this.clientId) {
+      params.clientId = this.clientId;
+    }
+    return this.connect(params);
   }
 
   async requestFullSnapshot() {
@@ -253,7 +255,11 @@ export class RealmRealtimeClient {
     if (this.connection.state !== signalR.HubConnectionState.Connected) {
       throw new Error('Connection is not ready.');
     }
-    return this.connection.invoke(method, ...args);
+    const result = await this.connection.invoke<Awaited<ReturnType<HubServerMethods[K]>>>(
+      method,
+      ...args
+    );
+    return result;
   }
 
   private withCommandId<T extends { commandId?: string }>(request: T): T {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
-import { motion } from 'framer-motion';
+import { motion, type MotionStyle } from 'framer-motion';
 
 interface RuneChipProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
@@ -26,7 +26,7 @@ export const RuneChip: React.FC<RuneChipProps> = ({
           : "text-[var(--pr-text-muted)] hover:text-white",
         className
       )}
-      style={style as React.CSSProperties | undefined}
+      style={style as MotionStyle | undefined}
       {...filteredProps}
     >
       {/* Background Texture */}

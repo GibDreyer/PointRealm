@@ -34,10 +34,11 @@ export function RegisterPage() {
     setError(null);
 
     try {
+      const trimmedDisplayName = displayName.trim();
       const response = await authApi.register({
         email,
         password,
-        displayName: displayName || undefined,
+        displayName: trimmedDisplayName || email,
       });
       setAuthToken(response.accessToken);
       setAuthUser(response.user);

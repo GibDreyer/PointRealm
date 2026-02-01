@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '../lib/utils';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { motion, HTMLMotionProps, type MotionStyle } from 'framer-motion';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
 
@@ -128,7 +128,7 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
   const textColor = variant === 'ghost' ? 'var(--pr-text-muted)' : '#ffffff';
   const glowShadow = variant === 'ghost' ? '' : `0 0 40px color-mix(in srgb, ${baseColorVar}, transparent 55%)`;
 
-  const mergedStyle: React.CSSProperties = {
+  const mergedStyle: MotionStyle = {
     ...(style ?? {}),
     ...cssVariables,
     color: textColor,
