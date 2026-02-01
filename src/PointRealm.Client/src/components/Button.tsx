@@ -70,29 +70,18 @@ const ButtonSVG = ({ variant }: { variant: ButtonVariant }) => {
         </linearGradient>
       </defs>
 
-      {/* Outer Shadow Edge */}
       <path d="M12 100 H648" stroke="black" strokeOpacity="0.3" strokeWidth="2"></path>
 
-      {/* Main Frame Shell */}
       <rect x="8" y="18" width="644" height="88" rx="6" fill="black" opacity="0.4"></rect>
       
-      {/* Dynamic Colored Body */}
       <rect x="10" y="20" width="640" height="84" rx="6" fill={`url(#fillGrad-${variant})`} filter={`url(#texture-${variant})`}></rect>
       
-      {/* Structural Stroke */}
       <rect x="10" y="20" width="640" height="84" rx="6" fill="none" stroke={`url(#frameStroke-${variant})`} strokeWidth="3"></rect>
 
-      {/* Bevel Highlights */}
       <rect x="14" y="24" width="632" height="76" rx="5" fill="none" stroke="white" strokeOpacity="0.15" strokeWidth="1.5"></rect>
       <rect x="16" y="26" width="628" height="72" rx="4" fill="none" stroke="black" strokeOpacity="0.2" strokeWidth="1.2"></rect>
 
-      {/* Top Gloss Sheen */}
       <path d="M14 26 H646 A4 4 0 0 1 650 30 V46 H10 V30 A4 4 0 0 1 14 26 Z" fill={`url(#topSheen-${variant})`} opacity="0.5"></path>
-
-      {/* Side Diamonds & Rays Removed */ }
-
-
-      {/* Corner Carvings */}
       <g opacity="0.4" fill="white">
         <path d="M18 28 l10 0 l-6 6 l-6 0 z" />
         <path d="M18 96 l10 0 l-6 -6 l-6 0 z" />
@@ -112,12 +101,10 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
 }, ref) => {
   const { style, ...filteredProps } = props;
 
-  // Determine base colors from CSS variables depending on the variant
   const baseColorVar = variant === 'secondary' ? 'var(--pr-secondary)' : 
                        variant === 'danger' ? 'var(--pr-danger)' : 
                        'var(--pr-primary)';
   
-  // We use CSS color-mix to derive the multi-tone scales from the single base theme color
   const cssVariables = variant === 'ghost' ? {} : {
     '--btn-accent-light': `color-mix(in srgb, ${baseColorVar}, white 40%)`,
     '--btn-accent-main': baseColorVar,
@@ -151,10 +138,8 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
       style={mergedStyle}
       {...filteredProps}
     >
-      {/* 1. High-Fidelity RPG SVG Background */}
       <ButtonSVG variant={variant} />
 
-      {/* 2. Interactive Outer Glow Layer */}
       <motion.span 
         className="absolute inset-4 z-[-1] rounded-lg opacity-0 transition-all duration-300"
         variants={{
@@ -167,7 +152,6 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
         }}
       />
       
-      {/* 3. Button Content (Label) */}
       <motion.span 
         className="relative z-10 flex items-center gap-2 drop-shadow-[0_2px_8px_rgba(0,0,0,1)]"
         variants={{
@@ -178,7 +162,6 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
         {children}
       </motion.span>
 
-      {/* 4. Magical Sheen Sweep (on Hover) */}
       {variant !== 'ghost' && (
         <motion.span 
           className="absolute inset-0 z-20 pointer-events-none overflow-hidden rounded-lg opacity-0 group-hover:opacity-100"

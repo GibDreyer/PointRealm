@@ -14,5 +14,5 @@ public sealed class Vote : Entity
         Value = value;
     }
 
-    private Vote() { } // EF Core
+    private Vote() { }
 }

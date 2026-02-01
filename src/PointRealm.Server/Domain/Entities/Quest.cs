@@ -32,7 +32,7 @@ public sealed class Quest : Entity
         ExternalUrl = externalUrl;
     }
 
-    private Quest() { } // EF Core
+    private Quest() { }
 
     public void Activate()
     {
