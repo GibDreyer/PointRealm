@@ -42,14 +42,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (payload: LoginPayload) => {
-    try {
-      const response = await authApi.login(payload);
-      setStorageToken(response.accessToken);
-      setStorageUser(response.user);
-      setUser(response.user);
-    } catch (error) {
-      throw error;
-    }
+    const response = await authApi.login(payload);
+    setStorageToken(response.accessToken);
+    setStorageUser(response.user);
+    setUser(response.user);
   };
 
   const logout = async () => {

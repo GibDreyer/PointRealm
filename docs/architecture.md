@@ -1,5 +1,7 @@
 # PointRealm Architecture Notes
 
+For onboarding, configuration, and endpoints, start with the developer handbook in [`docs/README.md`](README.md).
+
 ## System overview
 - **Frontend:** React + Vite client renders realm state snapshots and issues realtime commands. It never resolves conflicts locally.
 - **Backend API:** ASP.NET Core hosts REST endpoints (realm creation/join/settings) and the SignalR hub for realtime state.
