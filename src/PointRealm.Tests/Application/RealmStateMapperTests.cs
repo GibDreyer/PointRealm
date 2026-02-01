@@ -1,3 +1,4 @@
+using FluentAssertions;
 using PointRealm.Server.Application.Services;
 using PointRealm.Server.Domain.Entities;
 using PointRealm.Server.Domain.ValueObjects;
@@ -64,5 +65,27 @@ public class RealmStateMapperTests
 
         var memberState = state.PartyRoster.Members.First(m => m.Id == member.Id);
         Assert.Equal("choosing", memberState.Status);
+    }
+
+    [Fact]
+    public void MapToRealmStateDto_ConcealsVotesUntilReveal()
+    {
+        var realm = Realm.Create("realm", "Realm", "theme", RealmSettings.Default()).Value;
+        var member = PartyMember.Create(realm.Id, "client", "Member", false);
+        realm.AddMember(member);
+        realm.AddQuest("Quest", "Desc");
+        realm.StartEncounter(realm.CurrentQuestId!.Value);
+        var encounter = realm.Encounters.First();
+        encounter.CastVote(member.Id, new RuneCardValue("3", 3));
+        realm.UpdateSettings(new RealmSettings(RuneDeck.Standard(), false, true, true));
+
+        var mapper = new RealmStateMapper();
+        var state = mapper.MapToRealmStateDto(realm);
+
+        state.Encounter.Should().NotBeNull();
+        state.Encounter!.Votes.Should().BeEmpty();
+        state.Encounter.Distribution.Should().BeEmpty();
+        state.Encounter.HasVoted[member.Id].Should().BeTrue();
+        state.Encounter.ShouldHideVoteCounts.Should().BeTrue();
     }
 }
