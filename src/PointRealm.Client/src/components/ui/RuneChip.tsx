@@ -2,7 +2,8 @@ import React from 'react';
 import { cn } from '../../lib/utils';
 import { motion, type HTMLMotionProps } from 'framer-motion';
 
-interface RuneChipProps extends HTMLMotionProps<'button'> {
+interface RuneChipProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
+  children: React.ReactNode;
   active?: boolean;
 }
 
