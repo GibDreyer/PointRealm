@@ -17,6 +17,7 @@ export function useProphecyStats(encounter: Encounter, partyRoster: PartyMember[
       .map(member => ({
         id: member.id,
         name: member.name,
+        avatarEmoji: member.avatarEmoji ?? null,
         voteValue: revealed ? encounter.votes[member.id] ?? null : null,
       }));
   }, [partyRoster, encounter.votes, revealed]);

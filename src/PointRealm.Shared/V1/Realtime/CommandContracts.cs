@@ -34,6 +34,12 @@ public record SetDisplayNameRequest
     public Guid? CommandId { get; init; }
 }
 
+public record SetAvatarEmojiRequest
+{
+    public required string Emoji { get; init; }
+    public Guid? CommandId { get; init; }
+}
+
 public record SelectRuneRequest
 {
     public required string Value { get; init; }

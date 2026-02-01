@@ -34,6 +34,11 @@ export interface SetDisplayNameRequest {
   commandId?: string;
 }
 
+export interface SetAvatarEmojiRequest {
+  emoji: string;
+  commandId?: string;
+}
+
 export interface SelectRuneRequest {
   value: string;
   encounterVersion: number;
@@ -117,6 +122,7 @@ export interface HubServerMethods {
   JoinRealm: (realmCode: string) => Promise<void>;
   RequestFullSnapshot: () => Promise<void>;
   SetDisplayName: (request: SetDisplayNameRequest) => Promise<CommandResult>;
+  SetAvatarEmoji: (request: SetAvatarEmojiRequest) => Promise<CommandResult>;
   JoinPresence: (request: JoinPresenceRequest) => Promise<CommandResult>;
   LeavePresence: (request: LeavePresenceRequest) => Promise<CommandResult>;
   SelectRune: (request: SelectRuneRequest) => Promise<CommandResult>;

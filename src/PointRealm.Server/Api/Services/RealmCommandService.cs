@@ -11,6 +11,7 @@ public sealed record RealmCommandContext(Guid RealmId, Guid MemberId, string Con
 public sealed class RealmCommandService
 {
     private const string StaleMessage = "Your realm view is out of date. Refreshing prophecy…";
+    private const int MaxAvatarEmojiLength = 16;
 
     private readonly PointRealmDbContext _dbContext;
     private readonly IRealmBroadcaster _broadcaster;
@@ -33,6 +34,27 @@ public sealed class RealmCommandService
             }
 
             member.UpdateName(request.Name.Trim());
+            await SaveAndBroadcastAsync(realm.Id);
+            return CommandResultDto.Ok();
+        });
+    }
+
+    public Task<CommandResultDto> SetAvatarEmojiAsync(RealmCommandContext context, SetAvatarEmojiRequest request)
+    {
+        return ExecuteAsync(context, request.CommandId, async (realm, member) =>
+        {
+            if (string.IsNullOrWhiteSpace(request.Emoji))
+            {
+                return CommandResultDto.Fail(CreateError("VALIDATION_ERROR", "Avatar emoji cannot be empty."));
+            }
+
+            var trimmed = request.Emoji.Trim();
+            if (trimmed.Length > MaxAvatarEmojiLength)
+            {
+                return CommandResultDto.Fail(CreateError("VALIDATION_ERROR", "Avatar emoji is too long."));
+            }
+
+            member.UpdateAvatarEmoji(trimmed);
             await SaveAndBroadcastAsync(realm.Id);
             return CommandResultDto.Ok();
         });
