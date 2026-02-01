@@ -1,5 +1,7 @@
 # Database Setup
 
+For the broader developer guide (configuration, auth, endpoints), see [`docs/README.md`](docs/README.md).
+
 ## Overview
 
 This project uses **Entity Framework Core** with **SQLite** for local development. The database schema is version-controlled through **EF Core Migrations**, while the actual database files (containing data) are excluded from git.

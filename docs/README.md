@@ -1,5 +1,7 @@
 # PointRealm Documentation
 
+This directory is the developer handbook for the Realm. For the quick overview and setup, start at the root [README](../README.md).
+
 ## 1. Architecture Overview
 
 PointRealm follows a **Clean Architecture** (Onion/Hexagonal) pattern, separating the application into three distinct layers:
@@ -71,3 +73,28 @@ PointRealm follows a **Clean Architecture** (Onion/Hexagonal) pattern, separatin
 - `POST /api/realms/{code}/encounters/{encounterId}/vote`: Vote on an encounter.
 - `POST /api/realms/{code}/encounters/{encounterId}/reveal`: Reveal votes.
 - `POST /api/realms/{code}/encounters/{encounterId}/clear`: Clear votes.
+
+## 6. Configuration & Environments
+
+### Backend settings
+The API reads configuration from `appsettings.json`, with a few values that are especially important during local development:
+- **CORS origins:** `Cors:AllowedOrigins` controls which frontend origins can access the API (defaults to `http://localhost:5173`).
+- **Member token signing key:** `MemberToken:Key` secures realm membership tokens used by the API and SignalR hub.
+- **Database path:** `POINTREALM_DB_PATH` (env var) or `Database:Path` (appsettings) sets the SQLite file location.
+
+Default backend URLs (from the launch profile):
+- `http://localhost:5219`
+- `https://localhost:7143`
+
+### Frontend environment
+The Vite client reads environment variables from `.env` / `.env.local`. Use `src/PointRealm.Client/.env.example` as a template:
+- `VITE_BACKEND_URL` sets the dev proxy target for `/api` and `/hubs`.
+- `VITE_API_BASE_URL` sets the API base path (defaults to `/api/v1`).
+- `VITE_SIGNALR_HUB_URL` sets the SignalR hub path (defaults to `/hubs/realm`).
+- `VITE_REALTIME_DEBUG` enables additional realtime debug logging.
+
+## 7. API Reference & Health
+In development, the API exposes OpenAPI and Scalar UI endpoints along with a health check route:
+- OpenAPI JSON: `/openapi/v1.json`
+- Scalar UI: `/scalar/v1`
+- Health check: `/health`
