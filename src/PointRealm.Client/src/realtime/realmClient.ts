@@ -21,7 +21,7 @@ import type {
 
 type EventHandler<T> = (payload: T) => void;
 
-class TypedEventEmitter<Events extends Record<string, any>> {
+class TypedEventEmitter<Events extends Record<string, unknown>> {
   private listeners: { [K in keyof Events]?: Set<EventHandler<Events[K]>> } =
     {};
 

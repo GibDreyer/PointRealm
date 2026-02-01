@@ -11,7 +11,7 @@ export function getClientId(): string {
       localStorage.setItem(STORAGE_KEYS.CLIENT_ID, stored);
     }
     return stored;
-  } catch (e) {
+  } catch {
     // Fallback to memory
     if (!memoryClientId) {
       memoryClientId = crypto.randomUUID();

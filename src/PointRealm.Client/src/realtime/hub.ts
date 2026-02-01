@@ -7,7 +7,7 @@ export class RealmHub {
   private startedPromise: Promise<void> | null = null;
   private currentMemberToken: string | null = null;
   private currentClientId: string | null = null;
-  private listeners: Map<string, ((...args: any[]) => void)[]> = new Map();
+  private listeners: Map<string, ((...args: unknown[]) => void)[]> = new Map();
   private connectionHandlersAttached = false;
 
   public async connect(memberToken: string, clientId?: string) {
@@ -59,7 +59,7 @@ export class RealmHub {
     }
   }
 
-  public on(methodName: string, newMethod: (...args: any[]) => void) {
+  public on(methodName: string, newMethod: (...args: unknown[]) => void) {
     if (!this.listeners.has(methodName)) {
         this.listeners.set(methodName, []);
     }
@@ -70,7 +70,7 @@ export class RealmHub {
     }
   }
 
-  public off(methodName: string, method: (...args: any[]) => void) {
+  public off(methodName: string, method: (...args: unknown[]) => void) {
     const methods = this.listeners.get(methodName);
     if (methods) {
         const index = methods.indexOf(method);
@@ -118,12 +118,12 @@ export class RealmHub {
       return methodName === 'reconnecting' || methodName === 'reconnected' || methodName === 'close';
   }
 
-  private emitLifecycleEvent(methodName: string, ...args: any[]) {
+  private emitLifecycleEvent(methodName: string, ...args: unknown[]) {
       const methods = this.listeners.get(methodName) ?? [];
       methods.forEach((handler) => handler(...args));
   }
   
-  public async invoke<T = any>(methodName: string, ...args: any[]): Promise<T> {
+  public async invoke<T = unknown>(methodName: string, ...args: unknown[]): Promise<T> {
       if (!this.connection) {
           throw new Error("Cannot invoke: Connection not started. Call connect(token) first.");
       }

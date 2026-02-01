@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { CreateRealmPage } from './CreateRealmPage';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '../../theme/ThemeProvider';
 import { api } from '../../api/client';
@@ -66,8 +66,9 @@ describe('CreateRealmPage', () => {
 
   it('validates custom deck parsing (valid)', async () => {
     // Setup API mock for success
-    (api.post as any).mockResolvedValueOnce({ code: 'ABCDE' }); // Create
-    (api.post as any).mockResolvedValueOnce({ memberToken: 'token123', memberId: 'mem1' }); // Join
+    const apiPostMock = api.post as Mock;
+    apiPostMock.mockResolvedValueOnce({ code: 'ABCDE' }); // Create
+    apiPostMock.mockResolvedValueOnce({ memberToken: 'token123', memberId: 'mem1' }); // Join
 
     renderComponent();
 
@@ -94,9 +95,9 @@ describe('CreateRealmPage', () => {
 
   it('disables submit button while loading', async () => {
     // Setup API mock to hang or take time
-    let resolveApi: (val: any) => void;
-    const apiPromise = new Promise(resolve => { resolveApi = resolve; });
-    (api.post as any).mockReturnValue(apiPromise);
+    let resolveApi: (val: unknown) => void;
+    const apiPromise = new Promise<unknown>((resolve) => { resolveApi = resolve; });
+    (api.post as Mock).mockReturnValue(apiPromise);
 
     renderComponent();
 

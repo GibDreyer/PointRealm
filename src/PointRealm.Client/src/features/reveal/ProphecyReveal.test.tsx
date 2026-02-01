@@ -32,7 +32,7 @@ const renderReveal = async (opts: {
   const reduced = opts.reducedMotion ?? false;
   vi.resetModules();
   vi.doMock('framer-motion', async () => {
-    const actual = await vi.importActual<any>('framer-motion');
+    const actual = await vi.importActual<typeof import('framer-motion')>('framer-motion');
     return { ...actual, useReducedMotion: () => reduced };
   });
 

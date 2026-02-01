@@ -10,6 +10,13 @@ import { generateRandomRealmName, generateRandomQuestName, generateBotName } fro
 import { ThemePicker } from "@/features/createRealm/components/ThemePicker";
 import { useTheme } from "@/theme/ThemeProvider";
 import { getClientId } from "@/lib/storage";
+import type { Quest, RealmStateDto } from "@/types/realm";
+
+const getErrorMessage = (error: unknown) => {
+    if (!error || typeof error !== "object") return "Unknown error";
+    const maybeError = error as { message?: string };
+    return maybeError.message || "Unknown error";
+};
 
 export function StressTestPage() {
     // Extra safety check in case route leaks
@@ -87,8 +94,8 @@ export function StressTestPage() {
             sessionStorage.setItem(`pointrealm:v1:realm:${code}:memberId`, gmJoin.memberId);
 
             // Setup state listener to catch updates
-            let latestState: any = null;
-            const handleStateUpdate = (state: any) => { latestState = state; };
+            let latestState: RealmStateDto | null = null;
+            const handleStateUpdate = (state: RealmStateDto) => { latestState = state; };
 
             const gmClientId = getClientId();
             mainClient = new RealmRealtimeClient({ clientId: gmClientId });
@@ -119,7 +126,7 @@ export function StressTestPage() {
                 if (!latestState) await new Promise(r => setTimeout(r, 1000));
                 
                 const quests = latestState?.questLog?.quests || [];
-                const found = quests.find((q: any) => q.title === questName);
+                const found = quests.find((q) => q.title === questName);
                 if (found) questId = found.id;
             }
 
@@ -128,7 +135,7 @@ export function StressTestPage() {
             }
 
             log(`Quest added: ${questId}. Starting encounter...`);
-            const questVersion = (latestState?.questLog?.quests || []).find((q: any) => q.id === questId)?.version;
+            const questVersion = (latestState?.questLog?.quests || []).find((q) => q.id === questId)?.version;
             if (!latestState?.realmVersion || !questVersion) {
                 throw new Error("Missing realm or quest version.");
             }
@@ -162,7 +169,7 @@ export function StressTestPage() {
                 });
                 
                 if (!joinRes.ok) throw new Error(`Bot ${botName} failed to join`);
-                const botJoin = await joinRes.json();
+                const botJoin = await joinRes.json() as { memberToken: string };
                 
                 // Connect SignalR
                 await botClient.connect({ realmCode: code, memberToken: botJoin.memberToken, clientId: botClientId });
@@ -200,8 +207,8 @@ export function StressTestPage() {
                     });
                     votesCast++;
                     // log(`Bot voted ${val} after ${delayMs/1000}s`);
-                } catch (e) {
-                    console.error("Bot vote failed", e);
+                } catch (error) {
+                    console.error("Bot vote failed", error);
                 }
             }));
 
@@ -210,9 +217,9 @@ export function StressTestPage() {
             // Clean up listener
             unsubscribeState();
 
-        } catch (err: any) {
+        } catch (err) {
             console.error(err);
-            log(`ERROR: ${err.message}`);
+            log(`ERROR: ${getErrorMessage(err)}`);
         } finally {
             await Promise.all(bots.map((bot) => bot.disconnect().catch(() => undefined)));
             if (mainClient) {

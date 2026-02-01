@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useRealmStore } from '@/state/realmStore';
+import type { RealmStateDto } from '@/types/realm';
 
 describe('realmStore', () => {
   beforeEach(() => {
@@ -14,7 +15,7 @@ describe('realmStore', () => {
   });
 
   it('applies server snapshot to store', () => {
-    const snapshot: any = {
+    const snapshot: RealmStateDto = {
       realmCode: 'ABC',
       themeKey: 'dark-fantasy-arcane',
       settings: { deckType: 'FIBONACCI', autoReveal: false, allowAbstain: true, hideVoteCounts: false },
@@ -32,7 +33,7 @@ describe('realmStore', () => {
   });
 
   it('ignores stale snapshots by revision', () => {
-    const baseSnapshot: any = {
+    const baseSnapshot: RealmStateDto & { revision: number } = {
       realmCode: 'ABC',
       themeKey: 'dark-fantasy-arcane',
       settings: { deckType: 'FIBONACCI', autoReveal: false, allowAbstain: true, hideVoteCounts: false },
@@ -42,7 +43,7 @@ describe('realmStore', () => {
       revision: 10,
     };
 
-    const staleSnapshot: any = {
+    const staleSnapshot: RealmStateDto & { revision: number } = {
       ...baseSnapshot,
       realmCode: 'XYZ',
       revision: 9,

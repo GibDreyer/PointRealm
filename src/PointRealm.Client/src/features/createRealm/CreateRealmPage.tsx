@@ -84,6 +84,12 @@ const parseCustomDeck = (input: string): string[] => {
   ));
 };
 
+const getErrorMessage = (error: unknown) => {
+  if (!error || typeof error !== "object") return "The spell fizzled. An unknown error occurred.";
+  const maybeError = error as { message?: string };
+  return maybeError.message || "The spell fizzled. An unknown error occurred.";
+};
+
 // --- Component ---
 
 export function CreateRealmPage() {
@@ -177,9 +183,9 @@ export function CreateRealmPage() {
       setThemeKey(data.themeKey);
       navigate(`/realm/${realmCode}`);
 
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      setServerError(err.message || "The spell fizzled. An unknown error occurred.");
+      setServerError(getErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }

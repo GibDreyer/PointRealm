@@ -19,7 +19,7 @@ export const PageShell: React.FC<PageShellProps> = ({
   className,
   contentClassName,
   showBackground = true,
-  backgroundDensity: _backgroundDensity = 'medium',
+  backgroundDensity = 'medium',
   backgroundVariant = 'default',
   reducedMotion,
 }) => {
@@ -31,7 +31,10 @@ export const PageShell: React.FC<PageShellProps> = ({
   const particleColor = theme.effects?.particleColor || 'var(--pr-primary)';
 
   return (
-    <div className={cn("relative min-h-screen w-full overflow-hidden bg-pr-bg text-pr-text", className)}>
+    <div
+      className={cn("relative min-h-screen w-full overflow-hidden bg-pr-bg text-pr-text", className)}
+      data-background-density={backgroundDensity}
+    >
       {showBackground && (
         <>
           <FantasySky3D 

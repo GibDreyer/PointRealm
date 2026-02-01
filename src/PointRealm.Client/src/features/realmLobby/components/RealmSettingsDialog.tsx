@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
+import { cn } from '../../../lib/utils';
 import { Save, Loader2, Eye, EyeOff, UserX } from 'lucide-react';
 import { RealmSettings } from '../types';
 import { ThemePicker } from '../../createRealm/components/ThemePicker';
@@ -120,7 +121,16 @@ export function RealmSettingsDialog({ realmCode, currentSettings, currentThemeKe
     );
 }
 
-function ToggleRow({ label, description, icon, checked, onChange, disabled }: any) {
+interface ToggleRowProps {
+    label: string;
+    description: string;
+    icon: ReactNode;
+    checked: boolean;
+    onChange: () => void;
+    disabled?: boolean;
+}
+
+function ToggleRow({ label, description, icon, checked, onChange, disabled }: ToggleRowProps) {
     return (
         <label className={cn(
             "flex items-center justify-between p-4 rounded-[var(--pr-radius-md)] border transition-all cursor-pointer",
@@ -152,5 +162,3 @@ function ToggleRow({ label, description, icon, checked, onChange, disabled }: an
         </label>
     );
 }
-
-import { cn } from '../../../lib/utils';
