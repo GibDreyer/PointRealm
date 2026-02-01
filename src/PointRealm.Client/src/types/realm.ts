@@ -23,6 +23,8 @@ export interface PartyMember {
     id: string;
     name: string;
     avatarEmoji?: string | null;
+    profileImageUrl?: string | null;
+    profileEmoji?: string | null;
     role: "GM" | "Member" | "Observer";
     status: "ready" | "choosing" | "disconnected";
     isOnline: boolean;

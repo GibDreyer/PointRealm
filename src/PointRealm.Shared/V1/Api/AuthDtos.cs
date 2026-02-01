@@ -28,12 +28,12 @@ public record PasswordResetTokenResponse(string Email, string Token);
 /// <summary>
 /// Request to update user profile.
 /// </summary>
-public record UpdateProfileRequest(string? DisplayName, string? ProfileImageUrl);
+public record UpdateProfileRequest(string? DisplayName, string? ProfileImageUrl, string? ProfileEmoji);
 
 /// <summary>
 /// User profile information.
 /// </summary>
-public record UserProfileResponse(string Id, string Email, string? DisplayName, string? ProfileImageUrl);
+public record UserProfileResponse(string Id, string Email, string? DisplayName, string? ProfileImageUrl, string? ProfileEmoji);
 
 /// <summary>
 /// Authentication response with access token.

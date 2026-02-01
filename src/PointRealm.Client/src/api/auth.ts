@@ -22,6 +22,7 @@ export type LoginPayload = {
 export type ProfilePayload = {
   displayName?: string | null;
   profileImageUrl?: string | null;
+  profileEmoji?: string | null;
 };
 
 export const authApi = {

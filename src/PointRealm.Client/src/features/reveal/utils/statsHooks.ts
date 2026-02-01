@@ -18,6 +18,8 @@ export function useProphecyStats(encounter: Encounter, partyRoster: PartyMember[
         id: member.id,
         name: member.name,
         avatarEmoji: member.avatarEmoji ?? null,
+        profileImageUrl: member.profileImageUrl ?? null,
+        profileEmoji: member.profileEmoji ?? null,
         voteValue: revealed ? encounter.votes[member.id] ?? null : null,
       }));
   }, [partyRoster, encounter.votes, revealed]);

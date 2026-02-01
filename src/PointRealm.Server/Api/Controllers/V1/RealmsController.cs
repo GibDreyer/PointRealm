@@ -27,6 +27,7 @@ public class RealmsController(
     IRealmAuthorizationService authService,
     IQuestCsvService csvService,
     IMemberTokenService tokenService,
+    UserManager<ApplicationUser> userManager,
     ImportQuestsCommandHandler importQuestsHandler) : ControllerBase
 {
     private const string DefaultTheme = "dark-fantasy-arcane";
@@ -184,6 +185,14 @@ public class RealmsController(
             var isObserver = request.Role?.Equals("Observer", StringComparison.OrdinalIgnoreCase) ?? false;
 
             member = PartyMember.Create(realm.Id, clientId, request.DisplayName, isHost, userId, isObserver);
+            if (!string.IsNullOrWhiteSpace(userId))
+            {
+                var user = await userManager.FindByIdAsync(userId);
+                if (user is not null)
+                {
+                    member.UpdateProfileAvatar(user.ProfileImageUrl, user.ProfileEmoji);
+                }
+            }
             dbContext.PartyMembers.Add(member);
             
             try 

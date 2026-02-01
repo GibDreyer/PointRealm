@@ -42,6 +42,8 @@ public class PartyMemberSnapshotDto
     public string MemberId { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
     public string? AvatarEmoji { get; set; }
+    public string? ProfileImageUrl { get; set; }
+    public string? ProfileEmoji { get; set; }
     public string? ClassBadgeKey { get; set; }
     public string Presence { get; set; } = "Offline"; // Online, Offline
     public string VoteState { get; set; } = "NotVoting"; // NotVoting, Choosing, LockedIn

@@ -5,6 +5,7 @@ import { ApiError } from "@/api/client";
 import { Button } from "@/components/Button";
 import { PageShell } from "@/components/shell/PageShell";
 import { BackButton } from "@/components/ui/BackButton";
+import { EmojiPicker } from "@/components/ui/EmojiPicker";
 import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Panel } from "@/components/ui/Panel";
@@ -25,9 +26,13 @@ export function AccountPage() {
   const [user, setUser] = useState(getAuthUser());
   const [displayName, setDisplayName] = useState(user?.displayName ?? "");
   const [profileImageUrl, setProfileImageUrl] = useState(user?.profileImageUrl ?? "");
+  const [profileEmoji, setProfileEmoji] = useState(user?.profileEmoji ?? "");
   const [isLoading, setIsLoading] = useState(Boolean(token));
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const maxImageSizeBytes = 1_048_576;
+  const safeProfileEmoji = profileEmoji.replace(/[<>]/g, "");
 
   useEffect(() => {
     if (!token) {
@@ -44,6 +49,7 @@ export function AccountPage() {
         setAuthUser(data);
         setDisplayName(data.displayName ?? "");
         setProfileImageUrl(data.profileImageUrl ?? "");
+        setProfileEmoji(data.profileEmoji ?? "");
       })
       .catch((err) => {
         if (!isMounted) return;
@@ -75,6 +81,7 @@ export function AccountPage() {
       const updated = await authApi.updateProfile({
         displayName: displayName || null,
         profileImageUrl: profileImageUrl || null,
+        profileEmoji: profileEmoji || null,
       });
       setUser(updated);
       setAuthUser(updated);
@@ -86,6 +93,32 @@ export function AccountPage() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > maxImageSizeBytes) {
+      setImageError("Profile image must be 1MB or smaller.");
+      event.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result?.toString() ?? "";
+      setProfileImageUrl(result);
+      setImageError(null);
+    };
+    reader.onerror = () => {
+      setImageError("Unable to read that image.");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleClearImage = () => {
+    setProfileImageUrl("");
   };
 
   const handleLogout = async () => {
@@ -133,7 +166,7 @@ export function AccountPage() {
     <PageShell backgroundDensity="medium">
       <BackButton to="/" />
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <Panel variant="realm" className="max-w-md w-full p-8">
+        <Panel variant="realm" className="w-full max-w-md p-8 md:max-w-3xl">
           <PageHeader title="Account Vault" subtitle="Steward your profile" size="panel" />
           {isLoading ? (
             <p className="mt-6 text-sm text-pr-text-muted">Summoning your profile...</p>
@@ -145,44 +178,75 @@ export function AccountPage() {
                   <p className="mt-2 text-sm text-pr-text">{user.email}</p>
                 </div>
               )}
-              <form className="mt-6 space-y-4" onSubmit={handleSave}>
-                <Input
-                  label="Display name"
-                  tooltip="This is how others will see you in realms."
-                  type="text"
-                  value={displayName}
-                  onChange={(event) => setDisplayName(event.target.value)}
-                  placeholder="Mystic Wanderer"
-                />
-                <Input
-                  label="Profile image URL"
-                  tooltip="Paste a link to a public avatar image."
-                  type="url"
-                  value={profileImageUrl}
-                  onChange={(event) => setProfileImageUrl(event.target.value)}
-                  placeholder="https://..."
-                />
-                {profileImageUrl && (
-                  <img
-                    src={profileImageUrl}
-                    alt="Profile preview"
-                    className="h-20 w-20 rounded-full border border-pr-border/40 object-cover"
-                  />
-                )}
+              <form className="mt-6 space-y-6" onSubmit={handleSave}>
+                <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
+                  <div className="space-y-4">
+                    <Input
+                      label="Display name"
+                      tooltip="This is how others will see you in realms."
+                      type="text"
+                      value={displayName}
+                      onChange={(event) => setDisplayName(event.target.value)}
+                      placeholder="Mystic Wanderer"
+                    />
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase tracking-[0.2em] text-pr-text-muted">
+                        Upload profile image (max 1MB)
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="mt-2 block w-full text-xs text-pr-text-muted file:mr-4 file:rounded-md file:border-0 file:bg-pr-primary/20 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-pr-primary hover:file:bg-pr-primary/30"
+                        />
+                      </label>
+                      {profileImageUrl && (
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={profileImageUrl}
+                            alt="Profile preview"
+                            className="h-20 w-20 rounded-full border border-pr-border/40 object-cover"
+                          />
+                          <Button type="button" variant="ghost" onClick={handleClearImage}>
+                            Remove image
+                          </Button>
+                        </div>
+                      )}
+                      {!profileImageUrl && safeProfileEmoji && (
+                        <div className="h-20 w-20 rounded-full border border-pr-border/40 bg-pr-surface/40 flex items-center justify-center text-3xl">
+                          <span aria-label="Profile emoji preview">{safeProfileEmoji}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-xs uppercase tracking-[0.2em] text-pr-text-muted">
+                      Or choose an emoji
+                    </p>
+                    <EmojiPicker selectedEmoji={safeProfileEmoji || null} onSelect={setProfileEmoji} className="md:max-w-sm" />
+                    {safeProfileEmoji && (
+                      <div className="pt-1">
+                        <Button type="button" variant="ghost" onClick={() => setProfileEmoji("")}>
+                          Clear emoji
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {imageError && <p className="text-xs text-pr-danger/80">{imageError}</p>}
                 {error && <p className="text-xs text-pr-danger/80">{error}</p>}
-                <Tooltip content="Save your updated profile details.">
-                  <Button type="submit" variant="primary" fullWidth disabled={isSaving}>
-                    {isSaving ? "Saving..." : "Save Profile"}
-                  </Button>
-                </Tooltip>
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <Tooltip content="Save your updated profile details.">
+                    <Button type="submit" variant="primary" className="md:px-10" fullWidth disabled={isSaving}>
+                      {isSaving ? "Saving..." : "Save Profile"}
+                    </Button>
+                  </Tooltip>
+                  <Tooltip content="Sign out and return to the tavern.">
+                    <Button variant="ghost" className="md:w-auto" fullWidth onClick={handleLogout}>
+                      Sign Out
+                    </Button>
+                  </Tooltip>
+                </div>
               </form>
-              <div className="mt-6">
-                <Tooltip content="Sign out and return to the tavern.">
-                  <Button variant="ghost" fullWidth onClick={handleLogout}>
-                    Sign Out
-                  </Button>
-                </Tooltip>
-              </div>
             </>
           )}
         </Panel>
