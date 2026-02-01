@@ -26,9 +26,6 @@ export function AccountPage() {
   const [user, setUser] = useState(getAuthUser());
   const [displayName, setDisplayName] = useState(user?.displayName ?? "");
   const [profileImageUrl, setProfileImageUrl] = useState(user?.profileImageUrl ?? "");
-  const [profileImageInput, setProfileImageInput] = useState(
-    user?.profileImageUrl && user.profileImageUrl.startsWith("data:") ? "" : user?.profileImageUrl ?? ""
-  );
   const [profileEmoji, setProfileEmoji] = useState(user?.profileEmoji ?? "");
   const [isLoading, setIsLoading] = useState(Boolean(token));
   const [isSaving, setIsSaving] = useState(false);
@@ -51,9 +48,6 @@ export function AccountPage() {
         setAuthUser(data);
         setDisplayName(data.displayName ?? "");
         setProfileImageUrl(data.profileImageUrl ?? "");
-        setProfileImageInput(
-          data.profileImageUrl && data.profileImageUrl.startsWith("data:") ? "" : data.profileImageUrl ?? ""
-        );
         setProfileEmoji(data.profileEmoji ?? "");
       })
       .catch((err) => {
@@ -114,7 +108,6 @@ export function AccountPage() {
     reader.onload = () => {
       const result = reader.result?.toString() ?? "";
       setProfileImageUrl(result);
-      setProfileImageInput("");
       setImageError(null);
     };
     reader.onerror = () => {
@@ -125,7 +118,6 @@ export function AccountPage() {
 
   const handleClearImage = () => {
     setProfileImageUrl("");
-    setProfileImageInput("");
   };
 
   const handleLogout = async () => {
@@ -173,7 +165,7 @@ export function AccountPage() {
     <PageShell backgroundDensity="medium">
       <BackButton to="/" />
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <Panel variant="realm" className="max-w-md w-full p-8">
+        <Panel variant="realm" className="w-full max-w-md p-8 md:max-w-3xl">
           <PageHeader title="Account Vault" subtitle="Steward your profile" size="panel" />
           {isLoading ? (
             <p className="mt-6 text-sm text-pr-text-muted">Summoning your profile...</p>
@@ -185,66 +177,58 @@ export function AccountPage() {
                   <p className="mt-2 text-sm text-pr-text">{user.email}</p>
                 </div>
               )}
-              <form className="mt-6 space-y-4" onSubmit={handleSave}>
-                <Input
-                  label="Display name"
-                  tooltip="This is how others will see you in realms."
-                  type="text"
-                  value={displayName}
-                  onChange={(event) => setDisplayName(event.target.value)}
-                  placeholder="Mystic Wanderer"
-                />
-                <Input
-                  label="Profile image URL"
-                  tooltip="Paste a link to a public avatar image."
-                  type="url"
-                  value={profileImageInput}
-                  onChange={(event) => {
-                    setProfileImageInput(event.target.value);
-                    setProfileImageUrl(event.target.value);
-                    setImageError(null);
-                  }}
-                  placeholder="https://..."
-                />
-                <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-[0.2em] text-pr-text-muted">
-                    Upload profile image (max 1MB)
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="mt-2 block w-full text-xs text-pr-text-muted file:mr-4 file:rounded-md file:border-0 file:bg-pr-primary/20 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-pr-primary hover:file:bg-pr-primary/30"
+              <form className="mt-6 space-y-6" onSubmit={handleSave}>
+                <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
+                  <div className="space-y-4">
+                    <Input
+                      label="Display name"
+                      tooltip="This is how others will see you in realms."
+                      type="text"
+                      value={displayName}
+                      onChange={(event) => setDisplayName(event.target.value)}
+                      placeholder="Mystic Wanderer"
                     />
-                  </label>
-                  {profileImageUrl && (
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={profileImageUrl}
-                        alt="Profile preview"
-                        className="h-20 w-20 rounded-full border border-pr-border/40 object-cover"
-                      />
-                      <Button type="button" variant="ghost" onClick={handleClearImage}>
-                        Remove image
-                      </Button>
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase tracking-[0.2em] text-pr-text-muted">
+                        Upload profile image (max 1MB)
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="mt-2 block w-full text-xs text-pr-text-muted file:mr-4 file:rounded-md file:border-0 file:bg-pr-primary/20 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-pr-primary hover:file:bg-pr-primary/30"
+                        />
+                      </label>
+                      {profileImageUrl && (
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={profileImageUrl}
+                            alt="Profile preview"
+                            className="h-20 w-20 rounded-full border border-pr-border/40 object-cover"
+                          />
+                          <Button type="button" variant="ghost" onClick={handleClearImage}>
+                            Remove image
+                          </Button>
+                        </div>
+                      )}
+                      {!profileImageUrl && profileEmoji && (
+                        <div className="h-20 w-20 rounded-full border border-pr-border/40 bg-pr-surface/40 flex items-center justify-center text-3xl">
+                          <span aria-label="Profile emoji preview">{profileEmoji}</span>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <p className="text-xs uppercase tracking-[0.2em] text-pr-text-muted">
-                    Or choose an emoji
-                  </p>
-                  <EmojiPicker selectedEmoji={profileEmoji || null} onSelect={setProfileEmoji} />
-                  {profileEmoji && (
-                    <Button type="button" variant="ghost" onClick={() => setProfileEmoji("")}>
-                      Clear emoji
-                    </Button>
-                  )}
-                </div>
-                {!profileImageUrl && profileEmoji && (
-                  <div className="h-20 w-20 rounded-full border border-pr-border/40 bg-pr-surface/40 flex items-center justify-center text-3xl">
-                    <span aria-label="Profile emoji preview">{profileEmoji}</span>
                   </div>
-                )}
+                  <div className="space-y-2">
+                    <p className="text-xs uppercase tracking-[0.2em] text-pr-text-muted">
+                      Or choose an emoji
+                    </p>
+                    <EmojiPicker selectedEmoji={profileEmoji || null} onSelect={setProfileEmoji} className="md:max-w-sm" />
+                    {profileEmoji && (
+                      <Button type="button" variant="ghost" onClick={() => setProfileEmoji("")}>
+                        Clear emoji
+                      </Button>
+                    )}
+                  </div>
+                </div>
                 {imageError && <p className="text-xs text-pr-danger/80">{imageError}</p>}
                 {error && <p className="text-xs text-pr-danger/80">{error}</p>}
                 <Tooltip content="Save your updated profile details.">
