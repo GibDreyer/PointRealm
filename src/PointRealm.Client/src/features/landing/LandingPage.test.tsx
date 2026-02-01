@@ -68,7 +68,7 @@ describe('LandingPage', () => {
     renderPage();
     
     expect(screen.getByText('PointRealm')).toBeInTheDocument();
-    expect(screen.getByText('Co-op estimation, RPG style.')).toBeInTheDocument();
+    expect(screen.getByText('Co-op estimation')).toBeInTheDocument();
     expect(screen.getByText('Free, open source, self-host friendly.')).toBeInTheDocument();
   });
 });

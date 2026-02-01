@@ -10,8 +10,30 @@ type ApiErrorData = Record<string, unknown> | null;
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
-const getErrorMessage = (data: unknown) =>
-  isRecord(data) && typeof data.message === 'string' ? data.message : undefined;
+const getErrorMessage = (data: unknown): string | undefined => {
+  if (!isRecord(data)) return undefined;
+  
+  // 1. Handle standard { message: "..." }
+  if (typeof data.message === 'string') return data.message;
+  
+  // 2. Handle Identity errors: [{ code: "...", description: "..." }, ...]
+  if (Array.isArray(data)) {
+    const firstError = data[0];
+    if (isRecord(firstError) && typeof firstError.description === 'string') {
+      return firstError.description;
+    }
+  }
+
+  // 3. Handle Validation problems: { errors: { field: ["error"] } }
+  if (isRecord(data.errors)) {
+    const firstField = Object.values(data.errors)[0];
+    if (Array.isArray(firstField) && typeof firstField[0] === 'string') {
+      return firstField[0];
+    }
+  }
+
+  return undefined;
+};
 
 export class ApiError extends Error {
   constructor(public status: number, public message: string, public data?: ApiErrorData) {

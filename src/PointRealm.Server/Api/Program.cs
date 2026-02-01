@@ -56,7 +56,16 @@ var app = builder.Build();
 var dbPath = app.Configuration.GetValue<string>("POINTREALM_DB_PATH") ?? 
                 app.Configuration["Database:Path"] ?? 
                 "./data/pointrealm.db";
-Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
+if (Directory.Exists(dbPath))
+{
+    dbPath = Path.Combine(dbPath, "pointrealm.db");
+}
+
+var dbDirName = Path.GetDirectoryName(dbPath);
+if (!string.IsNullOrEmpty(dbDirName))
+{
+    Directory.CreateDirectory(dbDirName);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

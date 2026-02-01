@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using PointRealm.Server.Domain.Entities;
 using PointRealm.Server.Infrastructure.Services;
 
-namespace PointRealm.Server.Api.Controllers;
+namespace PointRealm.Server.Api.Controllers.V1;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v1/[controller]")]
 public class AuthController(
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,

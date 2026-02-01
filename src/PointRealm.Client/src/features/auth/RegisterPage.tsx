@@ -24,6 +24,13 @@ export function RegisterPage() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (password.length < 8) {
+      const message = "Password must be at least 8 characters.";
+      setError(message);
+      toast(message, "error");
+      return;
+    }
+
     if (password !== confirmPassword) {
       const message = "Passwords do not match.";
       setError(message);
@@ -82,13 +89,14 @@ export function RegisterPage() {
             />
             <Input
               label="Password"
-              tooltip="Choose a strong password you'll remember."
+              tooltip="At least 8 characters."
               type="password"
               autoComplete="new-password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               placeholder="••••••••"
               required
+              minLength={8}
             />
             <Input
               label="Confirm password"
@@ -99,6 +107,7 @@ export function RegisterPage() {
               onChange={(event) => setConfirmPassword(event.target.value)}
               placeholder="••••••••"
               required
+              minLength={8}
             />
             {error && <p className="text-xs text-pr-danger/80">{error}</p>}
             <Tooltip content="Create your account and jump into the tavern.">

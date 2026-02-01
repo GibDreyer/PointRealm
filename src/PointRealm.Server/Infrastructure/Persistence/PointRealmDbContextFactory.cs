@@ -16,20 +16,25 @@ public class PointRealmDbContextFactory : IDesignTimeDbContextFactory<PointRealm
 
         while (!string.IsNullOrEmpty(searchDirectory))
         {
-            var potentialPath = Path.Combine(searchDirectory, "src", "PointRealm.Server", "Api");
-            if (Directory.Exists(potentialPath))
+            // Check for 'Api' or 'PointRealm.Server.Api' folders
+            var potentialPaths = new[] 
             {
-                apiPath = potentialPath;
-                break;
+                Path.Combine(searchDirectory, "src", "PointRealm.Server", "Api"),
+                Path.Combine(searchDirectory, "src", "PointRealm.Server", "PointRealm.Server.Api"),
+                Path.Combine(searchDirectory, "Api"),
+                Path.Combine(searchDirectory, "PointRealm.Server.Api")
+            };
+
+            foreach (var potentialPath in potentialPaths)
+            {
+                if (Directory.Exists(potentialPath) && File.Exists(Path.Combine(potentialPath, "PointRealm.Server.Api.csproj")))
+                {
+                    apiPath = potentialPath;
+                    break;
+                }
             }
 
-            // Also check if we are already inside the Server directory
-            potentialPath = Path.Combine(searchDirectory, "Api");
-            if (Directory.Exists(potentialPath) && File.Exists(Path.Combine(potentialPath, "PointRealm.Server.Api.csproj")))
-            {
-                apiPath = potentialPath;
-                break;
-            }
+            if (apiPath != null) break;
 
             var parent = Directory.GetParent(searchDirectory)?.FullName;
             if (parent == searchDirectory || parent == null) break;
@@ -41,7 +46,10 @@ public class PointRealmDbContextFactory : IDesignTimeDbContextFactory<PointRealm
             // Fallback to current directory or Infrastructure's sibling
             if (currentDirectory.EndsWith("Infrastructure"))
             {
-                apiPath = Path.GetFullPath(Path.Combine(currentDirectory, "..", "Api"));
+                var siblingApi = Path.GetFullPath(Path.Combine(currentDirectory, "..", "Api"));
+                var siblingFullApi = Path.GetFullPath(Path.Combine(currentDirectory, "..", "PointRealm.Server.Api"));
+                
+                apiPath = Directory.Exists(siblingFullApi) ? siblingFullApi : siblingApi;
             }
             else
             {
@@ -64,6 +72,12 @@ public class PointRealmDbContextFactory : IDesignTimeDbContextFactory<PointRealm
         if (!Path.IsPathRooted(dbPath))
         {
             dbPath = Path.GetFullPath(Path.Combine(apiPath, dbPath));
+        }
+        
+        // Safety check: If dbPath is a directory, it's definitely wrong (likely an env var misconfiguration)
+        if (Directory.Exists(dbPath))
+        {
+            dbPath = Path.Combine(dbPath, "pointrealm.db");
         }
 
         // Ensure directory exists

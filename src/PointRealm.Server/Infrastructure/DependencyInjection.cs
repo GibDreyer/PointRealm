@@ -19,8 +19,13 @@ public static class DependencyInjection
                      configuration["Database:Path"] ?? 
                      "./data/pointrealm.db";
 
+        // Safety check: If dbPath is a directory, it's likely an env var misconfiguration
+        if (Directory.Exists(dbPath))
+        {
+            dbPath = Path.Combine(dbPath, "pointrealm.db");
+        }
+
         services.AddDbContext<PointRealmDbContext>(options =>
-            // Directory is ensured in Program.cs
             options.UseSqlite($"Data Source={dbPath}"));
 
         services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -28,12 +33,12 @@ public static class DependencyInjection
             .AddDefaultTokenProviders();
         services.Configure<IdentityOptions>(options =>
         {
-            options.Password.RequireDigit = true;
+            options.Password.RequireDigit = false;
             options.Password.RequireLowercase = true;
             options.Password.RequireUppercase = true;
-            options.Password.RequireNonAlphanumeric = true;
-            options.Password.RequiredLength = 12;
-            options.Password.RequiredUniqueChars = 4;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequiredLength = 8;
+            options.Password.RequiredUniqueChars = 0;
             options.Lockout.AllowedForNewUsers = true;
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
             options.Lockout.MaxFailedAccessAttempts = 5;

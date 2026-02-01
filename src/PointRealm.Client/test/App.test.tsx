@@ -15,6 +15,6 @@ describe('LandingPage', () => {
       </RootProvider>
     );
     expect(screen.getByText('PointRealm')).toBeInTheDocument();
-    expect(screen.getByText('Co-op estimation, RPG style.')).toBeInTheDocument();
+    expect(screen.getByText('Co-op estimation')).toBeInTheDocument();
   });
 });

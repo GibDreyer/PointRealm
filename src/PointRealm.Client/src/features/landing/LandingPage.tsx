@@ -31,7 +31,7 @@ export const LandingPage: React.FC = () => {
         >
           <PageHeader
             title="PointRealm"
-            subtitle="Co-op estimation, RPG style."
+            subtitle="Co-op estimation"
             size="hero"
             showOrnaments
           />
