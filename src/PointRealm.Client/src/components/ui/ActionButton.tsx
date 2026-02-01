@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { RefreshCw } from 'lucide-react';
+import { Tooltip } from './Tooltip';
 
 export interface ActionButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     /** Icon element to display */
@@ -13,6 +14,10 @@ export interface ActionButtonProps extends React.ButtonHTMLAttributes<HTMLButton
     loading?: boolean;
     /** Visual variant */
     variant?: 'primary' | 'action' | 'danger' | 'default';
+    /** Optional tooltip content */
+    tooltip?: string | undefined;
+    /** Tooltip placement */
+    tooltipSide?: "top" | "bottom" | "left" | "right";
 }
 
 const variants = {
@@ -34,9 +39,11 @@ export function ActionButton({
     variant = 'default', 
     className, 
     disabled,
+    tooltip,
+    tooltipSide = 'top',
     ...props 
 }: ActionButtonProps) {
-    return (
+    const button = (
         <button
             className={cn(
                 "flex items-center gap-3 p-3 rounded-lg border transition-all",
@@ -56,4 +63,14 @@ export function ActionButton({
             </div>
         </button>
     );
+
+    if (tooltip) {
+        return (
+            <Tooltip content={tooltip} side={tooltipSide}>
+                {button}
+            </Tooltip>
+        );
+    }
+
+    return button;
 }

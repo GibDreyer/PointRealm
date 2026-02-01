@@ -1,5 +1,7 @@
 import React from 'react';
+import { Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Tooltip } from './Tooltip';
 import styles from './Input.module.css';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -7,6 +9,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   helper?: string | undefined;
   error?: string | undefined;
   wrapperClassName?: string | undefined;
+  tooltip?: string | undefined;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(({ 
@@ -15,11 +18,27 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   label,
   helper,
   error,
+  tooltip,
   ...props 
 }, ref) => {
   return (
     <div className={cn("w-full", wrapperClassName)}>
-      {label && <label className={styles.label}>{label}</label>}
+      {label && (
+        <div className={styles.labelRow}>
+          <label className={styles.label}>{label}</label>
+          {tooltip && (
+            <Tooltip content={tooltip}>
+              <button
+                type="button"
+                className={styles.tooltipButton}
+                aria-label={`${label} info`}
+              >
+                <Info size={14} />
+              </button>
+            </Tooltip>
+          )}
+        </div>
+      )}
       {helper && <p className={styles.helper}>{helper}</p>}
       <input 
         ref={ref}

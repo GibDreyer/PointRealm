@@ -24,6 +24,7 @@ import { BackButton } from '../../components/ui/BackButton';
 import { Panel } from '../../components/ui/Panel';
 import { Input } from '../../components/ui/Input';
 import { SectionHeader } from '../../components/ui/SectionHeader';
+import { Tooltip } from '../../components/ui/Tooltip';
 import styles from './joinRealm.module.css';
 
 export type RealmRole = 'participant' | 'observer';
@@ -216,6 +217,7 @@ export function JoinRealmPage() {
                   <div className={styles.field}>
                     <Input
                       label="Realm Code or Link"
+                      tooltip="Paste a full invite link or a short realm code."
                       helper="Paste an invite"
                       value={realmInput}
                       onChange={(e) => {
@@ -234,6 +236,7 @@ export function JoinRealmPage() {
                   <div className={styles.field}>
                     <Input
                       label="Display Name"
+                      tooltip="Your name as it appears to the party."
                       helper="Your party alias"
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
@@ -253,58 +256,64 @@ export function JoinRealmPage() {
                       className="mb-2"
                   />
                   <div className={styles.roleGrid} role="radiogroup" aria-label="Choose your role">
-                    <button
-                      type="button"
-                      className={role === 'participant' ? `${styles.roleCard} ${styles.roleCardActive}` : styles.roleCard}
-                      onClick={() => setRole('participant')}
-                      disabled={isLoading}
-                      role="radio"
-                      aria-checked={role === 'participant'}
-                    >
-                      <div className={styles.roleIcon} aria-hidden="true">
-                        <Shield />
-                      </div>
-                      <div className={styles.roleText}>
-                        <span className={styles.roleTitle}>Participant</span>
-                        <span className={styles.roleDescription}>Vote and take part in encounters</span>
-                      </div>
-                    </button>
-                    <button
-                      type="button"
-                      className={role === 'observer' ? `${styles.roleCard} ${styles.roleCardActive}` : styles.roleCard}
-                      onClick={() => setRole('observer')}
-                      disabled={isLoading}
-                      role="radio"
-                      aria-checked={role === 'observer'}
-                    >
-                      <div className={styles.roleIcon} aria-hidden="true">
-                        <Eye />
-                      </div>
-                      <div className={styles.roleText}>
-                        <span className={styles.roleTitle}>Observer</span>
-                        <span className={styles.roleDescription}>Watch without voting</span>
-                      </div>
-                    </button>
+                    <Tooltip content="Participants can vote and help estimate quests.">
+                      <button
+                        type="button"
+                        className={role === 'participant' ? `${styles.roleCard} ${styles.roleCardActive}` : styles.roleCard}
+                        onClick={() => setRole('participant')}
+                        disabled={isLoading}
+                        role="radio"
+                        aria-checked={role === 'participant'}
+                      >
+                        <div className={styles.roleIcon} aria-hidden="true">
+                          <Shield />
+                        </div>
+                        <div className={styles.roleText}>
+                          <span className={styles.roleTitle}>Participant</span>
+                          <span className={styles.roleDescription}>Vote and take part in encounters</span>
+                        </div>
+                      </button>
+                    </Tooltip>
+                    <Tooltip content="Observers can watch the session without casting votes.">
+                      <button
+                        type="button"
+                        className={role === 'observer' ? `${styles.roleCard} ${styles.roleCardActive}` : styles.roleCard}
+                        onClick={() => setRole('observer')}
+                        disabled={isLoading}
+                        role="radio"
+                        aria-checked={role === 'observer'}
+                      >
+                        <div className={styles.roleIcon} aria-hidden="true">
+                          <Eye />
+                        </div>
+                        <div className={styles.roleText}>
+                          <span className={styles.roleTitle}>Observer</span>
+                          <span className={styles.roleDescription}>Watch without voting</span>
+                        </div>
+                      </button>
+                    </Tooltip>
                   </div>
                 </section>
 
                 <div className="pt-4">
-                  <Button
-                    onClick={() => handleJoin()}
-                    disabled={isLoading || !realmInput.trim() || !displayName.trim()}
-                    fullWidth
-                    variant="primary"
-                    className="h-14 text-lg tracking-[0.2em] uppercase font-bold"
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className={styles.spinner} />
-                        Joining...
-                      </>
-                    ) : (
-                      'Enter Realm'
-                    )}
-                  </Button>
+                  <Tooltip content="Connect to the realm with the selected role and name.">
+                    <Button
+                      onClick={() => handleJoin()}
+                      disabled={isLoading || !realmInput.trim() || !displayName.trim()}
+                      fullWidth
+                      variant="primary"
+                      className="h-14 text-lg tracking-[0.2em] uppercase font-bold"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className={styles.spinner} />
+                          Joining...
+                        </>
+                      ) : (
+                        'Enter Realm'
+                      )}
+                    </Button>
+                  </Tooltip>
                 </div>
               </form>
             </div>

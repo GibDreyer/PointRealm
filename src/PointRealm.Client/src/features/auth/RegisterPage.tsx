@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Panel } from "@/components/ui/Panel";
 import { useToast } from "@/components/ui/ToastSystem";
 import { setAuthToken, setAuthUser } from "@/lib/storage/auth";
+import { Tooltip } from "@/components/ui/Tooltip";
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -62,6 +63,7 @@ export function RegisterPage() {
           <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
             <Input
               label="Display name"
+              tooltip="Shown in realms. You can change this later."
               type="text"
               autoComplete="nickname"
               value={displayName}
@@ -70,6 +72,7 @@ export function RegisterPage() {
             />
             <Input
               label="Email"
+              tooltip="We'll use this to sign you in."
               type="email"
               autoComplete="email"
               value={email}
@@ -79,6 +82,7 @@ export function RegisterPage() {
             />
             <Input
               label="Password"
+              tooltip="Choose a strong password you'll remember."
               type="password"
               autoComplete="new-password"
               value={password}
@@ -88,6 +92,7 @@ export function RegisterPage() {
             />
             <Input
               label="Confirm password"
+              tooltip="Re-enter your password to confirm."
               type="password"
               autoComplete="new-password"
               value={confirmPassword}
@@ -96,9 +101,11 @@ export function RegisterPage() {
               required
             />
             {error && <p className="text-xs text-pr-danger/80">{error}</p>}
-            <Button type="submit" variant="primary" fullWidth disabled={isSubmitting}>
-              {isSubmitting ? "Creating..." : "Create Account"}
-            </Button>
+            <Tooltip content="Create your account and jump into the tavern.">
+              <Button type="submit" variant="primary" fullWidth disabled={isSubmitting}>
+                {isSubmitting ? "Creating..." : "Create Account"}
+              </Button>
+            </Tooltip>
           </form>
           <div className="mt-6 text-center text-xs text-pr-text-muted">
             Already have an account?{" "}

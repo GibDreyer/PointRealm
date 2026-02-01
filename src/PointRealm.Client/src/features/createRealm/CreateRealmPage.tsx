@@ -22,6 +22,7 @@ import { PageFooter } from "@/components/ui/PageFooter";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Panel } from "@/components/ui/Panel";
 import { ToggleSettingRow } from "@/components/ui/ToggleSettingRow";
+import { Tooltip } from "@/components/ui/Tooltip";
 import { DECKS } from "./constants";
 import { BackButton } from "@/components/ui/BackButton";
 import styles from "./createRealm.module.css";
@@ -122,6 +123,12 @@ export function CreateRealmPage() {
   const { watch, handleSubmit, control, setValue, formState: { errors } } = form;
 
   const selectedDeckType = watch("deckType");
+  const deckTooltips: Record<"FIBONACCI" | "SHORT_FIBONACCI" | "TSHIRT" | "CUSTOM", string> = {
+    FIBONACCI: "Classic Fibonacci deck for balanced estimation.",
+    SHORT_FIBONACCI: "Shorter Fibonacci deck for faster voting.",
+    TSHIRT: "XS-XL sizing for relative estimates.",
+    CUSTOM: "Provide your own comma-separated rune values.",
+  };
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
@@ -258,24 +265,27 @@ export function CreateRealmPage() {
                   <div className={styles.field}>
                     <Input
                       label="Realm Name"
+                      tooltip="Optional. Leave blank to keep the generated name."
                       {...form.register("realmName")}
                       placeholder="e.g. The Emerald Sanctum..."
                       disabled={isSubmitting}
                       error={errors.realmName?.message}
                       className="bg-black/20 pr-10"
                     />
-                    <button
-                      type="button"
-                      className={styles.randomizeBtn}
-                      onClick={() => setValue("realmName", generateRandomRealmName())}
-                      title="Randomize Realm Name"
-                    >
-                      <Sparkles size={16} />
-                    </button>
+                    <Tooltip content="Generate a fresh random realm name.">
+                      <button
+                        type="button"
+                        className={styles.randomizeBtn}
+                        onClick={() => setValue("realmName", generateRandomRealmName())}
+                      >
+                        <Sparkles size={16} />
+                      </button>
+                    </Tooltip>
                   </div>
                   <div className={styles.field}>
                     <Input
                       label="Your Name"
+                      tooltip="This name is shown to everyone in the realm."
                       {...form.register("displayName")}
                       placeholder="e.g. Archmage Aethelgard"
                       disabled={isSubmitting}
@@ -291,15 +301,16 @@ export function CreateRealmPage() {
                   </div>
                   <div className={styles.optionRow}>
                     {(["FIBONACCI", "SHORT_FIBONACCI", "TSHIRT", "CUSTOM"] as const).map(type => (
-                      <Button
-                        key={type}
-                        type="button"
-                        variant={selectedDeckType === type ? "secondary" : "primary"}
-                        onClick={() => setValue("deckType", type)}
-                        className={`w-full min-h-[44px] h-[48px] px-2 py-0 !text-[0.6rem] sm:!text-[0.7rem] leading-none tracking-widest ${selectedDeckType !== type ? 'opacity-70 hover:opacity-100 grayscale-[0.6] hover:grayscale-0' : ''}`}
-                      >
-                        {type === "SHORT_FIBONACCI" ? "Short Fib." : type === "TSHIRT" ? "T-Shirt" : type.replace("_", " ")}
-                      </Button>
+                      <Tooltip key={type} content={deckTooltips[type]}>
+                        <Button
+                          type="button"
+                          variant={selectedDeckType === type ? "secondary" : "primary"}
+                          onClick={() => setValue("deckType", type)}
+                          className={`w-full min-h-[44px] h-[48px] px-2 py-0 !text-[0.6rem] sm:!text-[0.7rem] leading-none tracking-widest ${selectedDeckType !== type ? 'opacity-70 hover:opacity-100 grayscale-[0.6] hover:grayscale-0' : ''}`}
+                        >
+                          {type === "SHORT_FIBONACCI" ? "Short Fib." : type === "TSHIRT" ? "T-Shirt" : type.replace("_", " ")}
+                        </Button>
+                      </Tooltip>
                     ))}
                   </div>
 
@@ -312,6 +323,7 @@ export function CreateRealmPage() {
                     >
                       <Input
                         label="Custom Values"
+                        tooltip="Comma-separated rune values. Use ? to allow abstain."
                         helper="Comma separated runes. Max 24."
                         {...form.register("customDeckValuesInput")}
                         placeholder="0, 1, 2, 3, 5, 8, ?"
@@ -353,6 +365,7 @@ export function CreateRealmPage() {
                       icon={Eye}
                       label="Auto Reveal"
                       description="When all voted"
+                      tooltip="Automatically reveal results once all players vote."
                       {...form.register("autoReveal")}
                       disabled={isSubmitting}
                       rowClassName={styles.toggleItem}
@@ -362,6 +375,7 @@ export function CreateRealmPage() {
                       icon={UserX}
                       label="Allow Abstain"
                       description="Permit uncertainty"
+                      tooltip="Adds a '?' rune so players can abstain."
                       {...form.register("allowAbstain")}
                       disabled={isSubmitting}
                       rowClassName={styles.toggleItem}
@@ -371,6 +385,7 @@ export function CreateRealmPage() {
                       icon={EyeOff}
                       label="Hide Counts"
                       description="Until reveal"
+                      tooltip="Hide how many votes are in until the reveal."
                       {...form.register("hideVoteCounts")}
                       disabled={isSubmitting}
                       rowClassName={styles.toggleItem}
@@ -401,21 +416,23 @@ export function CreateRealmPage() {
             </div>
 
             <div className={styles.actions}>
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                variant="primary"
-                className="w-full md:w-auto min-w-[300px] h-14 text-lg tracking-[0.2em] uppercase"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="animate-spin mr-2" />
-                    Summoning...
-                  </>
-                ) : (
-                  "Create Realm"
-                )}
-              </Button>
+              <Tooltip content="Create the realm and enter as the facilitator.">
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  variant="primary"
+                  className="w-full md:w-auto min-w-[300px] h-14 text-lg tracking-[0.2em] uppercase"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="animate-spin mr-2" />
+                      Summoning...
+                    </>
+                  ) : (
+                    "Create Realm"
+                  )}
+                </Button>
+              </Tooltip>
               <p className={styles.disclaimer}>
                 By entering the realm, you agree to the{" "}
                 <a className={styles.inlineLink} href="/code-of-conduct">Code of Conduct</a>.
