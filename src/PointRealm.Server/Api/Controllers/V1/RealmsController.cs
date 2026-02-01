@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PointRealm.Server.Domain.Entities;
-using PointRealm.Server.Domain.ValueObjects;
 using PointRealm.Server.Infrastructure.Persistence;
 using PointRealm.Server.Infrastructure.Services;
+using PointRealm.Server.Application.Services;
 using PointRealm.Shared.V1.Api;
 
 namespace PointRealm.Server.Api.Controllers.V1;
@@ -19,9 +19,11 @@ namespace PointRealm.Server.Api.Controllers.V1;
 [Route("api/v1/realms")]
 public class RealmsController(
     PointRealmDbContext dbContext,
-    RealmCodeGenerator codeGenerator,
-    RealmAuthorizationService authService,
-    QuestCsvService csvService,
+    IRealmCodeGenerator codeGenerator,
+    IRealmSettingsService settingsService,
+    IRealmHistoryService historyService,
+    IRealmAuthorizationService authService,
+    IQuestCsvService csvService,
     MemberTokenService tokenService) : ControllerBase
 {
     private const string DefaultTheme = "dark-fantasy-arcane";
@@ -48,7 +50,7 @@ public class RealmsController(
             : request.ThemeKey;
 
         // Build settings from request or use defaults
-        var settings = BuildRealmSettings(request.Settings);
+        var settings = settingsService.BuildRealmSettings(request.Settings);
 
         // Get authenticated user ID if available
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -77,7 +79,7 @@ public class RealmsController(
             Name = realm.Name,
             JoinUrl = $"/realm/{realm.Code}",
             ThemeKey = realm.Theme,
-            Settings = MapToSettingsDto(realm.Settings)
+            Settings = settingsService.MapToSettingsDto(realm.Settings)
         };
 
         return Ok(response);
@@ -125,7 +127,7 @@ public class RealmsController(
             Code = realm.Code,
             Name = realm.Name,
             ThemeKey = realm.Theme,
-            Settings = MapToSettingsDto(realm.Settings),
+            Settings = settingsService.MapToSettingsDto(realm.Settings),
             MemberCount = realm.Members.Count,
             QuestCount = realm.Quests.Count,
             CreatedAt = realm.CreatedAt
@@ -259,63 +261,13 @@ public class RealmsController(
         }
 
         // Update settings using the UpdateSettings method
-        var newSettings = BuildRealmSettings(request, realm.Settings);
+        var newSettings = settingsService.BuildRealmSettings(request, realm.Settings);
         realm.UpdateSettings(newSettings);
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Ok(MapToSettingsDto(newSettings));
+        return Ok(settingsService.MapToSettingsDto(newSettings));
     }
-
-    #region Helper Methods
-
-    private static RealmSettings BuildRealmSettings(RealmSettingsRequest? request, RealmSettings? existing = null)
-    {
-        var deck = RuneDeck.Standard(); // Default deck
-        
-        if (request?.DeckType is not null)
-        {
-            deck = request.DeckType.ToUpperInvariant() switch
-            {
-                "FIBONACCI" => RuneDeck.Fibonacci(),
-                "SHORT_FIBONACCI" => RuneDeck.ShortFibonacci(),
-                "TSHIRT" => RuneDeck.TShirt(),
-                "CUSTOM" when request.CustomDeckValues != null => RuneDeck.Custom(request.CustomDeckValues),
-                _ => RuneDeck.Standard()
-            };
-        }
-        else if (existing is not null)
-        {
-            deck = existing.Deck;
-        }
-
-        var autoReveal = request?.AutoReveal ?? existing?.AutoReveal ?? false;
-        var allowAbstain = request?.AllowAbstain ?? existing?.AllowAbstain ?? true;
-        var hideVoteCounts = request?.HideVoteCounts ?? existing?.HideVoteCounts ?? false;
-
-        return new RealmSettings(deck, autoReveal, allowAbstain, hideVoteCounts);
-    }
-
-    private static RealmSettingsDto MapToSettingsDto(RealmSettings settings)
-    {
-        return new RealmSettingsDto
-        {
-            Deck = new RuneDeckDto
-            {
-                Name = settings.Deck.Name,
-                Cards = settings.Deck.Cards.Select(c => new RuneCardDto
-                {
-                    Label = c.Label,
-                    Value = c.Value
-                }).ToList()
-            },
-            AutoReveal = settings.AutoReveal,
-            AllowAbstain = settings.AllowAbstain,
-            HideVoteCounts = settings.HideVoteCounts
-        };
-    }
-
-    #endregion
 
     #region User Realms & History
 
@@ -432,60 +384,7 @@ public class RealmsController(
                 type: "Realm.NotFound");
         }
 
-        // Build history by grouping encounters by quest
-        var questHistories = realm.Quests
-            .OrderBy(q => q.Order)
-            .Select(quest =>
-            {
-                // Get all completed (revealed) encounters for this quest
-                var completedEncounters = realm.Encounters
-                    .Where(e => e.QuestId == quest.Id && e.Status == Domain.Entities.EncounterStatus.Revealed)
-                    .OrderBy(e => e.Id) // Order by creation (could add timestamp if needed)
-                    .Select(encounter =>
-                    {
-                        var votes = encounter.Votes.Select(v =>
-                        {
-                            var member = realm.Members.FirstOrDefault(m => m.Id == v.PartyMemberId);
-                            return new VoteHistory
-                            {
-                                MemberId = v.PartyMemberId,
-                                MemberName = member?.Name ?? "Unknown",
-                                VoteValue = v.Value.Label
-                            };
-                        }).ToList();
-
-                        // Build distribution
-                        var distribution = votes
-                            .GroupBy(v => v.VoteValue)
-                            .ToDictionary(g => g.Key, g => g.Count());
-
-                        return new EncounterHistory
-                        {
-                            EncounterId = encounter.Id,
-                            CompletedAt = DateTime.UtcNow, // Could add actual timestamp to Encounter entity
-                            SealedOutcome = encounter.Outcome,
-                            Votes = votes,
-                            Distribution = distribution
-                        };
-                    }).ToList();
-
-                return new QuestHistory
-                {
-                    QuestId = quest.Id,
-                    Title = quest.Title,
-                    Description = quest.Description,
-                    ExternalId = quest.ExternalId,
-                    ExternalUrl = quest.ExternalUrl,
-                    Order = quest.Order,
-                    Encounters = completedEncounters
-                };
-            }).ToList();
-
-        var response = new RealmHistoryResponse
-        {
-            RealmCode = realm.Code,
-            QuestHistories = questHistories
-        };
+        var response = historyService.BuildRealmHistory(realm);
 
         return Ok(response);
     }
