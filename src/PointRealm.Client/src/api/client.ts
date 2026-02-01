@@ -5,8 +5,16 @@ import { getAuthToken } from '../lib/storage/auth';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
+type ApiErrorData = Record<string, unknown> | null;
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const getErrorMessage = (data: unknown) =>
+  isRecord(data) && typeof data.message === 'string' ? data.message : undefined;
+
 export class ApiError extends Error {
-  constructor(public status: number, public message: string, public data?: any) {
+  constructor(public status: number, public message: string, public data?: ApiErrorData) {
     super(message);
   }
 }
@@ -16,7 +24,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   
   // Check for realm-specific token in session storage
   // Endpoints typically look like /realms/{code}/...
-  const realmMatch = endpoint.match(/\/realms\/([^\/]+)/);
+  const realmMatch = endpoint.match(/\/realms\/([^/]+)/);
   let authHeader = {};
   
   if (realmMatch && realmMatch[1]) {
@@ -45,11 +53,12 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
   if (!response.ok) {
     let errorMessage = 'An error occurred';
-    let errorData = null;
+    let errorData: ApiErrorData = null;
     
     try {
-      errorData = await response.json();
-      errorMessage = errorData.message || response.statusText;
+      const payload = await response.json();
+      errorData = isRecord(payload) ? payload : null;
+      errorMessage = getErrorMessage(payload) ?? response.statusText;
     } catch {
       errorMessage = response.statusText;
     }
@@ -71,8 +80,8 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
 export const api = {
   get: <T>(endpoint: string, options?: RequestInit) => request<T>(endpoint, { method: 'GET', ...options }),
-  post: <T>(endpoint: string, body: any, options?: RequestInit) => request<T>(endpoint, { method: 'POST', body: JSON.stringify(body), ...options }),
-  put: <T>(endpoint: string, body: any, options?: RequestInit) => request<T>(endpoint, { method: 'PUT', body: JSON.stringify(body), ...options }),
-  patch: <T>(endpoint: string, body: any, options?: RequestInit) => request<T>(endpoint, { method: 'PATCH', body: JSON.stringify(body), ...options }),
+  post: <T>(endpoint: string, body: unknown, options?: RequestInit) => request<T>(endpoint, { method: 'POST', body: JSON.stringify(body), ...options }),
+  put: <T>(endpoint: string, body: unknown, options?: RequestInit) => request<T>(endpoint, { method: 'PUT', body: JSON.stringify(body), ...options }),
+  patch: <T>(endpoint: string, body: unknown, options?: RequestInit) => request<T>(endpoint, { method: 'PATCH', body: JSON.stringify(body), ...options }),
   delete: <T>(endpoint: string, options?: RequestInit) => request<T>(endpoint, { method: 'DELETE', ...options }),
 };

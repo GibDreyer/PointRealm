@@ -1,4 +1,5 @@
 import React from "react";
+import type { UseFormRegisterReturn } from "react-hook-form";
 import styles from "./ToggleRow.module.css";
 
 interface ToggleRowProps {
@@ -6,7 +7,7 @@ interface ToggleRowProps {
   label: string;
   description: string;
   icon?: React.ReactNode;
-  register: any;
+  register: UseFormRegisterReturn;
   disabled?: boolean;
 }
 

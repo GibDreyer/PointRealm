@@ -19,6 +19,7 @@ import { SummoningCircle } from '../../components/ui/SummoningCircle';
 import { BackButton } from '../../components/ui/BackButton';
 import { Button } from '../../components/Button';
 import styles from './lobby.module.css';
+import type { RealmStateDto } from '../../types/realm';
 
 function LobbySkeleton() {
     return (
@@ -83,7 +84,7 @@ export function TavernLobbyPage() {
             }
         };
 
-        const onStateUpdated = (state: any) => {
+        const onStateUpdated = (state: RealmStateDto) => {
             if (state.encounter) {
                 navigate(`/realm/${realmCode}`);
             }

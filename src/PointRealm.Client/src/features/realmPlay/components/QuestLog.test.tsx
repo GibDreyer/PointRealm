@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import type { ReactNode } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { QuestLog } from './QuestLog';
 
@@ -15,19 +16,19 @@ vi.mock('framer-motion', async () => {
   return {
     ...actual,
     Reorder: {
-      Group: ({ children }: any) => (
+      Group: ({ children }: { children: ReactNode }) => (
         <div data-testid="reorder-group">
           {children}
           {/* Expose a way to trigger reorder for testing if needed, or just skip drag test */}
         </div>
       ),
-      Item: ({ children, value, ...props }: any) => (
+      Item: ({ children, value, ...props }: { children: ReactNode; value: { id: string }; [key: string]: unknown }) => (
          <div data-testid={`reorder-item-${value.id}`} {...props}>
             {children}
          </div>
       ),
     },
-     AnimatePresence: ({ children }: any) => <>{children}</>,
+     AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,
   };
 });
 

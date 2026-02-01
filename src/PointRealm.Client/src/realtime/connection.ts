@@ -23,6 +23,11 @@ export function buildConnection({
   memberToken,
   clientId,
 }: ConnectionParams): signalR.HubConnection {
+  const reconnectPolicy: signalR.IRetryPolicy = {
+    nextRetryDelayInMilliseconds: ({ previousRetryCount }) =>
+      retryDelay(previousRetryCount) ?? null,
+  };
+
   const connection = new signalR.HubConnectionBuilder()
     .withUrl(baseUrl || DEFAULT_HUB_URL, {
       accessTokenFactory: () => memberToken,
@@ -34,10 +39,7 @@ export function buildConnection({
         signalR.HttpTransportType.ServerSentEvents |
         signalR.HttpTransportType.LongPolling,
     })
-    .withAutomaticReconnect({
-      nextRetryDelayInMilliseconds: ({ previousRetryCount }) =>
-        retryDelay(previousRetryCount),
-    })
+    .withAutomaticReconnect(reconnectPolicy)
     .build();
 
   connection.serverTimeoutInMilliseconds = 60000;

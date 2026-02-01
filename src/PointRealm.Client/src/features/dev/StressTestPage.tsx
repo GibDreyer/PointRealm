@@ -10,6 +10,13 @@ import { generateRandomRealmName, generateRandomQuestName, generateBotName } fro
 import { ThemePicker } from "@/features/createRealm/components/ThemePicker";
 import { useTheme } from "@/theme/ThemeProvider";
 import { getClientId } from "@/lib/storage";
+import type { Quest, RealmStateDto } from "@/types/realm";
+
+const getErrorMessage = (error: unknown) => {
+    if (!error || typeof error !== "object") return "Unknown error";
+    const maybeError = error as { message?: string };
+    return maybeError.message || "Unknown error";
+};
 
 export function StressTestPage() {
     // Extra safety check in case route leaks
@@ -87,8 +94,8 @@ export function StressTestPage() {
             sessionStorage.setItem(`pointrealm:v1:realm:${code}:memberId`, gmJoin.memberId);
 
             // Setup state listener to catch updates
-            let latestState: any = null;
-            const handleStateUpdate = (state: any) => { latestState = state; };
+            let latestState: RealmStateDto | undefined;
+            const handleStateUpdate = (state: RealmStateDto) => { latestState = state; };
 
             const gmClientId = getClientId();
             mainClient = new RealmRealtimeClient({ clientId: gmClientId });
@@ -102,13 +109,14 @@ export function StressTestPage() {
             // 3. Create Quest & Start Encounter
             log("Adding Quest...");
             const questName = generateRandomQuestName();
-            if (!latestState?.questLogVersion) {
+            const questLogVersion = latestState?.questLogVersion;
+            if (!questLogVersion) {
                 throw new Error("Missing quest log version.");
             }
             const addQuestResult = await mainClient.addQuest({
                 title: questName,
                 description: "Testing load with " + botCount + " bots.",
-                questLogVersion: latestState.questLogVersion,
+                questLogVersion,
             });
             let questId = addQuestResult?.payload;
             
@@ -119,7 +127,7 @@ export function StressTestPage() {
                 if (!latestState) await new Promise(r => setTimeout(r, 1000));
                 
                 const quests = latestState?.questLog?.quests || [];
-                const found = quests.find((q: any) => q.title === questName);
+                const found = quests.find((q: Quest) => q.title === questName);
                 if (found) questId = found.id;
             }
 
@@ -128,13 +136,14 @@ export function StressTestPage() {
             }
 
             log(`Quest added: ${questId}. Starting encounter...`);
-            const questVersion = (latestState?.questLog?.quests || []).find((q: any) => q.id === questId)?.version;
-            if (!latestState?.realmVersion || !questVersion) {
+            const questVersion = (latestState?.questLog?.quests || []).find((q: Quest) => q.id === questId)?.version;
+            const realmVersion = latestState?.realmVersion;
+            if (!realmVersion || !questVersion) {
                 throw new Error("Missing realm or quest version.");
             }
             await mainClient.startEncounter({
                 questId,
-                realmVersion: latestState.realmVersion,
+                realmVersion,
                 questVersion,
             });
             log("Encounter Started.");
@@ -162,7 +171,7 @@ export function StressTestPage() {
                 });
                 
                 if (!joinRes.ok) throw new Error(`Bot ${botName} failed to join`);
-                const botJoin = await joinRes.json();
+                const botJoin = await joinRes.json() as { memberToken: string };
                 
                 // Connect SignalR
                 await botClient.connect({ realmCode: code, memberToken: botJoin.memberToken, clientId: botClientId });
@@ -188,7 +197,10 @@ export function StressTestPage() {
                 const delayMs = Math.floor(Math.random() * (maxDelay - minDelay + 1) + minDelay) * 1000;
                 await new Promise(r => setTimeout(r, delayMs));
 
-                const val = botDeck[Math.floor(Math.random() * botDeck.length)];
+                const val = botDeck[Math.floor(Math.random() * botDeck.length)] ?? botDeck[0];
+                if (!val) {
+                    throw new Error("No deck value available for bot vote.");
+                }
                 try {
                     const encounterVersion = latestState?.encounter?.version;
                     if (!encounterVersion) {
@@ -200,8 +212,8 @@ export function StressTestPage() {
                     });
                     votesCast++;
                     // log(`Bot voted ${val} after ${delayMs/1000}s`);
-                } catch (e) {
-                    console.error("Bot vote failed", e);
+                } catch (error) {
+                    console.error("Bot vote failed", error);
                 }
             }));
 
@@ -210,9 +222,9 @@ export function StressTestPage() {
             // Clean up listener
             unsubscribeState();
 
-        } catch (err: any) {
+        } catch (err) {
             console.error(err);
-            log(`ERROR: ${err.message}`);
+            log(`ERROR: ${getErrorMessage(err)}`);
         } finally {
             await Promise.all(bots.map((bot) => bot.disconnect().catch(() => undefined)));
             if (mainClient) {

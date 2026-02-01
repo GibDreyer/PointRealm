@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '../lib/utils';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { motion, HTMLMotionProps, type MotionStyle } from 'framer-motion';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
 
@@ -128,6 +128,12 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
   const textColor = variant === 'ghost' ? 'var(--pr-text-muted)' : '#ffffff';
   const glowShadow = variant === 'ghost' ? '' : `0 0 40px color-mix(in srgb, ${baseColorVar}, transparent 55%)`;
 
+  const mergedStyle = {
+    ...(style ?? {}),
+    ...cssVariables,
+    color: textColor,
+  } as MotionStyle;
+
   return (
     <motion.button 
       ref={ref}
@@ -142,11 +148,7 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
         fullWidth ? "w-full" : "w-auto",
         className
       )}
-      style={{
-        ...style as any,
-        ...cssVariables,
-        color: textColor,
-      }}
+      style={mergedStyle}
       {...filteredProps}
     >
       {/* 1. High-Fidelity RPG SVG Background */}

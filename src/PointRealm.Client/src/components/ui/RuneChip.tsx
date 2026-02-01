@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
-import { motion } from 'framer-motion';
+import { motion, type MotionStyle } from 'framer-motion';
 
 interface RuneChipProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
@@ -13,8 +13,9 @@ export const RuneChip: React.FC<RuneChipProps> = ({
   className, 
   ...props 
 }) => {
-  // Omit conflicting props from props to avoid type errors with motion.button
-  const { onAnimationStart, onDrag, onDragEnd, onDragStart, style, ...filteredProps } = props;
+  const { style, ...filteredProps } = props;
+
+  const styleProp = style ? { style: style as MotionStyle } : {};
 
   return (
     <motion.button
@@ -27,7 +28,7 @@ export const RuneChip: React.FC<RuneChipProps> = ({
           : "text-[var(--pr-text-muted)] hover:text-white",
         className
       )}
-      style={style as any}
+      {...styleProp}
       {...filteredProps}
     >
       {/* Background Texture */}

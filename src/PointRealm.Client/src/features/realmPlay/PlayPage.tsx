@@ -38,7 +38,7 @@ export function PlayPage() {
         );
     }
 
-    const activeQuest = state?.questLog?.quests.find((q: any) => state.encounter && q.id === state.encounter.questId);
+    const activeQuest = state?.questLog?.quests.find((q) => state.encounter && q.id === state.encounter.questId);
 
     return (
         <PageShell

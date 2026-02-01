@@ -5,7 +5,7 @@ import { Encounter, PartyMember, Quest } from '../../../types/realm';
 import { PlayerSeat } from './PlayerSeat';
 import { cn } from '../../../lib/utils';
 import { Button } from '../../../components/Button';
-import { RefreshCcw, Eye, ChartBar, Link2, Check } from 'lucide-react';
+import { RefreshCcw, Eye, ChartBar } from 'lucide-react';
 import { ProphecyReveal } from '../../reveal/ProphecyReveal';
 import { Dialog } from '../../../components/ui/Dialog';
 import { useProphecyStats } from '../../reveal/utils/statsHooks';

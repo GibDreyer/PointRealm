@@ -28,6 +28,32 @@ import styles from './joinRealm.module.css';
 
 export type RealmRole = 'participant' | 'observer';
 
+interface JoinRealmResponse {
+  memberToken?: string;
+  memberId?: string;
+  realmName?: string;
+  themeKey?: string;
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const getJoinErrorMessage = (error: unknown) => {
+  const record = isRecord(error) ? error : null;
+  const status = record && typeof record.status === 'number' ? record.status : undefined;
+  const message = record && typeof record.message === 'string' ? record.message : undefined;
+  const data = record && isRecord(record.data) ? record.data : null;
+  const detail = data && typeof data.detail === 'string' ? data.detail : undefined;
+
+  if (status === 404) return 'That realm does not exist.';
+  if (status === 410) return 'That invite has expired. Ask the host for a new link.';
+  if (status === 429) return 'Too many attempts. Try again shortly.';
+  if (!status && (message === 'Failed to fetch' || message === 'Network Error')) {
+    return 'Network error. Check your connection.';
+  }
+  return detail ?? message ?? 'Unable to join the realm.';
+};
+
 export function JoinRealmPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -94,7 +120,7 @@ export function JoinRealmPage() {
     setIsLoading(true);
 
     try {
-      const response = await api.post<any>(`/realms/${code}/join`, {
+      const response = await api.post<JoinRealmResponse>(`/realms/${code}/join`, {
         displayName: nameToUse,
         role: roleToUse
       });
@@ -116,26 +142,9 @@ export function JoinRealmPage() {
       });
 
       navigate(`/realm/${code}`);
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      let msg = 'Unable to join the realm.';
-      const status = err.status;
-
-      if (status === 404) {
-        msg = 'That realm does not exist.';
-      } else if (status === 410) {
-        msg = 'That invite has expired. Ask the host for a new link.';
-      } else if (status === 429) {
-        msg = 'Too many attempts. Try again shortly.';
-      } else if (!status && (err.message === 'Failed to fetch' || err.message === 'Network Error')) {
-        msg = 'Network error. Check your connection.';
-      } else if (err.data?.detail) {
-        msg = err.data.detail;
-      } else if (err.message) {
-        msg = err.message;
-      }
-
-      setError(msg);
+      setError(getJoinErrorMessage(err));
     } finally {
       setIsLoading(false);
     }

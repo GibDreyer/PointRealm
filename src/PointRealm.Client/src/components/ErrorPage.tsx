@@ -4,8 +4,14 @@ import { BackButton } from "./ui/BackButton";
 import { Panel } from "./ui/Panel";
 import { PageHeader } from "./ui/PageHeader";
 
+const getErrorMessage = (error: unknown) => {
+  if (!error || typeof error !== "object") return "Unknown error";
+  const maybeError = error as { statusText?: string; message?: string };
+  return maybeError.statusText || maybeError.message || "Unknown error";
+};
+
 export function ErrorPage() {
-  const error = useRouteError() as any;
+  const error = useRouteError();
   console.error(error);
 
   return (
@@ -23,7 +29,7 @@ export function ErrorPage() {
             The spell has backfired in an unforeseen way.
           </p>
           <div className="p-3 bg-red-900/20 border border-red-500/30 rounded text-red-400 text-sm font-mono break-all">
-            {error.statusText || error.message || "Unknown error"}
+            {getErrorMessage(error)}
           </div>
         </Panel>
       </div>

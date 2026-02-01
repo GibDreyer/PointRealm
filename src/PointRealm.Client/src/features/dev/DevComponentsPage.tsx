@@ -6,25 +6,38 @@ import { PartyRosterPanel } from '../realmPlay/components/PartyRosterPanel';
 import { useToast } from '../../components/ui/ToastSystem';
 import { ProphecyReveal } from '../reveal/ProphecyReveal';
 import { BackButton } from '../../components/ui/BackButton';
+import type { Encounter, PartyMember, Quest } from '../../types/realm';
 
 export const DevComponentsPage: React.FC = () => {
   const [selectedRune, setSelectedRune] = useState<string | null>(null);
   const [hideVotes, setHideVotes] = useState(false);
   const { toast } = useToast();
 
-  const [quests] = useState<any[]>([
-    { id: '1', title: 'Determine Project Scope', status: 'active' },
-    { id: '2', title: 'Select Tech Stack', status: 'completed', estimate: '5' },
-    { id: '3', title: 'Design Database Schema', status: 'pending' },
-    { id: '4', title: 'Implement Authentication', status: 'pending' },
+  const [quests] = useState<Quest[]>([
+    { id: '1', title: 'Determine Project Scope', description: '', status: 'Active', order: 1 },
+    { id: '2', title: 'Select Tech Stack', description: '', status: 'Completed', order: 2, sealedEstimate: '5' },
+    { id: '3', title: 'Design Database Schema', description: '', status: 'Pending', order: 3 },
+    { id: '4', title: 'Implement Authentication', description: '', status: 'Pending', order: 4 },
   ]);
 
-  const [members] = useState<any[]>([
+  const [members] = useState<PartyMember[]>([
     { id: '1', name: 'Gandalf (GM)', role: 'GM', isOnline: true, status: 'ready' },
-    { id: '2', name: 'Aragorn', role: 'Traveler', isOnline: true, status: 'choosing' },
-    { id: '3', name: 'Legolas', role: 'Traveler', isOnline: true, status: 'resting' },
-    { id: '4', name: 'Gimli', role: 'Traveler', isOnline: false, status: 'resting' },
+    { id: '2', name: 'Aragorn', role: 'Member', isOnline: true, status: 'choosing' },
+    { id: '3', name: 'Legolas', role: 'Member', isOnline: true, status: 'ready' },
+    { id: '4', name: 'Gimli', role: 'Member', isOnline: false, status: 'disconnected' },
   ]);
+
+  const demoEncounter: Encounter = {
+    questId: '1',
+    isRevealed: true,
+    votes: {
+      '1': '5',
+      '2': '8',
+      '3': '5',
+      '4': '3'
+    },
+    distribution: {},
+  };
 
   return (
     <RealmShell>
@@ -61,18 +74,7 @@ export const DevComponentsPage: React.FC = () => {
                 {selectedRune === 'REVEAL_DEMO' ? (
                     <div className="w-full h-[600px] border border-pr-border/20 rounded-xl overflow-hidden bg-pr-bg/40 backdrop-blur-sm p-6">
                         <ProphecyReveal 
-                            encounter={{
-                                id: 'dev-enc',
-                                questId: '1',
-                                status: 'Active',
-                                isRevealed: true,
-                                votes: {
-                                    '1': '5',
-                                    '2': '8',
-                                    '3': '5',
-                                    '4': '3'
-                                }
-                            } as any}
+                            encounter={demoEncounter}
                             partyRoster={members}
                             isGM={true}
                             deckValues={['1','2','3','5','8','13','?']}
