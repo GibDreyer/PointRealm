@@ -62,6 +62,7 @@ export function RuneCard({
                 "relative aspect-[2/3] w-full min-w-[70px] max-w-[120px]",
                 "flex flex-col items-center justify-center transition-all duration-500",
                 "group outline-none",
+                isCardSelected && "pr-rune-card-selected",
                 disabled && !isCardSelected && "opacity-40 grayscale-[80%] cursor-not-allowed",
                 className
             )}

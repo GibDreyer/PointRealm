@@ -25,18 +25,18 @@ export const PageFooter: React.FC<PageFooterProps> = ({
     <footer className={[styles.footer, className].filter(Boolean).join(" ")}>
       {backLinkLabel && (
         backLinkHref ? (
-          <a className={styles.backLink} href={backLinkHref}>
+          <a className={`${styles.backLink} pr-interactive`} href={backLinkHref}>
             {backLinkLabel}
           </a>
         ) : (
-          <button type="button" className={styles.backLink} onClick={onBackClick}>
+          <button type="button" className={`${styles.backLink} pr-interactive`} onClick={onBackClick}>
             {backLinkLabel}
           </button>
         )
       )}
       <p className={styles.microcopy}>{microcopy}</p>
       <a
-        className={styles.tip}
+        className={`${styles.tip} pr-interactive`}
         href={tipUrl}
         target={tipIsExternal ? "_blank" : undefined}
         rel={tipIsExternal ? "noopener noreferrer" : undefined}
