@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { HubConnectionState } from '@microsoft/signalr';
+import type { HubConnection } from '@microsoft/signalr';
 import { RealmRealtimeClient } from '../realmClient';
 
 class FakeConnection {
@@ -11,8 +12,8 @@ class FakeConnection {
     this.state = HubConnectionState.Disconnected;
   });
   invoke = vi.fn(async () => undefined);
-  on = vi.fn((_event: string, _handler: (...args: any[]) => void) => undefined);
-  off = vi.fn((_event: string) => undefined);
+  on = vi.fn(() => undefined);
+  off = vi.fn(() => undefined);
   onreconnecting = vi.fn((handler: () => void) => {
     this.reconnectingHandler = handler;
   });
@@ -36,7 +37,7 @@ describe('RealmRealtimeClient', () => {
   });
 
   it('connect registers handlers once', async () => {
-    const buildConnection = vi.fn(() => connection as any);
+    const buildConnection = vi.fn(() => connection as unknown as HubConnection);
     const client = new RealmRealtimeClient({
       clientId: 'client-1',
       buildConnection,
@@ -50,7 +51,7 @@ describe('RealmRealtimeClient', () => {
   });
 
   it('disconnect stops connection and removes handlers', async () => {
-    const buildConnection = vi.fn(() => connection as any);
+    const buildConnection = vi.fn(() => connection as unknown as HubConnection);
     const client = new RealmRealtimeClient({
       clientId: 'client-1',
       buildConnection,
@@ -65,7 +66,7 @@ describe('RealmRealtimeClient', () => {
   });
 
   it('reconnect triggers resync', async () => {
-    const buildConnection = vi.fn(() => connection as any);
+    const buildConnection = vi.fn(() => connection as unknown as HubConnection);
     const client = new RealmRealtimeClient({
       clientId: 'client-1',
       buildConnection,
@@ -85,8 +86,8 @@ describe('RealmRealtimeClient', () => {
     const secondConnection = new FakeConnection();
 
     const buildConnection = vi.fn()
-      .mockReturnValueOnce(firstConnection as any)
-      .mockReturnValueOnce(secondConnection as any);
+      .mockReturnValueOnce(firstConnection as unknown as HubConnection)
+      .mockReturnValueOnce(secondConnection as unknown as HubConnection);
 
     const refreshMemberToken = vi.fn(async () => 'new-token');
 

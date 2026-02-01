@@ -19,7 +19,7 @@ export function Tooltip({ content, children, className, side = "top" }: TooltipP
             const rect = triggerRef.current.getBoundingClientRect();
             // Simple positioning logic
             let top = rect.top;
-            let left = rect.left + rect.width / 2;
+            const left = rect.left + rect.width / 2;
 
             if (side === "top") top = rect.top - 8;
             if (side === "bottom") top = rect.bottom + 8;

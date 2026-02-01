@@ -32,6 +32,15 @@ interface UseRealmResult {
   connect: (code: string) => Promise<void>;
 }
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (!isRecord(error)) return fallback;
+  const message = typeof error.message === 'string' ? error.message : undefined;
+  return message ?? fallback;
+};
+
 export function useRealm(realmCode?: string): UseRealmResult {
   const navigate = useNavigate();
   const client = useRealmClient();
@@ -60,10 +69,10 @@ export function useRealm(realmCode?: string): UseRealmResult {
         const clientId = getClientId();
         await client.connect({ realmCode: code, memberToken: token, clientId });
         await client.joinPresence();
-      } catch (err: any) {
+      } catch (err) {
         setLastError({
           code: 'connection_failed',
-          message: err?.message || 'Failed to connect to realm.',
+          message: getErrorMessage(err, 'Failed to connect to realm.'),
         });
         setConnectionStatus('error');
       }
@@ -97,7 +106,7 @@ export function useRealm(realmCode?: string): UseRealmResult {
   const resolveEncounterVersion = () =>
     state?.encounter?.version ?? state?.encounterVersion ?? null;
 
-  const wrapAction = async (actionName: string, ...args: any[]) => {
+  const wrapAction = async (actionName: string, ...args: unknown[]) => {
     if (connectionStatus !== 'connected') {
       setLastError({
         code: 'connection_unavailable',
@@ -108,24 +117,24 @@ export function useRealm(realmCode?: string): UseRealmResult {
     try {
       const method = actionName as keyof typeof client;
       // We must call it as client[method](...args) or bind it to preserve 'this' context logic
-      // Casting to any to allow dynamic invocation but ensuring context
-      const handler = (client as any)[method];
+      const handler = client[method] as unknown;
       
       if (typeof handler === 'function') {
-        const result = await handler.call(client, ...args);
+        const result = await (handler as (...handlerArgs: unknown[]) => Promise<unknown>).call(client, ...args);
 
-        if (result?.success === false) {
+        if (isRecord(result) && result.success === false) {
+          const error = isRecord(result.error) ? result.error : undefined;
           setLastError({
-            code: result.error?.errorCode ?? 'action_failed',
-            message: result.error?.message ?? `Failed to invoke ${actionName}.`,
+            code: (error?.errorCode as string | undefined) ?? 'action_failed',
+            message: (error?.message as string | undefined) ?? `Failed to invoke ${actionName}.`,
           });
-          throw new Error(result.error?.message ?? `Failed to invoke ${actionName}.`);
+          throw new Error((error?.message as string | undefined) ?? `Failed to invoke ${actionName}.`);
         }
       }
-    } catch (err: any) {
+    } catch (err) {
       setLastError({
         code: 'action_failed',
-        message: err?.message || `Failed to invoke ${actionName}.`,
+        message: getErrorMessage(err, `Failed to invoke ${actionName}.`),
       });
       throw err;
     }

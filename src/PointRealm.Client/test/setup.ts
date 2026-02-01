@@ -13,11 +13,11 @@ class ResizeObserverStub {
 }
 
 if (!window.ResizeObserver) {
-  window.ResizeObserver = ResizeObserverStub as any;
+  window.ResizeObserver = ResizeObserverStub as typeof ResizeObserver;
 }
 
 if (!window.matchMedia) {
-  window.matchMedia = (query: string) =>
+  window.matchMedia = (query: string): MediaQueryList =>
     ({
       matches: false,
       media: query,
@@ -26,5 +26,5 @@ if (!window.matchMedia) {
       addListener: () => {},
       removeListener: () => {},
       dispatchEvent: () => false,
-    }) as any;
+    }) as MediaQueryList;
 }
