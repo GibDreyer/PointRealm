@@ -160,3 +160,122 @@ html, body {
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
 }
+
+/* Interactive UI flair */
+@keyframes pr-shimmer-sweep {
+  0% { transform: translateX(-140%) skewX(-18deg); opacity: 0; }
+  30% { opacity: 0.7; }
+  100% { transform: translateX(140%) skewX(-18deg); opacity: 0; }
+}
+
+@keyframes pr-arc-burst {
+  0% { transform: scale(0.6); opacity: 0; }
+  40% { opacity: 0.8; }
+  100% { transform: scale(1.2); opacity: 0; }
+}
+
+@keyframes pr-rune-surge {
+  0% { box-shadow: 0 0 0 rgba(230, 176, 78, 0); }
+  50% { box-shadow: 0 0 24px rgba(230, 176, 78, 0.55), 0 0 40px rgba(103, 232, 249, 0.25); }
+  100% { box-shadow: 0 0 0 rgba(230, 176, 78, 0); }
+}
+
+@keyframes pr-rune-shake {
+  0% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-1px) rotate(-1deg); }
+  50% { transform: translateY(1px) rotate(1deg); }
+  75% { transform: translateY(-1px) rotate(0deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+.pr-interactive {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 160ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.pr-interactive::before {
+  content: "";
+  position: absolute;
+  inset: -60%;
+  background: radial-gradient(circle, rgba(103, 232, 249, 0.25), transparent 60%);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 240ms ease, transform 240ms ease;
+  z-index: 0;
+}
+
+.pr-interactive::after {
+  content: "";
+  position: absolute;
+  inset: -120% 30%;
+  background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  opacity: 0;
+  transform: translateX(-140%) skewX(-18deg);
+  z-index: 0;
+}
+
+.pr-interactive:hover::before,
+.pr-interactive:focus-visible::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.pr-interactive:hover::after,
+.pr-interactive:focus-visible::after {
+  opacity: 0.9;
+  animation: pr-shimmer-sweep 1.3s ease-out;
+}
+
+.pr-interactive:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 0 12px rgba(103, 232, 249, 0.25);
+}
+
+.pr-interactive > * {
+  position: relative;
+  z-index: 1;
+}
+
+.pr-rune-chip {
+  position: relative;
+}
+
+.pr-rune-chip::after {
+  content: "";
+  position: absolute;
+  inset: -80%;
+  background: radial-gradient(circle, rgba(230, 176, 78, 0.4), transparent 65%);
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 220ms ease, transform 220ms ease;
+  z-index: 0;
+}
+
+.pr-rune-chip:hover::after,
+.pr-rune-chip:focus-visible::after {
+  opacity: 0.8;
+  transform: scale(1);
+  animation: pr-arc-burst 900ms ease-out;
+}
+
+.pr-rune-chip-active {
+  animation: pr-rune-surge 1.8s ease-in-out infinite, pr-rune-shake 360ms ease-out;
+}
+
+.pr-rune-card-selected {
+  animation: pr-rune-surge 2.2s ease-in-out infinite, pr-rune-shake 420ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pr-interactive,
+  .pr-interactive::before,
+  .pr-interactive::after,
+  .pr-rune-chip,
+  .pr-rune-chip::after,
+  .pr-rune-chip-active {
+    animation: none !important;
+    transition: none !important;
+  }
+}

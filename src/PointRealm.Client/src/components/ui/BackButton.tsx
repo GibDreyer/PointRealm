@@ -68,7 +68,7 @@ export const BackButton: React.FC<BackButtonProps> = ({
           hover:text-white hover:border-[var(--pr-primary-cyan)]
           hover:bg-[rgba(74,158,255,0.15)]
           hover:scale-110 hover:shadow-[0_0_15px_rgba(74,158,255,0.2)]
-          backdrop-blur-sm group
+          backdrop-blur-sm group pr-interactive
         "
       >
         <ArrowLeft className="w-[22px] h-[22px] transition-transform group-hover:-translate-x-0.5" />

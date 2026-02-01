@@ -22,9 +22,9 @@ export const RuneChip: React.FC<RuneChipProps> = ({
       whileHover={{ scale: 1.05, y: -2 }}
       whileTap={{ scale: 0.95 }}
       className={cn(
-        "relative group inline-flex items-center justify-center px-4 py-2 min-h-[36px] rounded-[4px] font-heading font-bold text-xs uppercase tracking-[0.1em] transition-all duration-300 select-none overflow-hidden",
+        "relative group inline-flex items-center justify-center px-4 py-2 min-h-[36px] rounded-[4px] font-heading font-bold text-xs uppercase tracking-[0.1em] transition-all duration-300 select-none overflow-hidden pr-rune-chip",
         active 
-          ? "text-black shadow-[0_0_15px_rgba(230,176,78,0.4)]" 
+          ? "text-black shadow-[0_0_15px_rgba(230,176,78,0.4)] pr-rune-chip-active" 
           : "text-[var(--pr-text-muted)] hover:text-white",
         className
       )}

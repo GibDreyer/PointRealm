@@ -46,7 +46,7 @@ export function ActionButton({
     const button = (
         <button
             className={cn(
-                "flex items-center gap-3 p-3 rounded-lg border transition-all",
+                "flex items-center gap-3 p-3 rounded-lg border transition-all pr-interactive",
                 "disabled:opacity-50 disabled:cursor-not-allowed",
                 variants[variant],
                 className
