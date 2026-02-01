@@ -3,13 +3,12 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using PointRealm.Server.Application.Abstractions;
 using PointRealm.Server.Domain.Entities;
 
 namespace PointRealm.Server.Infrastructure.Services;
 
-public record UserTokenResult(string AccessToken, DateTime ExpiresAt);
-
-public class UserTokenService(IOptions<UserTokenSettings> settings, IOptions<MemberTokenSettings> memberSettings)
+public class UserTokenService(IOptions<UserTokenSettings> settings, IOptions<MemberTokenSettings> memberSettings) : IUserTokenService
 {
     private readonly UserTokenSettings _settings = settings.Value;
     private readonly MemberTokenSettings _memberSettings = memberSettings.Value;

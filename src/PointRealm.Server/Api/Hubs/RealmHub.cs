@@ -2,7 +2,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using PointRealm.Server.Api.Services;
+using PointRealm.Server.Application.Abstractions;
+using PointRealm.Server.Application.Commands;
+using PointRealm.Server.Application.Commands.Encounter;
+using PointRealm.Server.Application.Commands.Handlers;
+using PointRealm.Server.Application.Commands.Member;
+using PointRealm.Server.Application.Commands.Quest;
 using PointRealm.Server.Infrastructure.Persistence;
 using PointRealm.Shared.V1.Realtime;
 
@@ -12,20 +17,26 @@ namespace PointRealm.Server.Api.Hubs;
 public class RealmHub : Hub<IRealmClient>
 {
     private readonly PointRealmDbContext _dbContext;
-    private readonly RealmStateMapper _mapper;
-    private readonly RealmCommandService _commandService;
+    private readonly IRealmStateMapper _mapper;
     private readonly IRealmBroadcaster _broadcaster;
+    private readonly MemberCommandHandler _memberHandler;
+    private readonly EncounterCommandHandler _encounterHandler;
+    private readonly QuestCommandHandler _questHandler;
 
     public RealmHub(
         PointRealmDbContext dbContext,
-        RealmStateMapper mapper,
-        RealmCommandService commandService,
-        IRealmBroadcaster broadcaster)
+        IRealmStateMapper mapper,
+        IRealmBroadcaster broadcaster,
+        MemberCommandHandler memberHandler,
+        EncounterCommandHandler encounterHandler,
+        QuestCommandHandler questHandler)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _commandService = commandService;
         _broadcaster = broadcaster;
+        _memberHandler = memberHandler;
+        _encounterHandler = encounterHandler;
+        _questHandler = questHandler;
     }
 
     public override async Task OnConnectedAsync()
@@ -101,51 +112,93 @@ public class RealmHub : Hub<IRealmClient>
     }
 
     public async Task<CommandResultDto> SetDisplayName(SetDisplayNameRequest request)
-        => await _commandService.SetDisplayNameAsync(await GetCommandContextAsync(), request);
+    {
+        var ctx = await GetCommandContextAsync();
+        return await _memberHandler.HandleAsync(new SetDisplayNameCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, request.Name, request.CommandId));
+    }
 
     public async Task<CommandResultDto> SetAvatarEmoji(SetAvatarEmojiRequest request)
-        => await _commandService.SetAvatarEmojiAsync(await GetCommandContextAsync(), request);
+    {
+        var ctx = await GetCommandContextAsync();
+        return await _memberHandler.HandleAsync(new SetAvatarEmojiCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, request.Emoji, 0, request.CommandId));
+    }
 
     public async Task<CommandResultDto> JoinPresence(JoinPresenceRequest request)
-        => await _commandService.JoinPresenceAsync(await GetCommandContextAsync(), request);
+    {
+        var ctx = await GetCommandContextAsync();
+        return await _memberHandler.HandleAsync(new JoinPresenceCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId));
+    }
 
     public async Task<CommandResultDto> LeavePresence(LeavePresenceRequest request)
-        => await _commandService.LeavePresenceAsync(await GetCommandContextAsync(), request);
+    {
+        var ctx = await GetCommandContextAsync();
+        return await _memberHandler.HandleAsync(new LeavePresenceCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId));
+    }
 
     public async Task<CommandResultDto> SelectRune(SelectRuneRequest request)
-        => await _commandService.SelectRuneAsync(await GetCommandContextAsync(), request);
+    {
+        var ctx = await GetCommandContextAsync();
+        return await _encounterHandler.HandleAsync(new SelectRuneCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, request.Value, request.EncounterVersion, request.CommandId));
+    }
 
     public async Task<CommandResultDto> StartEncounter(StartEncounterRequest request)
-        => await _commandService.StartEncounterAsync(await GetCommandContextAsync(), request);
+    {
+        var ctx = await GetCommandContextAsync();
+        return await _encounterHandler.HandleAsync(new StartEncounterCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, request.QuestId, request.RealmVersion, request.QuestVersion, request.CommandId));
+    }
 
     public async Task<CommandResultDto> RevealProphecy(RevealProphecyRequest request)
-        => await _commandService.RevealProphecyAsync(await GetCommandContextAsync(), request);
+    {
+        var ctx = await GetCommandContextAsync();
+        return await _encounterHandler.HandleAsync(new RevealProphecyCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, request.EncounterVersion, request.CommandId));
+    }
 
     public async Task<CommandResultDto> ReRollFates(ReRollFatesRequest request)
-        => await _commandService.ReRollFatesAsync(await GetCommandContextAsync(), request);
+    {
+        var ctx = await GetCommandContextAsync();
+        return await _encounterHandler.HandleAsync(new ReRollFatesCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, request.EncounterVersion, request.CommandId));
+    }
 
     public async Task<CommandResultDto> SealOutcome(SealOutcomeRequest request)
-        => await _commandService.SealOutcomeAsync(await GetCommandContextAsync(), request);
+    {
+        var ctx = await GetCommandContextAsync();
+        return await _encounterHandler.HandleAsync(new SealOutcomeCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, request.FinalValue, request.EncounterVersion, request.CommandId));
+    }
 
     public async Task<CommandResultWithPayloadDto<Guid>> AddQuest(AddQuestRequest request)
-        => await _commandService.AddQuestAsync(await GetCommandContextAsync(), request);
+    {
+        var ctx = await GetCommandContextAsync();
+        return await _questHandler.HandleAsync(new AddQuestCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, request.Title, request.Description, null, null, request.QuestLogVersion, request.CommandId));
+    }
 
     public async Task<CommandResultDto> UpdateQuest(UpdateQuestRequest request)
-        => await _commandService.UpdateQuestAsync(await GetCommandContextAsync(), request);
+    {
+        var ctx = await GetCommandContextAsync();
+        return await _questHandler.HandleAsync(new UpdateQuestCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, request.QuestId, request.Title, request.Description, null, null, request.QuestVersion, request.CommandId));
+    }
 
     public async Task<CommandResultDto> DeleteQuest(DeleteQuestRequest request)
-        => await _commandService.DeleteQuestAsync(await GetCommandContextAsync(), request);
+    {
+        var ctx = await GetCommandContextAsync();
+        return await _questHandler.HandleAsync(new DeleteQuestCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, request.QuestId, request.QuestLogVersion, request.CommandId));
+    }
 
     public async Task<CommandResultDto> ReorderQuests(ReorderQuestsRequest request)
-        => await _commandService.ReorderQuestsAsync(await GetCommandContextAsync(), request);
+    {
+        var ctx = await GetCommandContextAsync();
+        return await _questHandler.HandleAsync(new ReorderQuestsCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, request.NewOrder, request.QuestLogVersion, request.CommandId));
+    }
 
     public async Task<CommandResultDto> SetActiveQuest(SetActiveQuestRequest request)
-        => await _commandService.SetActiveQuestAsync(await GetCommandContextAsync(), request);
+    {
+        var ctx = await GetCommandContextAsync();
+        return await _questHandler.HandleAsync(new SetActiveQuestCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, request.QuestId, request.QuestLogVersion, request.CommandId));
+    }
 
     private async Task<RealmCommandContext> GetCommandContextAsync()
     {
         var (realmId, memberId, connectionId) = await GetCallerIdsAsync();
-        return new RealmCommandContext(realmId, memberId, connectionId);
+        return new RealmCommandContext(memberId, realmId, connectionId);
     }
 
     private async Task<(Guid realmId, Guid memberId, string connectionId)> GetCallerIdsAsync()

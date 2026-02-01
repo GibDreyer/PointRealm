@@ -2,8 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using PointRealm.Server.Application.Abstractions;
 using PointRealm.Server.Domain.Entities;
-using PointRealm.Server.Infrastructure.Services;
+using PointRealm.Shared.V1.Api;
 
 namespace PointRealm.Server.Api.Controllers.V1;
 
@@ -12,7 +13,7 @@ namespace PointRealm.Server.Api.Controllers.V1;
 public class AuthController(
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
-    UserTokenService tokenService) : ControllerBase
+    IUserTokenService tokenService) : ControllerBase
 {
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
@@ -139,12 +140,3 @@ public class AuthController(
             user.ProfileImageUrl);
     }
 }
-
-public record RegisterRequest(string Email, string Password, string? DisplayName);
-public record LoginRequest(string Email, string Password, bool RememberMe);
-public record ForgotPasswordRequest(string Email);
-public record ResetPasswordRequest(string Email, string Token, string NewPassword);
-public record PasswordResetTokenResponse(string Email, string Token);
-public record UpdateProfileRequest(string? DisplayName, string? ProfileImageUrl);
-public record UserProfileResponse(string Id, string Email, string? DisplayName, string? ProfileImageUrl);
-public record AuthTokenResponse(string AccessToken, DateTime ExpiresAt, UserProfileResponse User);

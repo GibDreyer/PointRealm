@@ -1,10 +1,11 @@
+using PointRealm.Server.Application.Abstractions;
 using PointRealm.Server.Domain.Entities;
 using PointRealm.Server.Domain.ValueObjects;
 using PointRealm.Shared.V1.Api;
 
-namespace PointRealm.Server.Api.Services;
+namespace PointRealm.Server.Application.Services;
 
-public sealed class RealmStateMapper
+public sealed class RealmStateMapper : IRealmStateMapper
 {
     public LobbySnapshotDto MapToLobbySnapshot(Realm realm, PartyMember currentMember)
     {

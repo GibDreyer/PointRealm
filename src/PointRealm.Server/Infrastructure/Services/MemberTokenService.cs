@@ -3,10 +3,11 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using PointRealm.Server.Application.Abstractions;
 
 namespace PointRealm.Server.Infrastructure.Services;
 
-public class MemberTokenService(IOptions<MemberTokenSettings> settings)
+public class MemberTokenService(IOptions<MemberTokenSettings> settings) : IMemberTokenService
 {
     private readonly MemberTokenSettings _settings = settings.Value;
 

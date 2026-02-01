@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using PointRealm.Server.Api.Hubs;
+using PointRealm.Server.Application.Abstractions;
 using PointRealm.Server.Infrastructure.Persistence;
 using PointRealm.Shared.V1.Api;
 using PointRealm.Shared.V1.Realtime;
@@ -11,9 +12,9 @@ public sealed class RealmBroadcaster : IRealmBroadcaster
 {
     private readonly IHubContext<RealmHub, IRealmClient> _hubContext;
     private readonly PointRealmDbContext _dbContext;
-    private readonly RealmStateMapper _mapper;
+    private readonly IRealmStateMapper _mapper;
 
-    public RealmBroadcaster(IHubContext<RealmHub, IRealmClient> hubContext, PointRealmDbContext dbContext, RealmStateMapper mapper)
+    public RealmBroadcaster(IHubContext<RealmHub, IRealmClient> hubContext, PointRealmDbContext dbContext, IRealmStateMapper mapper)
     {
         _hubContext = hubContext;
         _dbContext = dbContext;

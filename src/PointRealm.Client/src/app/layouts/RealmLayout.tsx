@@ -23,7 +23,7 @@ export function RealmLayout() {
 
   const { data: realm } = useQuery({
     queryKey: ['realm', realmCode],
-    queryFn: () => api.get<{ themeKey: string, name: string }>(`/realms/${realmCode}`),
+    queryFn: () => api.get<{ themeKey: string, name: string }>(`/v1/realms/${realmCode}`),
     enabled: !!realmCode
   });
 

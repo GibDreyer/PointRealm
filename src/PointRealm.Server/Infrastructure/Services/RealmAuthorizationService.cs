@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using PointRealm.Server.Application.Abstractions;
 using PointRealm.Server.Domain.Entities;
 using PointRealm.Server.Infrastructure.Persistence;
 
 namespace PointRealm.Server.Infrastructure.Services;
 
-public class RealmAuthorizationService(PointRealmDbContext dbContext)
+public class RealmAuthorizationService(PointRealmDbContext dbContext) : IRealmAuthorizationService
 {
     public async Task<bool> IsGm(Guid realmId, Guid userId)
     {

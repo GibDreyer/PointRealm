@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PointRealm.Server.Application.Abstractions;
 using PointRealm.Server.Domain.Entities;
 using PointRealm.Server.Infrastructure.Persistence;
-using PointRealm.Server.Infrastructure.Services;
 using PointRealm.Server.Application.Services;
 using PointRealm.Shared.V1.Api;
 
@@ -19,12 +19,12 @@ namespace PointRealm.Server.Api.Controllers.V1;
 [Route("api/v1/realms")]
 public class RealmsController(
     PointRealmDbContext dbContext,
-    RealmCodeGenerator codeGenerator,
+    IRealmCodeGenerator codeGenerator,
     IRealmSettingsService settingsService,
     IRealmHistoryService historyService,
-    RealmAuthorizationService authService,
-    QuestCsvService csvService,
-    MemberTokenService tokenService) : ControllerBase
+    IRealmAuthorizationService authService,
+    IQuestCsvService csvService,
+    IMemberTokenService tokenService) : ControllerBase
 {
     private const string DefaultTheme = "dark-fantasy-arcane";
 

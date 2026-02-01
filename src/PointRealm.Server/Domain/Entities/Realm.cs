@@ -52,7 +52,6 @@ public sealed class Realm : Entity
         Settings = newSettings;
     }
 
-
     public void AddMember(PartyMember member)
     {
         if (_members.Any(m => m.Id == member.Id))
@@ -63,9 +62,9 @@ public sealed class Realm : Entity
         _members.Add(member);
     }
 
-    public Result<Guid> AddQuest(string title, string description)
+    public Result<Guid> AddQuest(string title, string description, string? externalId = null, string? externalUrl = null)
     {
-        var quest = new Quest(Id, title, description, _quests.Count + 1);
+        var quest = new Quest(Id, title, description, _quests.Count + 1, externalId, externalUrl);
         _quests.Add(quest);
         QuestLogVersion++;
         
@@ -86,12 +85,13 @@ public sealed class Realm : Entity
             return Result.Failure(new Error("Realm.QuestNotFound", "The specified quest was not found in this realm."));
         }
 
-        // If there is an active encounter, maybe we should error or finish it?
-        // For now, let's just start a new one and update the reference.
+        // Check if quest is active? Not strictly required by logic but common sense.
+        // For now keep original logic.
+
         var encounter = new Encounter(questId);
         _encounters.Add(encounter);
         CurrentEncounterId = encounter.Id;
-        CurrentQuestId = questId;
+        CurrentQuestId = questId; // Ensure quest is current
         quest.Activate();
 
         return Result.Success();
@@ -115,7 +115,7 @@ public sealed class Realm : Entity
         return Result.Success();
     }
 
-    public Result UpdateQuest(Guid questId, string title, string description)
+    public Result UpdateQuest(Guid questId, string title, string description, string? externalId = null, string? externalUrl = null)
     {
         var quest = _quests.FirstOrDefault(q => q.Id == questId);
         if (quest is null)
@@ -123,13 +123,8 @@ public sealed class Realm : Entity
             return Result.Failure(new Error("Realm.QuestNotFound", "The specified quest was not found in this realm."));
         }
 
-        // We need to expose a method on Quest to update it, but for now assuming we can't directly set private setters.
-        // Let's modify Quest to allow updates or use reflection/internal if strictly needed, 
-        // but adding a method to Quest is cleaner. 
-        // Since I can't edit Quest in this same tool call, I will add the method to Realm and then go update Quest.
-        // Wait, I can only rely on what's available. 
-        // I will assume I will add `UpdateDetails` to Quest.
         quest.UpdateDetails(title, description);
+        quest.SetExternalFields(externalId, externalUrl);
         QuestLogVersion++;
         
         return Result.Success();

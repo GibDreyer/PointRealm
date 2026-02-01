@@ -30,7 +30,7 @@ export function RealmSettingsDialog({ realmCode, currentSettings, currentThemeKe
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            await api.patch(`/realms/${realmCode}/settings`, {
+            await api.patch(`/v1/realms/${realmCode}/settings`, {
                 themeKey,
                 settings
             });

@@ -2,6 +2,7 @@ using PointRealm.Server.Api.Infrastructure;
 using PointRealm.Server.Api.Services;
 using PointRealm.Server.Api.Hubs;
 using PointRealm.Server.Application;
+using PointRealm.Server.Application.Abstractions;
 using PointRealm.Server.Infrastructure;
 using Scalar.AspNetCore;
 
@@ -18,8 +19,6 @@ builder.Services
     .AddInfrastructure(builder.Configuration);
 
 builder.Services.AddMemoryCache();
-builder.Services.AddScoped<RealmStateMapper>();
-builder.Services.AddScoped<RealmCommandService>();
 builder.Services.AddScoped<IRealmBroadcaster, RealmBroadcaster>();
 builder.Services.AddScoped<ICommandDeduplicator, InMemoryCommandDeduplicator>();
 

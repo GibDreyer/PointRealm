@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PointRealm.Server.Application.Abstractions;
 using PointRealm.Server.Infrastructure.Persistence;
+using PointRealm.Server.Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Identity;
 using PointRealm.Server.Domain.Entities;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -110,11 +112,14 @@ public static class DependencyInjection
         
         services.Configure<MemberTokenSettings>(configuration.GetSection(MemberTokenSettings.SectionName));
         services.Configure<UserTokenSettings>(configuration.GetSection(UserTokenSettings.SectionName));
-        services.AddScoped<MemberTokenService>();
-        services.AddScoped<UserTokenService>();
-        services.AddScoped<RealmAuthorizationService>();
-        services.AddScoped<RealmCodeGenerator>();
-        services.AddScoped<QuestCsvService>();
+        services.AddScoped<IMemberTokenService, MemberTokenService>();
+        services.AddScoped<IUserTokenService, UserTokenService>();
+        services.AddScoped<IRealmAuthorizationService, RealmAuthorizationService>();
+        services.AddScoped<IRealmCodeGenerator, RealmCodeGenerator>();
+        services.AddScoped<IQuestCsvService, QuestCsvService>();
+        
+        // Repositories
+        services.AddScoped<IRealmRepository, RealmRepository>();
 
         return services;
     }

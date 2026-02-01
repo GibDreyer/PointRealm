@@ -121,7 +121,7 @@ export function JoinRealmPage() {
     setIsLoading(true);
 
     try {
-      const response = await api.post<JoinRealmResponse>(`/realms/${code}/join`, {
+      const response = await api.post<JoinRealmResponse>(`/v1/realms/${code}/join`, {
         displayName: nameToUse,
         role: roleToUse
       });

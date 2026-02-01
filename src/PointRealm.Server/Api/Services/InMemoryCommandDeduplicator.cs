@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Caching.Memory;
+using PointRealm.Server.Application.Abstractions;
 
 namespace PointRealm.Server.Api.Services;
 
