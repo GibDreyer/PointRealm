@@ -10,7 +10,14 @@ namespace PointRealm.Server.Api.Controllers.V1;
 /// </summary>
 [ApiController]
 [Route("api/v1/realms")]
-public class RealmsController(IRealmApiService realmService) : ControllerBase
+public class RealmsController(
+    IRealmCreationService creationService,
+    IRealmSummaryService summaryService,
+    IRealmMembershipService membershipService,
+    IRealmSettingsApiService settingsService,
+    IUserRealmsService userRealmsService,
+    IRealmHistoryApiService historyService,
+    IQuestCsvApiService questCsvService) : ControllerBase
 {
     /// <summary>
     /// Creates a new realm (anonymous or authenticated).
@@ -25,7 +32,7 @@ public class RealmsController(IRealmApiService realmService) : ControllerBase
         [FromBody] CreateRealmRequest request,
         CancellationToken cancellationToken = default)
     {
-        return realmService.CreateRealmAsync(request, User, cancellationToken);
+        return creationService.CreateRealmAsync(request, User, cancellationToken);
     }
 
     /// <summary>
@@ -41,7 +48,7 @@ public class RealmsController(IRealmApiService realmService) : ControllerBase
         string code,
         CancellationToken cancellationToken = default)
     {
-        return realmService.GetRealmSummaryAsync(code, cancellationToken);
+        return summaryService.GetRealmSummaryAsync(code, cancellationToken);
     }
 
     /// <summary>
@@ -56,7 +63,7 @@ public class RealmsController(IRealmApiService realmService) : ControllerBase
         CancellationToken cancellationToken = default)
     {
         var clientId = Request.Headers["X-PointRealm-ClientId"].ToString();
-        return realmService.JoinRealmAsync(code, request, clientId, User, cancellationToken);
+        return membershipService.JoinRealmAsync(code, request, clientId, User, cancellationToken);
     }
 
     /// <summary>
@@ -79,7 +86,7 @@ public class RealmsController(IRealmApiService realmService) : ControllerBase
         [FromBody] UpdateRealmSettingsRequest request,
         CancellationToken cancellationToken = default)
     {
-        return realmService.UpdateRealmSettingsAsync(code, request, User, cancellationToken);
+        return settingsService.UpdateRealmSettingsAsync(code, request, User, cancellationToken);
     }
 
     #region User Realms & History
@@ -96,7 +103,7 @@ public class RealmsController(IRealmApiService realmService) : ControllerBase
     public Task<IActionResult> GetMyRealms(CancellationToken cancellationToken = default)
     {
         var clientId = Request.Headers["X-PointRealm-ClientId"].ToString();
-        return realmService.GetMyRealmsAsync(User, clientId, cancellationToken);
+        return userRealmsService.GetMyRealmsAsync(User, clientId, cancellationToken);
     }
 
     /// <summary>
@@ -112,7 +119,7 @@ public class RealmsController(IRealmApiService realmService) : ControllerBase
         string code,
         CancellationToken cancellationToken = default)
     {
-        return realmService.GetRealmHistoryAsync(code, cancellationToken);
+        return historyService.GetRealmHistoryAsync(code, cancellationToken);
     }
 
     #endregion
@@ -139,7 +146,7 @@ public class RealmsController(IRealmApiService realmService) : ControllerBase
         IFormFile file,
         CancellationToken cancellationToken = default)
     {
-        return realmService.ImportQuestsCsvAsync(code, file, User, cancellationToken);
+        return questCsvService.ImportQuestsCsvAsync(code, file, User, cancellationToken);
     }
 
     /// <summary>
@@ -155,7 +162,7 @@ public class RealmsController(IRealmApiService realmService) : ControllerBase
         string code,
         CancellationToken cancellationToken = default)
     {
-        return realmService.ExportQuestsCsvAsync(code, cancellationToken);
+        return questCsvService.ExportQuestsCsvAsync(code, cancellationToken);
     }
 
     #endregion
