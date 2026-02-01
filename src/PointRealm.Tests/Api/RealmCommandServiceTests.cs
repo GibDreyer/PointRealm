@@ -1,9 +1,16 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using PointRealm.Server.Api.Services;
+using PointRealm.Server.Application.Abstractions;
+using PointRealm.Server.Application.Commands;
+using PointRealm.Server.Application.Commands.Encounter;
+using PointRealm.Server.Application.Commands.Handlers;
+using PointRealm.Server.Application.Commands.Quest;
+using PointRealm.Server.Application.Services;
 using PointRealm.Server.Domain.Entities;
 using PointRealm.Server.Domain.ValueObjects;
 using PointRealm.Server.Infrastructure.Persistence;
+using PointRealm.Server.Infrastructure.Persistence.Repositories;
+using PointRealm.Shared.V1.Api;
 using PointRealm.Shared.V1.Realtime;
 using Xunit;
 
@@ -30,6 +37,7 @@ public class RealmCommandServiceTests
             realm.AddMember(gm);
             realm.AddQuest("Quest", "Desc");
             setup.Realms.Add(realm);
+            setup.PartyMembers.Add(gm);
             setup.SaveChanges();
 
             realmId = realm.Id;
@@ -58,7 +66,7 @@ public class RealmCommandServiceTests
         var service = new RealmCommandService(context1, broadcaster, new NoOpDeduplicator());
 
         var result = await service.UpdateQuestAsync(
-            new RealmCommandContext(realmId, memberId, "conn-1"),
+            new RealmCommandContext(memberId, realmId, "conn-1"),
             new UpdateQuestRequest
             {
                 QuestId = questId,
@@ -92,6 +100,7 @@ public class RealmCommandServiceTests
             realm.AddQuest("Quest 1", "Desc");
             realm.AddQuest("Quest 2", "Desc");
             setup.Realms.Add(realm);
+            setup.PartyMembers.Add(gm);
             setup.SaveChanges();
 
             realmId = realm.Id;
@@ -105,7 +114,7 @@ public class RealmCommandServiceTests
         var service = new RealmCommandService(context, broadcaster, new NoOpDeduplicator());
 
         var result = await service.ReorderQuestsAsync(
-            new RealmCommandContext(realmId, memberId, "conn-1"),
+            new RealmCommandContext(memberId, realmId, "conn-1"),
             new ReorderQuestsRequest
             {
                 NewOrder = new List<Guid> { questIds[0], questIds[0] },
@@ -113,7 +122,7 @@ public class RealmCommandServiceTests
             });
 
         Assert.False(result.Success);
-        Assert.Equal("VALIDATION_ERROR", result.Error?.ErrorCode);
+        Assert.Equal("Realm.InvalidQuestOrder", result.Error?.ErrorCode);
     }
 
     [Fact]
@@ -137,6 +146,7 @@ public class RealmCommandServiceTests
             var encounter = realm.Encounters.First();
             encounter.Reveal();
             setup.Realms.Add(realm);
+            setup.PartyMembers.Add(member);
             setup.SaveChanges();
 
             realmId = realm.Id;
@@ -149,11 +159,11 @@ public class RealmCommandServiceTests
         var service = new RealmCommandService(context, broadcaster, new NoOpDeduplicator());
 
         var result = await service.SelectRuneAsync(
-            new RealmCommandContext(realmId, memberId, "conn-1"),
+            new RealmCommandContext(memberId, realmId, "conn-1"),
             new SelectRuneRequest { Value = "1", EncounterVersion = encounterVersion });
 
         Assert.False(result.Success);
-        Assert.Equal("INVALID_STATE", result.Error?.ErrorCode);
+        Assert.Equal("Encounter.AlreadyRevealed", result.Error?.ErrorCode);
     }
 
     [Fact]
@@ -194,6 +204,7 @@ public class RealmCommandServiceTests
             realm.AddQuest("Quest", "Desc");
             realm.StartEncounter(realm.CurrentQuestId!.Value);
             setup.Realms.Add(realm);
+            setup.PartyMembers.Add(member);
             setup.SaveChanges();
 
             realmId = realm.Id;
@@ -204,7 +215,7 @@ public class RealmCommandServiceTests
         using var context = new PointRealmDbContext(options);
         var broadcaster = new TestBroadcaster();
         var service = new RealmCommandService(context, broadcaster, new NoOpDeduplicator());
-        var ctx = new RealmCommandContext(realmId, memberId, "conn-1");
+        var ctx = new RealmCommandContext(memberId, realmId, "conn-1");
 
         var reveal = await service.RevealProphecyAsync(ctx, new RevealProphecyRequest { EncounterVersion = encounterVersion });
         var reroll = await service.ReRollFatesAsync(ctx, new ReRollFatesRequest { EncounterVersion = encounterVersion });
@@ -213,6 +224,36 @@ public class RealmCommandServiceTests
         Assert.Equal("FORBIDDEN", reveal.Error?.ErrorCode);
         Assert.Equal("FORBIDDEN", reroll.Error?.ErrorCode);
         Assert.Equal("FORBIDDEN", seal.Error?.ErrorCode);
+    }
+
+    [Fact]
+    public async Task Diagnostic_Repository_ShouldFindMember()
+    {
+        using var connection = CreateInMemoryConnection();
+        var options = CreateOptions(connection);
+
+        Guid realmId;
+        Guid memberId;
+
+        using (var setup = new PointRealmDbContext(options))
+        {
+            setup.Database.EnsureCreated();
+            var realm = Realm.Create("realm", "Dark", "theme", RealmSettings.Default()).Value;
+            var member = PartyMember.Create(realm.Id, "client", "Member", false);
+            realm.AddMember(member);
+            setup.Realms.Add(realm);
+            setup.PartyMembers.Add(member);
+            setup.SaveChanges();
+            realmId = realm.Id;
+            memberId = member.Id;
+        }
+
+        using var context = new PointRealmDbContext(options);
+        var repo = new RealmRepository(context);
+        var realmLoaded = await repo.GetByIdWithRelationsAsync(realmId);
+        
+        Assert.NotNull(realmLoaded);
+        Assert.Contains(realmLoaded!.Members, m => m.Id == memberId);
     }
 
     private static SqliteConnection CreateInMemoryConnection()
@@ -262,5 +303,32 @@ public class RealmCommandServiceTests
         public void StoreResult(Guid memberId, Guid commandId, object? payload)
         {
         }
+    }
+
+    private sealed class RealmCommandService(
+        PointRealmDbContext context,
+        IRealmBroadcaster broadcaster,
+        ICommandDeduplicator deduplicator)
+    {
+        private readonly QuestCommandHandler _questHandler = new(new RealmRepository(context), broadcaster, deduplicator);
+        private readonly EncounterCommandHandler _encounterHandler = new(new RealmRepository(context), broadcaster, deduplicator);
+
+        public Task<CommandResultDto> UpdateQuestAsync(RealmCommandContext ctx, UpdateQuestRequest req)
+            => _questHandler.HandleAsync(new UpdateQuestCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, req.QuestId, req.Title, req.Description, null, null, req.QuestVersion, null));
+
+        public Task<CommandResultDto> ReorderQuestsAsync(RealmCommandContext ctx, ReorderQuestsRequest req)
+            => _questHandler.HandleAsync(new ReorderQuestsCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, req.NewOrder, req.QuestLogVersion, null));
+
+        public Task<CommandResultDto> SelectRuneAsync(RealmCommandContext ctx, SelectRuneRequest req)
+            => _encounterHandler.HandleAsync(new SelectRuneCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, req.Value, req.EncounterVersion, null));
+
+        public Task<CommandResultDto> RevealProphecyAsync(RealmCommandContext ctx, RevealProphecyRequest req)
+            => _encounterHandler.HandleAsync(new RevealProphecyCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, req.EncounterVersion, null));
+
+        public Task<CommandResultDto> ReRollFatesAsync(RealmCommandContext ctx, ReRollFatesRequest req)
+            => _encounterHandler.HandleAsync(new ReRollFatesCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, req.EncounterVersion, null));
+
+        public Task<CommandResultDto> SealOutcomeAsync(RealmCommandContext ctx, SealOutcomeRequest req)
+            => _encounterHandler.HandleAsync(new SealOutcomeCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, req.FinalValue, req.EncounterVersion, null));
     }
 }

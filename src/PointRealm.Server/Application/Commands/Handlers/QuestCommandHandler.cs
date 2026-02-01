@@ -136,10 +136,10 @@ public class QuestCommandHandler(
         }
 
         var realm = await realmRepository.GetByIdWithRelationsAsync(realmId, cancellationToken);
-        if (realm is null) return CommandResultDto.Fail(new CommandErrorDto { ErrorCode = "NOT_FOUND", Message = "Realm not found." });
+        if (realm is null) return CommandResultDto.Fail(new CommandErrorDto { ErrorCode = "REALM_NOT_FOUND", Message = "Realm not found." });
 
         var member = realm.Members.FirstOrDefault(m => m.Id == memberId);
-        if (member is null) return CommandResultDto.Fail(new CommandErrorDto { ErrorCode = "NOT_FOUND", Message = "Member not found." });
+        if (member is null) return CommandResultDto.Fail(new CommandErrorDto { ErrorCode = "MEMBER_NOT_FOUND", Message = "Member not found." });
 
         if (member.IsBanned) return CommandResultDto.Fail(new CommandErrorDto { ErrorCode = "FORBIDDEN", Message = "You are banned." });
 

@@ -30,7 +30,7 @@ export class RealmHub {
     };
 
     if (clientId) {
-        options.headers = { "X-Client-ID": clientId };
+        options.headers = { "X-PointRealm-ClientId": clientId };
     }
 
     this.connection = new signalR.HubConnectionBuilder()

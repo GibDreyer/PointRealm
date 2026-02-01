@@ -22,12 +22,12 @@ public sealed class RealmStateMapper : IRealmStateMapper
                 ThemeKey = realm.Theme,
                 Settings = new LobbyRealmSettingsDto
                 {
-                    DeckType = MapDeckType(realm.Settings.Deck),
-                    AutoReveal = realm.Settings.AutoReveal,
-                    AllowAbstain = realm.Settings.AllowAbstain,
-                    HideVoteCounts = realm.Settings.HideVoteCounts,
-                    CustomDeckValues = realm.Settings.Deck.Name == "Custom"
-                        ? realm.Settings.Deck.Cards.Select(c => c.Label).ToList()
+                    DeckType = MapDeckType(realm.Settings?.Deck ?? RealmSettings.Default().Deck),
+                    AutoReveal = realm.Settings?.AutoReveal ?? true,
+                    AllowAbstain = realm.Settings?.AllowAbstain ?? true,
+                    HideVoteCounts = realm.Settings?.HideVoteCounts ?? false,
+                    CustomDeckValues = (realm.Settings?.Deck?.Name ?? "FIBONACCI") == "Custom"
+                        ? realm.Settings!.Deck.Cards.Select(c => c.Label).ToList()
                         : null
                 }
             },
