@@ -8,7 +8,7 @@ public interface IRealmAuthorizationService
     /// <summary>
     /// Checks if the user (by Guid) is a GM for the specified realm.
     /// </summary>
-    Task<bool> IsGm(Guid realmId, Guid userId);
+
     
     /// <summary>
     /// Checks if the user (by string ID) is a GM for the specified realm.

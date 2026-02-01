@@ -9,6 +9,8 @@ using PointRealm.Server.Domain.Entities;
 using PointRealm.Server.Infrastructure.Persistence;
 using PointRealm.Server.Application.Services;
 using PointRealm.Shared.V1.Api;
+using PointRealm.Server.Application.Commands.Quest;
+using PointRealm.Server.Application.Commands.Handlers;
 
 namespace PointRealm.Server.Api.Controllers.V1;
 
@@ -24,7 +26,8 @@ public class RealmsController(
     IRealmHistoryService historyService,
     IRealmAuthorizationService authService,
     IQuestCsvService csvService,
-    IMemberTokenService tokenService) : ControllerBase
+    IMemberTokenService tokenService,
+    ImportQuestsCommandHandler importQuestsHandler) : ControllerBase
 {
     private const string DefaultTheme = "dark-fantasy-arcane";
 
@@ -443,132 +446,45 @@ public class RealmsController(
         }
 
         var realm = await dbContext.Realms
-            .Include(r => r.Quests)
+            .Select(r => new { r.Id, r.Code })
             .FirstOrDefaultAsync(r => r.Code == code, cancellationToken);
 
         if (realm is null)
         {
-            return Problem(
+             return Problem(
                 statusCode: StatusCodes.Status404NotFound,
                 title: "Realm Not Found",
                 detail: $"No realm found with code '{code}'.",
                 type: "Realm.NotFound");
         }
+        
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        // Note: CommandHandler will re-check GM permissions using userId, but we need to ensure we pass the right ID.
+        // If userId is null (not authenticated), Authorize attribute should have caught it, but double check.
+        if (userId == null) userId = string.Empty;
 
-        // Check GM authorization
-        if (!await CheckIsGmAsync(realm.Id))
+        using var stream = file.OpenReadStream();
+        var command = new ImportQuestsCommand(realm.Id, stream, userId);
+        
+        var result = await importQuestsHandler.HandleAsync(command, cancellationToken);
+
+        if (result.IsFailure)
         {
-            return Problem(
-                statusCode: StatusCodes.Status403Forbidden,
-                title: "Unauthorized",
-                detail: "Only the GM can import quests.",
-                type: "Realm.Unauthorized");
+             var error = result.Error;
+             // Map some specific errors to 403 or 404 if needed, mostly handled by 400
+             if (error.Code == "Realm.Unauthorized")
+             {
+                 return Problem(statusCode: StatusCodes.Status403Forbidden, title: "Unauthorized", detail: error.Description, type: error.Code);
+             }
+             if (error.Code == "Realm.NotFound")
+             {
+                 return Problem(statusCode: StatusCodes.Status404NotFound, title: "NotFound", detail: error.Description, type: error.Code);
+             }
+             
+             return Problem(statusCode: StatusCodes.Status400BadRequest, title: "Import Failed", detail: error.Description, type: error.Code);
         }
 
-        // Parse CSV
-        List<QuestCsvRow> rows;
-        using (var stream = file.OpenReadStream())
-        {
-            var parseResult = csvService.ParseCsv(stream);
-            if (parseResult.IsFailure)
-            {
-                return Problem(
-                    statusCode: StatusCodes.Status400BadRequest,
-                    title: "CSV Parse Error",
-                    detail: parseResult.Error.Description,
-                    type: parseResult.Error.Code);
-            }
-            rows = parseResult.Value;
-        }
-
-        if (!rows.Any())
-        {
-            return Problem(
-                statusCode: StatusCodes.Status400BadRequest,
-                title: "Empty CSV",
-                detail: "CSV file contains no valid quest rows.",
-                type: "Quest.EmptyCsv");
-        }
-
-        // Import quests
-        var successCount = 0;
-        var errors = new List<CsvValidationError>();
-        var currentMaxOrder = realm.Quests.Any() ? realm.Quests.Max(q => q.Order) : 0;
-
-        for (int i = 0; i < rows.Count; i++)
-        {
-            var row = rows[i];
-            var rowNumber = i + 2; // +2 because header is row 1, data starts at row 2
-
-            try
-            {
-                // Determine order: use provided order or auto-increment
-                var order = row.Order ?? (currentMaxOrder + successCount + 1);
-
-                // Check for duplicate external IDs within the realm
-                if (!string.IsNullOrWhiteSpace(row.ExternalId))
-                {
-                    var existingQuest = realm.Quests.FirstOrDefault(q => q.ExternalId == row.ExternalId);
-                    if (existingQuest != null)
-                    {
-                        errors.Add(new CsvValidationError
-                        {
-                            RowNumber = rowNumber,
-                            Field = "externalId",
-                            Error = $"Quest with externalId '{row.ExternalId}' already exists in this realm"
-                        });
-                        continue;
-                    }
-                }
-
-                var addResult = realm.AddQuest(row.Title, row.Description ?? string.Empty);
-                if (addResult.IsFailure)
-                {
-                    errors.Add(new CsvValidationError
-                    {
-                        RowNumber = rowNumber,
-                        Field = "quest",
-                        Error = addResult.Error.Description
-                    });
-                    continue;
-                }
-
-                // Get the newly added quest and set external fields
-                var newQuest = realm.Quests.OrderByDescending(q => q.Id).First();
-                if (!string.IsNullOrWhiteSpace(row.ExternalId) || !string.IsNullOrWhiteSpace(row.ExternalUrl))
-                {
-                    newQuest.SetExternalFields(row.ExternalId, row.ExternalUrl);
-                }
-
-                // Set custom order if provided
-                if (row.Order.HasValue)
-                {
-                    newQuest.SetOrder(row.Order.Value);
-                }
-
-                successCount++;
-            }
-            catch (Exception ex)
-            {
-                errors.Add(new CsvValidationError
-                {
-                    RowNumber = rowNumber,
-                    Field = "quest",
-                    Error = $"Failed to import quest: {ex.Message}"
-                });
-            }
-        }
-
-        await dbContext.SaveChangesAsync(cancellationToken);
-
-        var result = new CsvImportResult
-        {
-            SuccessCount = successCount,
-            ErrorCount = errors.Count,
-            Errors = errors
-        };
-
-        return Ok(result);
+        return Ok(result.Value);
     }
 
     /// <summary>

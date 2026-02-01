@@ -2,7 +2,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\PointRealm.Server.Domain.csproj" />
-    <ProjectReference Include="..\Contracts\PointRealm.Server.Contracts.csproj" />
+
+    <ProjectReference Include="..\..\PointRealm.Shared\PointRealm.Shared.csproj" />
     <ProjectReference Include="..\Common\PointRealm.Server.Common.csproj" />
   </ItemGroup>
 

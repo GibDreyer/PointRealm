@@ -18,6 +18,7 @@ public static class DependencyInjection
         services.AddScoped<MemberCommandHandler>();
         services.AddScoped<EncounterCommandHandler>();
         services.AddScoped<QuestCommandHandler>();
+        services.AddScoped<ImportQuestsCommandHandler>();
         
         services.AddScoped<IRealmStateMapper, RealmStateMapper>();
 
