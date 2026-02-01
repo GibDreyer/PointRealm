@@ -172,6 +172,7 @@ public class EncounterCommandHandler(
         {
              if (ex.GetType().Name.Contains("Concurrency") || ex.Message.Contains("concurrency"))
              {
+                 await broadcaster.SendRealmStateToConnectionAsync(clientId, realmId);
                  await broadcaster.BroadcastRealmStateAsync(realmId);
                  return CreateStaleError();
              }
