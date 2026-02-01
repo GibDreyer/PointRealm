@@ -15,9 +15,8 @@ export function RealmBackground() {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    // Particles
     const particles: { x: number; y: number; vx: number; vy: number; size: number; alpha: number }[] = [];
-    const particleCount = 40; // Subtle
+    const particleCount = 40;
 
     for (let i = 0; i < particleCount; i++) {
         particles.push({
@@ -36,23 +35,18 @@ export function RealmBackground() {
         if (!ctx) return;
         ctx.clearRect(0, 0, width, height);
 
-        // Fill background based on theme (optional, mainly handled by parent container)
-        // Check if we should use theme bg or just clear
-        // We generally overlay on top of CSS background, so just clear is fine.
-        
         ctx.fillStyle = theme.tokens.colors.primary;
 
         particles.forEach(p => {
             p.x += p.vx;
             p.y += p.vy;
 
-            // Wrap
             if (p.x < 0) p.x = width;
             if (p.x > width) p.x = 0;
             if (p.y < 0) p.y = height;
             if (p.y > height) p.y = 0;
 
-            ctx.globalAlpha = p.alpha * 0.15; // Very subtle
+            ctx.globalAlpha = p.alpha * 0.15;
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
             ctx.fill();
@@ -77,7 +71,6 @@ export function RealmBackground() {
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
-      {/* CSS Noise Overlay */}
       <div 
         className="absolute inset-0 opacity-[0.03]"
         style={{
@@ -87,7 +80,6 @@ export function RealmBackground() {
       
       <canvas ref={canvasRef} className="absolute inset-0" />
       
-      {/* Radial Gradient Glow (Center) */}
       <div 
         className="absolute inset-0"
         style={{

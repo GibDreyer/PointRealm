@@ -10,7 +10,6 @@ public sealed class RealmSettings : ValueObject
     public bool AllowAbstain { get; private set; }
     public bool HideVoteCounts { get; private set; }
 
-    // Parameterless constructor for EF Core
     private RealmSettings()
     {
         Deck = RuneDeck.Standard();

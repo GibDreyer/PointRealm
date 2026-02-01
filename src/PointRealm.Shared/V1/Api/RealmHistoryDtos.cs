@@ -1,6 +1,5 @@
 namespace PointRealm.Shared.V1.Api;
 
-// User realm list DTOs
 public record UserRealmListItem
 {
     public required string RealmCode { get; init; }
@@ -17,7 +16,6 @@ public record UserRealmsResponse
     public required List<UserRealmListItem> Realms { get; init; }
 }
 
-// Minimal realm info for anonymous users
 public record MinimalRealmInfo
 {
     public required string RealmCode { get; init; }
@@ -29,7 +27,6 @@ public record AnonymousRealmsResponse
     public required List<MinimalRealmInfo> Realms { get; init; }
 }
 
-// Realm history DTOs
 public record RealmHistoryResponse
 {
     public required string RealmCode { get; init; }

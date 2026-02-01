@@ -16,7 +16,6 @@ public sealed class PartyMember : Entity
     public string? ProfileImageUrl { get; private set; }
     public string? ProfileEmoji { get; private set; }
 
-    // Navigation property
     public Realm Realm { get; private set; } = null!;
 
     private PartyMember(Guid realmId, string clientInstanceId, string name, bool isHost, string? userId, bool isObserver) : base(Guid.NewGuid())
@@ -31,7 +30,7 @@ public sealed class PartyMember : Entity
         UserId = userId;
     }
 
-    private PartyMember() { } // EF Core
+    private PartyMember() { }
 
     public static PartyMember Create(Guid realmId, string clientInstanceId, string name, bool isHost, string? userId = null, bool isObserver = false)
     {

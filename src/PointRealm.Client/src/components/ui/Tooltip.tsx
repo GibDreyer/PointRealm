@@ -17,15 +17,11 @@ export function Tooltip({ content, children, className, side = "top" }: TooltipP
     React.useEffect(() => {
         if (isVisible && triggerRef.current) {
             const rect = triggerRef.current.getBoundingClientRect();
-            // Simple positioning logic
             let top = rect.top;
             const left = rect.left + rect.width / 2;
 
             if (side === "top") top = rect.top - 8;
             if (side === "bottom") top = rect.bottom + 8;
-            
-            // Adjust to center horizontally for top/bottom
-            // We rely on CSS transform translate for precise centering of the tooltip element itself
             
             setCoords({ top, left });
         }

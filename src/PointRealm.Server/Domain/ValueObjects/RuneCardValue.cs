@@ -8,7 +8,6 @@ public sealed class RuneCardValue : ValueObject
     public string Label { get; private set; }
     public decimal? Value { get; private set; }
 
-    // Parameterless constructor for EF Core
     private RuneCardValue()
     {
         Label = string.Empty;

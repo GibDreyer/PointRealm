@@ -33,7 +33,7 @@ public class QuestDto
     public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string Status { get; set; } = string.Empty; // Pending, Active, Completed
+    public string Status { get; set; } = string.Empty;
     public int Order { get; set; }
     public int Version { get; set; }
     public int? SealedOutcome { get; set; }
@@ -51,8 +51,8 @@ public class PartyMemberDto
     public string? AvatarEmoji { get; set; }
     public string? ProfileImageUrl { get; set; }
     public string? ProfileEmoji { get; set; }
-    public string Role { get; set; } = "Member"; // GM, Member
-    public string Status { get; set; } = "disconnected"; // ready, choosing, disconnected
+    public string Role { get; set; } = "Member";
+    public string Status { get; set; } = "disconnected";
     public bool IsOnline { get; set; }
     public bool IsObserver { get; set; }
     public bool IsBanned { get; set; }
@@ -62,8 +62,8 @@ public class EncounterDto
 {
     public Guid QuestId { get; set; }
     public bool IsRevealed { get; set; }
-    public Dictionary<Guid, string?> Votes { get; set; } = new(); // MemberId -> Value (masked if hidden)
-    public Dictionary<string, int> Distribution { get; set; } = new(); // Value -> Count (only valid when revealed)
+    public Dictionary<Guid, string?> Votes { get; set; } = new();
+    public Dictionary<string, int> Distribution { get; set; } = new();
     public int? Outcome { get; set; }
     public int Version { get; set; }
     public Dictionary<Guid, bool> HasVoted { get; set; } = new();

@@ -1,6 +1,5 @@
 namespace PointRealm.Shared.V1.Api;
 
-// Request DTOs
 public record CreateRealmRequest
 {
     public string? RealmName { get; init; }
@@ -17,7 +16,6 @@ public record RealmSettingsRequest
     public bool? HideVoteCounts { get; init; }
 }
 
-// Alias for clarity - update and create use the same request structure
 public record UpdateRealmSettingsRequest : RealmSettingsRequest;
 
 public record JoinRealmRequest
@@ -37,7 +35,6 @@ public record JoinRealmResponse
 }
 
 
-// Response DTOs
 public record CreateRealmResponse
 {
     public required string Code { get; init; }

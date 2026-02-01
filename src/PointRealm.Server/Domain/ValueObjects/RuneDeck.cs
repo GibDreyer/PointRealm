@@ -8,7 +8,6 @@ public sealed class RuneDeck : ValueObject
     public string Name { get; private set; }
     public List<RuneCardValue> Cards { get; private set; }
 
-    // Parameterless constructor for EF Core
     private RuneDeck()
     {
         Name = string.Empty;
@@ -22,7 +21,6 @@ public sealed class RuneDeck : ValueObject
         Cards = cards;
     }
 
-    // Factory constructor - for internal use by static factory methods
     private RuneDeck(string name, IEnumerable<RuneCardValue> cards)
     {
         Name = name;

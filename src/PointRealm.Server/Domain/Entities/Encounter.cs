@@ -27,7 +27,7 @@ public sealed class Encounter : Entity
         Status = EncounterStatus.Voting;
     }
 
-    private Encounter() { } // EF Core
+    private Encounter() { }
 
     public Result CastVote(Guid partyMemberId, RuneCardValue value)
     {
@@ -62,7 +62,7 @@ public sealed class Encounter : Entity
     {
         _votes.Clear();
         Status = EncounterStatus.Voting;
-        Outcome = null; // Reset outcome if any
+        Outcome = null;
         return Result.Success();
     }
 
@@ -74,7 +74,6 @@ public sealed class Encounter : Entity
         }
 
         Outcome = outcome;
-        // Logic to maybe store this outcome permanently or move to next stage could go here.
         return Result.Success();
     }
 }

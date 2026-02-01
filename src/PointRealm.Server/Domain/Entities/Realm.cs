@@ -35,7 +35,7 @@ public sealed class Realm : Entity
         CreatedAt = DateTime.UtcNow;
     }
 
-    private Realm() { } // EF Core
+    private Realm() { }
 
     public static Result<Realm> Create(string code, string? name, string theme, RealmSettings settings, string? createdByUserId = null)
     {
@@ -85,13 +85,10 @@ public sealed class Realm : Entity
             return Result.Failure(new Error("Realm.QuestNotFound", "The specified quest was not found in this realm."));
         }
 
-        // Check if quest is active? Not strictly required by logic but common sense.
-        // For now keep original logic.
-
         var encounter = new Encounter(questId);
         _encounters.Add(encounter);
         CurrentEncounterId = encounter.Id;
-        CurrentQuestId = questId; // Ensure quest is current
+        CurrentQuestId = questId;
         quest.Activate();
 
         return Result.Success();
@@ -141,7 +138,6 @@ public sealed class Realm : Entity
         _quests.Remove(quest);
         QuestLogVersion++;
         
-        // If the deleted quest was determining the current quest, we might need to handle that.
         if (CurrentQuestId == questId)
         {
             CurrentQuestId = null;
@@ -152,14 +148,11 @@ public sealed class Realm : Entity
 
     public Result ReorderQuests(List<Guid> newOrder)
     {
-        // Simple reordering logic
-        // Verify all IDs exist
         if (newOrder.Count != _quests.Count || newOrder.Distinct().Count() != _quests.Count || !newOrder.All(id => _quests.Any(q => q.Id == id)))
         {
              return Result.Failure(new Error("Realm.InvalidQuestOrder", "The provided quest order is invalid."));
         }
 
-        // We need a way to set Order on Quest. assuming `SetOrder` method.
         for (int i = 0; i < newOrder.Count; i++)
         {
             var quest = _quests.First(q => q.Id == newOrder[i]);
