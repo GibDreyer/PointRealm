@@ -95,6 +95,13 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .name {
   flex: 1;
   min-width: 0;

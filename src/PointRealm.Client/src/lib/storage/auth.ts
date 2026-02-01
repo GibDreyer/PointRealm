@@ -5,6 +5,7 @@ export type AuthUser = {
   email: string;
   displayName?: string | null;
   profileImageUrl?: string | null;
+  profileEmoji?: string | null;
 };
 
 export function getAuthToken(): string | null {

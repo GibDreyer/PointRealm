@@ -5,6 +5,7 @@ import { ApiError } from "@/api/client";
 import { Button } from "@/components/Button";
 import { PageShell } from "@/components/shell/PageShell";
 import { BackButton } from "@/components/ui/BackButton";
+import { EmojiPicker } from "@/components/ui/EmojiPicker";
 import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Panel } from "@/components/ui/Panel";
@@ -25,9 +26,15 @@ export function AccountPage() {
   const [user, setUser] = useState(getAuthUser());
   const [displayName, setDisplayName] = useState(user?.displayName ?? "");
   const [profileImageUrl, setProfileImageUrl] = useState(user?.profileImageUrl ?? "");
+  const [profileImageInput, setProfileImageInput] = useState(
+    user?.profileImageUrl && user.profileImageUrl.startsWith("data:") ? "" : user?.profileImageUrl ?? ""
+  );
+  const [profileEmoji, setProfileEmoji] = useState(user?.profileEmoji ?? "");
   const [isLoading, setIsLoading] = useState(Boolean(token));
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const maxImageSizeBytes = 1_048_576;
 
   useEffect(() => {
     if (!token) {
@@ -44,6 +51,10 @@ export function AccountPage() {
         setAuthUser(data);
         setDisplayName(data.displayName ?? "");
         setProfileImageUrl(data.profileImageUrl ?? "");
+        setProfileImageInput(
+          data.profileImageUrl && data.profileImageUrl.startsWith("data:") ? "" : data.profileImageUrl ?? ""
+        );
+        setProfileEmoji(data.profileEmoji ?? "");
       })
       .catch((err) => {
         if (!isMounted) return;
@@ -75,6 +86,7 @@ export function AccountPage() {
       const updated = await authApi.updateProfile({
         displayName: displayName || null,
         profileImageUrl: profileImageUrl || null,
+        profileEmoji: profileEmoji || null,
       });
       setUser(updated);
       setAuthUser(updated);
@@ -86,6 +98,34 @@ export function AccountPage() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > maxImageSizeBytes) {
+      setImageError("Profile image must be 1MB or smaller.");
+      event.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result?.toString() ?? "";
+      setProfileImageUrl(result);
+      setProfileImageInput("");
+      setImageError(null);
+    };
+    reader.onerror = () => {
+      setImageError("Unable to read that image.");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleClearImage = () => {
+    setProfileImageUrl("");
+    setProfileImageInput("");
   };
 
   const handleLogout = async () => {
@@ -158,17 +198,54 @@ export function AccountPage() {
                   label="Profile image URL"
                   tooltip="Paste a link to a public avatar image."
                   type="url"
-                  value={profileImageUrl}
-                  onChange={(event) => setProfileImageUrl(event.target.value)}
+                  value={profileImageInput}
+                  onChange={(event) => {
+                    setProfileImageInput(event.target.value);
+                    setProfileImageUrl(event.target.value);
+                    setImageError(null);
+                  }}
                   placeholder="https://..."
                 />
-                {profileImageUrl && (
-                  <img
-                    src={profileImageUrl}
-                    alt="Profile preview"
-                    className="h-20 w-20 rounded-full border border-pr-border/40 object-cover"
-                  />
+                <div className="space-y-2">
+                  <label className="text-xs uppercase tracking-[0.2em] text-pr-text-muted">
+                    Upload profile image (max 1MB)
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="mt-2 block w-full text-xs text-pr-text-muted file:mr-4 file:rounded-md file:border-0 file:bg-pr-primary/20 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-pr-primary hover:file:bg-pr-primary/30"
+                    />
+                  </label>
+                  {profileImageUrl && (
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={profileImageUrl}
+                        alt="Profile preview"
+                        className="h-20 w-20 rounded-full border border-pr-border/40 object-cover"
+                      />
+                      <Button type="button" variant="ghost" onClick={handleClearImage}>
+                        Remove image
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs uppercase tracking-[0.2em] text-pr-text-muted">
+                    Or choose an emoji
+                  </p>
+                  <EmojiPicker selectedEmoji={profileEmoji || null} onSelect={setProfileEmoji} />
+                  {profileEmoji && (
+                    <Button type="button" variant="ghost" onClick={() => setProfileEmoji("")}>
+                      Clear emoji
+                    </Button>
+                  )}
+                </div>
+                {!profileImageUrl && profileEmoji && (
+                  <div className="h-20 w-20 rounded-full border border-pr-border/40 bg-pr-surface/40 flex items-center justify-center text-3xl">
+                    <span aria-label="Profile emoji preview">{profileEmoji}</span>
+                  </div>
                 )}
+                {imageError && <p className="text-xs text-pr-danger/80">{imageError}</p>}
                 {error && <p className="text-xs text-pr-danger/80">{error}</p>}
                 <Tooltip content="Save your updated profile details.">
                   <Button type="submit" variant="primary" fullWidth disabled={isSaving}>

@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PointRealm.Server.Application.Abstractions;
 using PointRealm.Server.Domain.Entities;
+using PointRealm.Server.Infrastructure.Persistence;
 using PointRealm.Shared.V1.Api;
+using System.Linq;
 
 namespace PointRealm.Server.Api.Controllers.V1;
 
@@ -13,8 +15,11 @@ namespace PointRealm.Server.Api.Controllers.V1;
 public class AuthController(
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
-    IUserTokenService tokenService) : ControllerBase
+    IUserTokenService tokenService,
+    PointRealmDbContext dbContext) : ControllerBase
 {
+    private const int MaxProfileImageBytes = 1_048_576;
+
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
@@ -119,13 +124,40 @@ public class AuthController(
         var user = await userManager.GetUserAsync(User);
         if (user is null) return Unauthorized();
 
+        var profileImageUrl = string.IsNullOrWhiteSpace(request.ProfileImageUrl) ? null : request.ProfileImageUrl.Trim();
+        var profileEmoji = string.IsNullOrWhiteSpace(request.ProfileEmoji) ? null : request.ProfileEmoji.Trim();
+
+        if (!string.IsNullOrWhiteSpace(profileImageUrl) && IsDataUrl(profileImageUrl))
+        {
+            var estimatedBytes = EstimateDataUrlBytes(profileImageUrl);
+            if (estimatedBytes > MaxProfileImageBytes)
+            {
+                return BadRequest(new { message = $"Profile image must be {MaxProfileImageBytes / 1024}KB or smaller." });
+            }
+        }
+
         user.DisplayName = string.IsNullOrWhiteSpace(request.DisplayName) ? null : request.DisplayName.Trim();
-        user.ProfileImageUrl = string.IsNullOrWhiteSpace(request.ProfileImageUrl) ? null : request.ProfileImageUrl.Trim();
+        user.ProfileImageUrl = profileImageUrl;
+        user.ProfileEmoji = profileEmoji;
 
         var result = await userManager.UpdateAsync(user);
         if (!result.Succeeded)
         {
             return BadRequest(result.Errors);
+        }
+
+        if (!string.IsNullOrWhiteSpace(user.Id))
+        {
+            var members = dbContext.PartyMembers.Where(member => member.UserId == user.Id).ToList();
+            foreach (var member in members)
+            {
+                member.UpdateProfileAvatar(user.ProfileImageUrl, user.ProfileEmoji);
+            }
+
+            if (members.Count > 0)
+            {
+                await dbContext.SaveChangesAsync();
+            }
         }
 
         return Ok(MapUserProfile(user));
@@ -137,6 +169,35 @@ public class AuthController(
             user.Id,
             user.Email ?? string.Empty,
             user.DisplayName,
-            user.ProfileImageUrl);
+            user.ProfileImageUrl,
+            user.ProfileEmoji);
+    }
+
+    private static bool IsDataUrl(string value)
+    {
+        return value.StartsWith("data:", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static int EstimateDataUrlBytes(string dataUrl)
+    {
+        var commaIndex = dataUrl.IndexOf(',');
+        if (commaIndex < 0 || commaIndex == dataUrl.Length - 1)
+        {
+            return 0;
+        }
+
+        var base64 = dataUrl[(commaIndex + 1)..];
+        var padding = 0;
+        if (base64.EndsWith("==", StringComparison.Ordinal))
+        {
+            padding = 2;
+        }
+        else if (base64.EndsWith("=", StringComparison.Ordinal))
+        {
+            padding = 1;
+        }
+
+        var base64Length = base64.Length;
+        return (base64Length * 3 / 4) - padding;
     }
 }

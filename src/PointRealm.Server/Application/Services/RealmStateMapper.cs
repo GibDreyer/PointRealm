@@ -42,6 +42,8 @@ public sealed class RealmStateMapper : IRealmStateMapper
                 MemberId = m.Id.ToString(),
                 DisplayName = m.Name,
                 AvatarEmoji = m.AvatarEmoji,
+                ProfileImageUrl = m.ProfileImageUrl,
+                ProfileEmoji = m.ProfileEmoji,
                 Presence = m.IsOnline ? "Online" : "Offline",
                 VoteState = GetVoteState(m, realm),
                 IsGM = m.IsHost
@@ -139,6 +141,8 @@ public sealed class RealmStateMapper : IRealmStateMapper
             Id = m.Id,
             Name = m.Name ?? "Unknown Traveler",
             AvatarEmoji = m.AvatarEmoji,
+            ProfileImageUrl = m.ProfileImageUrl,
+            ProfileEmoji = m.ProfileEmoji,
             Role = m.IsHost ? "GM" : (m.IsObserver ? "Observer" : "Member"),
             Status = m.IsOnline ? status : "disconnected",
             IsOnline = m.IsOnline,
