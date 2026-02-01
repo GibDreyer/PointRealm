@@ -7,6 +7,7 @@ import styles from './PartyVotesList.module.css';
 export interface PartyVoteRow {
   id: string;
   name: string;
+  avatarEmoji?: string | null;
   voteValue: string | null;
 }
 
@@ -104,6 +105,7 @@ export const PartyVotesList: React.FC<PartyVotesListProps> = ({
           const isMin = numeric !== null && minVote !== null && numeric === minVote;
           const isMax = numeric !== null && maxVote !== null && numeric === maxVote;
           const displayValue = revealed ? (member.voteValue ?? '—') : '—';
+          const avatarEmoji = member.avatarEmoji?.trim();
 
           return (
             <div
@@ -114,7 +116,9 @@ export const PartyVotesList: React.FC<PartyVotesListProps> = ({
                 isMax && styles.rowMax
               )}
             >
-              <div className={styles.rowBadge}>{member.name.substring(0, 2).toUpperCase()}</div>
+              <div className={styles.rowBadge}>
+                {avatarEmoji ?? member.name.substring(0, 2).toUpperCase()}
+              </div>
               <div className={styles.name}>{member.name}</div>
               <FlipChip value={displayValue} shown={revealed} />
             </div>

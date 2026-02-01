@@ -18,6 +18,7 @@ import { Panel } from '../../components/ui/Panel';
 import { SummoningCircle } from '../../components/ui/SummoningCircle';
 import { BackButton } from '../../components/ui/BackButton';
 import { Button } from '../../components/Button';
+import { EmojiPicker } from '../../components/ui/EmojiPicker';
 import styles from './lobby.module.css';
 import type { RealmStateDto } from '../../types/realm';
 
@@ -145,6 +146,17 @@ export function TavernLobbyPage() {
     const me = snapshot.me;
     const isGM = me.role === 'GM';
     const gmName = snapshot.party.find(member => member.isGM)?.displayName || me.displayName;
+    const currentMember = snapshot.party.find(member => member.memberId === me.memberId);
+    const currentEmoji = currentMember?.avatarEmoji ?? null;
+
+    const handleAvatarEmojiSelect = async (emoji: string) => {
+        if (!currentMember || emoji === currentEmoji) return;
+        try {
+            await client.setAvatarEmoji({ emoji });
+        } catch (err) {
+            console.error("Failed to update avatar emoji", err);
+        }
+    };
 
     return (
         <PageShell
@@ -182,6 +194,25 @@ export function TavernLobbyPage() {
                         </div>
 
                         <div className={styles.panelBody}>
+                            {currentMember && (
+                                <Panel variant="default" className="mb-4 p-4">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div>
+                                            <p className="text-[10px] uppercase tracking-[0.3em] text-pr-text-muted/70">
+                                                Your Sigil
+                                            </p>
+                                            <p className="text-xs text-pr-text-muted">
+                                                Choose an emoji avatar for the party.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <EmojiPicker
+                                        selectedEmoji={currentEmoji}
+                                        onSelect={handleAvatarEmojiSelect}
+                                        disabled={status !== 'connected'}
+                                    />
+                                </Panel>
+                            )}
                             <div className={styles.memberList}>
                                 <AnimatePresence mode="popLayout" initial={false}>
                                     {snapshot.party.map((member) => (

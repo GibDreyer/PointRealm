@@ -48,6 +48,7 @@ public class PartyMemberDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
+    public string? AvatarEmoji { get; set; }
     public string Role { get; set; } = "Member"; // GM, Member
     public string Status { get; set; } = "disconnected"; // ready, choosing, disconnected
     public bool IsOnline { get; set; }

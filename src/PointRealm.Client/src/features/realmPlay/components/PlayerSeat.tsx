@@ -17,6 +17,7 @@ interface PlayerSeatProps {
 export function PlayerSeat({ member, vote, isRevealed, position, className }: PlayerSeatProps) {
     const hasVoted = member.status === 'ready';
     const isDisconnected = !member.isOnline || member.status === 'disconnected';
+    const avatarEmoji = member.avatarEmoji?.trim();
     
     // Determine card state
     // If revealed, show the vote value (or ? if they didn't vote but were ready?? usually ready means voted)
@@ -77,9 +78,15 @@ export function PlayerSeat({ member, vote, isRevealed, position, className }: Pl
                         hasVoted && "border-pr-primary text-pr-primary shadow-[0_0_10px_rgba(var(--pr-primary-rgb),0.3)]",
                         isDisconnected && "opacity-50 grayscale"
                      )}>
-                        <span className="text-xs sm:text-sm font-medium">
-                            {member.name.slice(0, 2).toUpperCase()}
-                        </span>
+                        {avatarEmoji ? (
+                            <span className="text-base sm:text-lg" aria-label={`${member.name} avatar`}>
+                                {avatarEmoji}
+                            </span>
+                        ) : (
+                            <span className="text-xs sm:text-sm font-medium">
+                                {member.name.slice(0, 2).toUpperCase()}
+                            </span>
+                        )}
                      </div>
                      
                      {/* Status Indicators */}

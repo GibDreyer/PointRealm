@@ -5,6 +5,7 @@ import type {
   HubServerMethods,
   RealtimeEventMap,
   SetDisplayNameRequest,
+  SetAvatarEmojiRequest,
   SelectRuneRequest,
   StartEncounterRequest,
   RevealProphecyRequest,
@@ -195,6 +196,10 @@ export class RealmRealtimeClient {
 
   async setDisplayName(request: SetDisplayNameRequest) {
     return this.invoke('SetDisplayName', this.withCommandId(request));
+  }
+
+  async setAvatarEmoji(request: SetAvatarEmojiRequest) {
+    return this.invoke('SetAvatarEmoji', this.withCommandId(request));
   }
 
   async joinPresence(request: JoinPresenceRequest = {}) {
