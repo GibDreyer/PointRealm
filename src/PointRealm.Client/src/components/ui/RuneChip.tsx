@@ -1,9 +1,8 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
-import { motion, type MotionStyle } from 'framer-motion';
+import { motion, type HTMLMotionProps } from 'framer-motion';
 
-interface RuneChipProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
+interface RuneChipProps extends HTMLMotionProps<'button'> {
   active?: boolean;
 }
 
@@ -15,7 +14,7 @@ export const RuneChip: React.FC<RuneChipProps> = ({
 }) => {
   const { style, ...filteredProps } = props;
 
-  const styleProp = style ? { style: style as MotionStyle } : {};
+  const styleProp = style ? { style } : {};
 
   return (
     <motion.button
