@@ -60,9 +60,14 @@ public static class ApiServiceTestHelpers
 
     public sealed class StubRealmRepository : IRealmRepository
     {
+        public Task<Realm?> GetByCodeAsync(string code, CancellationToken cancellationToken = default) => Task.FromResult<Realm?>(null);
         public Task<Realm?> GetByCodeWithRelationsAsync(string code, CancellationToken cancellationToken = default) => Task.FromResult<Realm?>(null);
+        public Task<bool> ExistsByCodeAsync(string code, CancellationToken cancellationToken = default) => Task.FromResult(false);
         public Task<Realm?> GetByIdWithRelationsAsync(Guid id, CancellationToken cancellationToken = default) => Task.FromResult<Realm?>(null);
         public Task<Realm?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) => Task.FromResult<Realm?>(null);
+        public Task<IReadOnlyList<Realm>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
+            => Task.FromResult<IReadOnlyList<Realm>>(Array.Empty<Realm>());
+        public Task AddAsync(Realm realm, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task SaveChangesAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 
