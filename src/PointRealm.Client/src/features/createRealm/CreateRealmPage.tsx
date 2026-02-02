@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { Eye, EyeOff, Loader2, UserX, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Loader2, UserX, Sparkles, Edit2, Check, UserPlus } from "lucide-react";
 import { generateRandomRealmName, generateRandomQuestName } from "@/lib/realmNames";
 import { SummoningCircle } from "@/components/ui/SummoningCircle";
 
@@ -15,6 +15,8 @@ import { useRealmClient } from "@/app/providers/RealtimeProvider";
 import { getClientId } from "@/lib/storage";
 import { updateProfile, getProfile, STORAGE_KEYS } from "@/lib/storage";
 import { useRealmStore } from "@/state/realmStore";
+import { useAuth } from "@/features/auth/AuthContext";
+import { authApi } from "@/api/auth";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/ui/Input";
 import { PageShell } from "@/components/shell/PageShell";
@@ -40,6 +42,7 @@ const formSchema = z.object({
   autoReveal: z.boolean(),
   allowAbstain: z.boolean(),
   hideVoteCounts: z.boolean(),
+  participateInVoting: z.boolean(),
 }).superRefine((data, ctx) => {
   if (data.deckType === "CUSTOM") {
     if (!data.customDeckValuesInput || data.customDeckValuesInput.trim().length === 0) {
@@ -99,12 +102,17 @@ export function CreateRealmPage() {
   const { setThemeKey } = useTheme();
   const client = useRealmClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [isUpdatingName, setIsUpdatingName] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const prefersReducedMotion = useReducedMotion() ?? false;
   const tipUrl = import.meta.env.VITE_TIP_JAR_URL || "/tip";
   const tipIsExternal = /^https?:\/\//i.test(tipUrl);
 
-  const initialDisplayName = localStorage.getItem(STORAGE_KEYS.DISPLAY_NAME) || getProfile().lastDisplayName || "";
+  const { user, isAuthenticated, refreshUser } = useAuth();
+  const initialDisplayName = (isAuthenticated && user?.displayName)
+    ? user.displayName
+    : (localStorage.getItem(STORAGE_KEYS.DISPLAY_NAME) || getProfile().lastDisplayName || "");
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -117,6 +125,7 @@ export function CreateRealmPage() {
       autoReveal: true,
       allowAbstain: true,
       hideVoteCounts: false,
+      participateInVoting: false,
     },
   });
 
@@ -130,6 +139,25 @@ export function CreateRealmPage() {
     CUSTOM: "Provide your own comma-separated rune values.",
   };
 
+  const handleSaveProfileName = async () => {
+    const newName = watch("displayName");
+    if (!newName || newName === user?.displayName) {
+      setIsEditingName(false);
+      return;
+    }
+
+    setIsUpdatingName(true);
+    try {
+      await authApi.updateProfile({ displayName: newName });
+      await refreshUser();
+      setIsEditingName(false);
+    } catch (err) {
+      console.error("Failed to update profile name:", err);
+    } finally {
+      setIsUpdatingName(false);
+    }
+  };
+
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     setServerError(null);
@@ -137,6 +165,16 @@ export function CreateRealmPage() {
     try {
       localStorage.setItem(STORAGE_KEYS.DISPLAY_NAME, data.displayName);
       updateProfile({ lastDisplayName: data.displayName });
+
+      if (isAuthenticated && data.displayName !== user?.displayName) {
+        try {
+          await authApi.updateProfile({ displayName: data.displayName });
+          await refreshUser();
+        } catch (err) {
+          console.error("Failed to update account profile:", err);
+          // Non-blocking error, we still proceed with realm creation
+        }
+      }
 
       let customDeckValues: string[] | undefined;
 
@@ -164,7 +202,8 @@ export function CreateRealmPage() {
 
       const joinPayload = {
         displayName: data.displayName,
-        role: "GM"
+        role: "GM",
+        isObserver: !data.participateInVoting
       };
 
       const joinResponse = await api.post<{ memberToken: string, memberId: string }>(`realms/${realmCode}/join`, joinPayload);
@@ -270,27 +309,57 @@ export function CreateRealmPage() {
                       placeholder="e.g. The Emerald Sanctum..."
                       disabled={isSubmitting}
                       error={errors.realmName?.message}
-                      className="bg-black/20 pr-10"
+                      className="bg-black/20"
+                      rightElement={
+                        <Tooltip content="Generate a fresh random realm name.">
+                          <button
+                            type="button"
+                            className={styles.randomizeBtn}
+                            onClick={() => setValue("realmName", generateRandomRealmName())}
+                            aria-label="Generate random realm name"
+                          >
+                            <Sparkles size={16} />
+                          </button>
+                        </Tooltip>
+                      }
                     />
-                    <Tooltip content="Generate a fresh random realm name.">
-                      <button
-                        type="button"
-                        className={styles.randomizeBtn}
-                        onClick={() => setValue("realmName", generateRandomRealmName())}
-                      >
-                        <Sparkles size={16} />
-                      </button>
-                    </Tooltip>
                   </div>
                   <div className={styles.field}>
                     <Input
                       label="Your Name"
-                      tooltip="This name is shown to everyone in the realm."
+                      tooltip={isAuthenticated ? "This is your permanent account identity." : "This name is shown to everyone in the realm."}
                       {...form.register("displayName")}
-                      placeholder="e.g. Archmage Aethelgard"
-                      disabled={isSubmitting}
+                      placeholder={isAuthenticated ? user?.displayName || "Your Name" : "e.g. Archmage Aethelgard"}
+                      disabled={isSubmitting || isUpdatingName}
+                      readOnly={isAuthenticated && !isEditingName}
                       error={errors.displayName?.message}
                       className="bg-black/20"
+                      rightElement={isAuthenticated ? (
+                        isEditingName ? (
+                          <Tooltip content="Confirm and save name to your profile">
+                            <button
+                              type="button"
+                              className={styles.randomizeBtn}
+                              onClick={handleSaveProfileName}
+                              disabled={isUpdatingName}
+                              aria-label="Save name"
+                            >
+                              {isUpdatingName ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
+                            </button>
+                          </Tooltip>
+                        ) : (
+                          <Tooltip content="Linked to account. Click to change your profile name.">
+                            <button
+                              type="button"
+                              className={styles.randomizeBtn}
+                              onClick={() => setIsEditingName(true)}
+                              aria-label="Edit name"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                          </Tooltip>
+                        )
+                      ) : undefined}
                     />
                   </div>
                 </section>
@@ -390,6 +459,18 @@ export function CreateRealmPage() {
                       disabled={isSubmitting}
                       rowClassName={styles.toggleItem}
                     />
+                    
+                    <div className="mt-4 pt-4 border-t border-pr-border/30">
+                      <ToggleSettingRow
+                        icon={UserPlus}
+                        label="Join as Voter"
+                        description="Participate in voting"
+                        tooltip="By default GMs are spectators. Check this to cast your own votes."
+                        {...form.register("participateInVoting")}
+                        disabled={isSubmitting}
+                        rowClassName={styles.toggleItem}
+                      />
+                    </div>
                   </div>
                 </section>
 

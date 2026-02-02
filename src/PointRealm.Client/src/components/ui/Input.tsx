@@ -10,6 +10,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string | undefined;
   wrapperClassName?: string | undefined;
   tooltip?: string | undefined;
+  rightElement?: React.ReactNode;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(({ 
@@ -19,6 +20,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   helper,
   error,
   tooltip,
+  rightElement,
   ...props 
 }, ref) => {
   return (
@@ -40,11 +42,18 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
         </div>
       )}
       {helper && <p className={styles.helper}>{helper}</p>}
-      <input 
-        ref={ref}
-        className={cn(styles.input, error && "border-pr-danger", className)} 
-        {...props}
-      />
+      <div className={styles.inputContainer}>
+        <input 
+          ref={ref}
+          className={cn(styles.input, error && "border-pr-danger", rightElement && styles.hasRightElement, className)} 
+          {...props}
+        />
+        {rightElement && (
+          <div className={styles.rightElement}>
+            {rightElement}
+          </div>
+        )}
+      </div>
       {error && <p className={styles.error}>{error}</p>}
     </div>
   );

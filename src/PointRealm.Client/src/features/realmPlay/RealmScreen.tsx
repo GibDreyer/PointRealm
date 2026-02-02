@@ -12,6 +12,10 @@ import { RuneHand } from './components/RuneHand';
 import { Menu, Settings, X, LogOut, Link2, Check, Smile } from 'lucide-react';
 import { Dialog } from '../../components/ui/Dialog';
 import { EmojiPicker } from '../../components/ui/EmojiPicker';
+import { AccountStatus } from '@/components/ui/AccountStatus';
+import { QuestDialog } from './components/QuestDialog';
+import { cn } from '@/lib/utils';
+import { useTheme } from '@/theme/ThemeProvider';
 
 import styles from './realmScreen.module.css';
 
@@ -27,9 +31,18 @@ export function RealmScreen() {
     const [isQuestSidebarOpen, setQuestSidebarOpen] = useState(false);
     const [isSettingsOpen, setSettingsOpen] = useState(false);
     const [isEmojiPickerOpen, setEmojiPickerOpen] = useState(false);
+    const [isQuestDialogOpen, setQuestDialogOpen] = useState(false);
     const [copied, setCopied] = useState(false);
     const prefersReducedMotion = useReducedMotion() ?? false;
 
+
+    const { setThemeKey } = useTheme();
+
+    useEffect(() => {
+        if (state?.themeKey) {
+            setThemeKey(state.themeKey);
+        }
+    }, [state?.themeKey, setThemeKey]);
 
     useEffect(() => {
         if (error) {
@@ -66,6 +79,7 @@ export function RealmScreen() {
                 backgroundVariant="realm"
                 reducedMotion={prefersReducedMotion}
                 contentClassName={styles.page}
+                hideAccountStatus={true}
             >
                 <div className="flex flex-col items-center justify-center h-full">
                      <div className="relative w-16 h-16">
@@ -167,6 +181,7 @@ export function RealmScreen() {
             backgroundVariant="realm"
             reducedMotion={prefersReducedMotion}
             contentClassName={styles.page}
+            hideAccountStatus={true}
         >
             <AnimatePresence>
                 {connectionStatus !== 'connected' && (
@@ -189,13 +204,24 @@ export function RealmScreen() {
                         </button>
                      </div>
 
-                     <div className="pointer-events-auto flex items-center gap-2">
+                     <div className="pointer-events-auto flex items-center gap-3">
+                        <AccountStatus />
                         <button
                             onClick={handleCopyLink}
-                            className="p-3 bg-pr-surface/80 backdrop-blur border border-pr-border/50 rounded-xl hover:bg-pr-surface hover:border-pr-primary/50 transition-all text-pr-text-muted hover:text-pr-text shadow-lg relative group"
+                            className="px-4 py-3 bg-pr-surface/80 backdrop-blur border border-pr-border/50 rounded-xl hover:bg-pr-surface hover:border-pr-primary/50 transition-all text-pr-text-muted hover:text-pr-text shadow-lg relative group flex items-center gap-2"
                             title="Copy Realm Link"
                         >
-                            {copied ? <Check size={24} className="text-green-500" /> : <Link2 size={24} />}
+                            {copied ? (
+                                <>
+                                    <Check size={20} className="text-green-500" />
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-green-500">Copied!</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Link2 size={20} />
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.1em]">Copy Link</span>
+                                </>
+                            )}
                         </button>
                         <button
                             onClick={() => setEmojiPickerOpen(true)}
@@ -246,12 +272,15 @@ export function RealmScreen() {
                         deckValues={getDeckValues()}
                         hideVoteCounts={settings.hideVoteCounts}
                         actionsDisabled={!isConnected}
-                        className="pb-32 sm:pb-40" // Add padding to avoid overlap with bottom hand
+                        className={cn(
+                            "transition-all duration-500",
+                            encounter && !encounter.isRevealed && !isGM ? "pb-56 sm:pb-72" : "pb-12 sm:pb-20"
+                        )}
                      />
                 </main>
 
-                {/* Hand / Voting Controls */}
-                {encounter && !encounter.isRevealed && (
+                {/* Hand / Voting Controls - GM doesn't vote traditionally in this layout to save space */}
+                {encounter && !encounter.isRevealed && !isObserver && (
                     <RuneHand 
                         options={getDeckValues()}
                         selectedValue={myVote || null}
@@ -297,7 +326,7 @@ export function RealmScreen() {
                                         quests={questLog.quests}
                                         activeQuestId={encounter?.questId || undefined}
                                         isGM={!!isGM}
-                                        onAddQuest={() => {}} // Add quest logic if needed
+                                        onAddQuest={() => setQuestDialogOpen(true)}
                                         onOpenSettings={() => setSettingsOpen(true)}
                                         onSelectQuest={(id) => {
                                              if(isGM) actions.startEncounter(id);
@@ -335,6 +364,13 @@ export function RealmScreen() {
                     disabled={!isConnected}
                 />
             </Dialog>
+
+            <QuestDialog
+                isOpen={isQuestDialogOpen}
+                mode="add"
+                onClose={() => setQuestDialogOpen(false)}
+                onSubmit={actions.addQuest}
+            />
         </PageShell>
     );
 }

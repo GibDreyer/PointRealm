@@ -246,10 +246,7 @@
 
 
 .randomizeBtn {
-  position: absolute;
-  right: 0;
-  top: 1.85rem; /* Adjusted for label height */
-  padding: 0.5rem;
+  padding: 0.4rem;
   background: transparent;
   border: none;
   color: var(--pr-secondary);

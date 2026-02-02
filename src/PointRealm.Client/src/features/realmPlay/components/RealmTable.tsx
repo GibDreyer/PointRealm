@@ -38,10 +38,18 @@ export function RealmTable({
     actionsDisabled = false,
     className 
 }: RealmTableProps) {
+    const voters = members.filter(m => !m.isObserver && !m.isBanned);
+    const votersCount = voters.length;
     const total = members.length;
     
     const topRow = members.slice(0, Math.ceil(total/2));
     const bottomRow = members.slice(Math.ceil(total/2));
+
+    const isCrowded = total > 6;
+    const isVeryCrowded = total > 12;
+
+    const gapClass = isVeryCrowded ? "gap-2 sm:gap-4" : isCrowded ? "gap-4 sm:gap-6" : "gap-8 sm:gap-10";
+    const tableAspectClass = isVeryCrowded ? "aspect-[4/1] sm:aspect-[6/1]" : isCrowded ? "aspect-[3/1] sm:aspect-[4/1]" : "aspect-[2/1] sm:aspect-[3/1]";
 
     const isRevealed = encounter?.isRevealed ?? false;
     const votes = encounter?.votes || {};
@@ -50,7 +58,7 @@ export function RealmTable({
     const voteCount = hasVotedCount > 0 ? hasVotedCount : Object.keys(votes).length;
     const readyCount = hasVotedCount > 0
         ? hasVotedCount
-        : members.filter(m => m.status === 'ready').length;
+        : voters.filter(m => m.status === 'ready').length;
 
 
     const { stats, consensusText, consensusColor } = useProphecyStats(
@@ -62,10 +70,10 @@ export function RealmTable({
     const [isRevealModalOpen, setIsRevealModalOpen] = useState(false);
 
     return (
-        <div className={cn("relative flex flex-col items-center justify-center min-h-[400px] w-full max-w-5xl mx-auto p-4", className)}>
+        <div className={cn("relative flex flex-col items-center justify-center min-h-[400px] w-full max-w-6xl mx-auto p-4 transition-all duration-700", className)}>
             
             {/* Top Row Seats */}
-            <div className="flex justify-center gap-8 mb-8 sm:mb-12 w-full">
+            <div className={cn("flex flex-wrap justify-center w-full", gapClass, isCrowded ? "mb-4 sm:mb-6" : "mb-8 sm:mb-12")}>
                 {topRow.map(member => (
                     <PlayerSeat 
                         key={member.id} 
@@ -80,41 +88,50 @@ export function RealmTable({
             {/* The Table Surface */}
             <Panel 
                 variant="realm"
-                className="relative w-full max-w-3xl aspect-[2/1] sm:aspect-[3/1] flex items-center justify-center transition-all duration-500"
+                className={cn("relative w-full max-w-3xl flex items-center justify-center transition-all duration-500", tableAspectClass)}
             >
                  {/* Table Texture/Glow */}
 
                  
-                 <div className="w-full flex flex-col items-center gap-4 relative z-10 p-1 text-center">
+                 <div className="w-full flex h-full justify-between flex-col items-center gap-2 sm:gap-4 relative z-10 p-2 text-center">
                      {quest ? (
                          <>
                             <motion.div 
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="space-y-1"
+                                className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 max-w-5xl mx-auto"
                             >
-                                <h2 className="text-xl sm:text-2xl font-serif font-bold text-pr-primary brightness-110">
+                                <h2 className={cn(
+                                    "font-serif font-bold text-pr-primary brightness-110 leading-tight shrink-0",
+                                    isCrowded ? "text-lg sm:text-xl" : "text-xl sm:text-2xl"
+                                )}>
                                     {quest.title}
                                 </h2>
                                 {quest.description && (
-                                    <p className="text-sm text-pr-text-muted max-w-md mx-auto line-clamp-2">
-                                        {quest.description}
-                                    </p>
+                                    <>
+                                        <div className="hidden sm:block w-px h-5 bg-white/10" />
+                                        <p className={cn(
+                                            "text-pr-text-muted max-w-md sm:max-w-xl mx-auto sm:mx-0 line-clamp-2 sm:line-clamp-1 text-center sm:text-left",
+                                            isCrowded ? "text-[10px] sm:text-xs" : "text-sm"
+                                        )}>
+                                            {quest.description}
+                                        </p>
+                                    </>
                                 )}
                             </motion.div>
 
                              {!isRevealed ? (
                                 <>
-                                    <div className="flex items-center gap-4 mt-2">
-                                        <div className="px-4 py-1.5 rounded-full bg-black/20 border border-pr-primary/10 text-xs uppercase tracking-widest text-pr-text-muted">
-                                            {readyCount}/{total} Votes Cast
+                                    <div className="flex items-center gap-4 mt-1 sm:mt-2">
+                                        <div className="px-3 py-1 rounded-full bg-black/20 border border-pr-primary/10 text-[9px] sm:text-xs uppercase tracking-widest text-pr-text-muted">
+                                            {readyCount}/{votersCount} Votes Cast
                                         </div>
                                     </div>
 
                                     {isGM && (
-                                        <div className="flex gap-4 mt-4">
+                                        <div className="flex gap-4 mt-2 sm:mt-4">
                                             {members.length <= 1 ? (
-                                                <div className="text-pr-text-muted italic opacity-70 border border-pr-border/30 bg-pr-surface/30 px-6 py-3 rounded-xl text-sm">
+                                                <div className="text-pr-text-muted italic opacity-70 border border-pr-border/30 bg-pr-surface/30 px-6 py-2 rounded-xl text-[10px] sm:text-sm">
                                                     It's lonely here among the echoes... Waiting for a party.
                                                 </div>
                                             ) : (
@@ -123,17 +140,17 @@ export function RealmTable({
                                                         variant="secondary"
                                                         onClick={onReroll}
                                                         disabled={voteCount === 0 || actionsDisabled}
-                                                        className="px-10 py-5 text-lg min-h-0 h-14"
+                                                        className={cn("px-6 sm:px-10 py-2 sm:py-5 min-h-0", isCrowded ? "h-10 sm:h-12 text-sm" : "h-14 text-lg")}
                                                     >
-                                                        <RefreshCcw size={18} className="mr-3" />
+                                                        <RefreshCcw size={isCrowded ? 14 : 18} className="mr-2 sm:mr-3" />
                                                         Reroll
                                                     </Button>
                                                     <Button
                                                         onClick={onReveal}
                                                         disabled={voteCount === 0 || actionsDisabled}
-                                                        className="px-10 py-5 text-lg min-h-0 h-14"
+                                                        className={cn("px-6 sm:px-10 py-2 sm:py-5 min-h-0", isCrowded ? "h-10 sm:h-12 text-sm" : "h-14 text-lg")}
                                                     >
-                                                        <Eye size={18} className="mr-3" />
+                                                        <Eye size={isCrowded ? 14 : 18} className="mr-2 sm:mr-3" />
                                                         Reveal Cards
                                                     </Button>
                                                 </>
@@ -143,63 +160,70 @@ export function RealmTable({
                                 </>
 
                              ) : (
-                                 <div className="w-full  flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-1000">
-                                    <div className="flex flex-row items-center gap-6 w-full max-w-2xl px-4">
-                                        {/* Consensus Block - 2/3 width */}
-                                        <div className="relative group flex-[2] h-27">
-                                             <div className="absolute inset-0 bg-pr-surface-slate/40 border border-pr-border/30 rounded-xl backdrop-blur-md shadow-lg transition-all duration-500 group-hover:border-pr-primary/30 group-hover:bg-pr-surface-slate/60" />
-                                             <div className="relative flex flex-col items-center justify-center h-full p-3">
-                                                 <span className="text-[9px] uppercase tracking-[0.3em] text-pr-text-dim mb-2 font-heading opacity-50">Consensus</span>
-                                                 <div className={cn("text-xl font-serif font-black uppercase tracking-widest leading-tight text-center px-1", consensusColor)}>
-                                                     {consensusText}
-                                                 </div>
-                                                 <div className="absolute -top-px left-1/2 -translate-x-1/2 w-16 h-px bg-gradient-to-r from-transparent via-pr-border/30 to-transparent" />
-                                                 <div className="absolute -bottom-px left-1/2 -translate-x-1/2 w-16 h-px bg-gradient-to-r from-transparent via-pr-border/30 to-transparent" />
-                                             </div>
-                                        </div>
- 
-                                        {/* Average Block - 1/3 width */}
-                                        <div className="relative group flex-1 h-27">
-                                             <div className="absolute inset-0 bg-pr-primary/5 border border-pr-primary/20 rounded-xl backdrop-blur-md shadow-md transition-all duration-500 group-hover:border-pr-primary/40 group-hover:bg-pr-primary/10" />
-                                             <div className="relative flex flex-col items-center justify-center h-full p-3">
-                                                 <span className="text-[9px] uppercase tracking-[0.3em] text-pr-primary/40 mb-1.5 font-heading">Average</span>
-                                                 <div className="text-4xl font-black text-pr-primary tracking-tighter drop-shadow-glow leading-none">
-                                                     {stats?.average ?? "?"}
-                                                 </div>
-                                                 <div className="mt-2 w-6 h-0.5 bg-pr-primary/20 rounded-full" />
-                                             </div>
-                                        </div>
-                                    </div>
- 
-                                     <div className="w-full flex items-center gap-4 mt-2" style={{justifyContent: "space-between"}}>
-                                         <Button
-                                             variant="ghost"
-                                             onClick={() => setIsRevealModalOpen(true)}
-                                             className="px-6 py-2 text-[10px] min-h-0  border border-white/10 hover:border-pr-primary/30 bg-black/20 hover:bg-black/40 backdrop-blur-md rounded-xl transition-all duration-300"
-                                         >
-                                             <div className="flex items-center gap-2">
-                                                 <ChartBar size={14} className="text-pr-primary opacity-60" />
-                                                 <span className="font-heading font-bold uppercase tracking-[0.2em]">Analysis</span>
-                                             </div>
-                                         </Button>
-
-                                         {isGM && (
-                                             <Button
-                                                 variant="secondary"
-                                                 onClick={onReroll}
-                                                 disabled={actionsDisabled}
-                                                 className="px-10 py-2 text-xs min-h-0 h-10 border-pr-secondary/30 hover:border-pr-secondary/60 transition-all duration-500"
-                                             >
-                                                 <RefreshCcw size={14} className="mr-3 opacity-70" />
-                                                 Reroll Fates
-                                             </Button>
-                                         )}
+                                    <div className="w-full  flex flex-col items-center gap-2 sm:gap-4 animate-in fade-in zoom-in duration-1000">
+                                       <div className="flex flex-row items-center gap-3 sm:gap-4 w-full max-w-xl px-4">
+                                           {/* Consensus Block - 2/3 width */}
+                                           <div className={cn("relative group flex-[2]", isCrowded ? "h-16 sm:h-20" : "h-20 sm:h-24")}>
+                                                <div className="absolute inset-0 bg-pr-surface-slate/40 border border-pr-border/30 rounded-xl backdrop-blur-md shadow-lg transition-all duration-500 group-hover:border-pr-primary/30 group-hover:bg-pr-surface-slate/60" />
+                                                <div className="relative flex flex-col items-center justify-center h-full p-1 sm:p-2">
+                                                    <span className="text-[7px] sm:text-[8px] uppercase tracking-[0.3em] text-pr-text-dim mb-0.5 sm:mb-1 font-heading opacity-50">Consensus</span>
+                                                    <div className={cn(
+                                                        "font-serif font-black uppercase tracking-widest leading-tight text-center px-1", 
+                                                        consensusColor,
+                                                        isCrowded ? "text-sm sm:text-lg" : "text-lg sm:text-xl"
+                                                    )}>
+                                                        {consensusText}
+                                                    </div>
+                                                    <div className="absolute -top-px left-1/2 -translate-x-1/2 w-12 h-px bg-gradient-to-r from-transparent via-pr-border/30 to-transparent" />
+                                                    <div className="absolute -bottom-px left-1/2 -translate-x-1/2 w-12 h-px bg-gradient-to-r from-transparent via-pr-border/30 to-transparent" />
+                                                </div>
+                                           </div>
+    
+                                           {/* Average Block - 1/3 width */}
+                                           <div className={cn("relative group flex-1", isCrowded ? "h-16 sm:h-20" : "h-20 sm:h-24")}>
+                                                <div className="absolute inset-0 bg-pr-primary/5 border border-pr-primary/20 rounded-xl backdrop-blur-md shadow-md transition-all duration-500 group-hover:border-pr-primary/40 group-hover:bg-pr-primary/10" />
+                                                <div className="relative flex flex-col items-center justify-center h-full p-1 sm:p-2">
+                                                    <span className="text-[7px] sm:text-[8px] uppercase tracking-[0.3em] text-pr-primary/40 mb-0.5 sm:mb-1 font-heading">Average</span>
+                                                    <div className={cn(
+                                                        "font-black text-pr-primary tracking-tighter drop-shadow-glow leading-none",
+                                                        isCrowded ? "text-xl sm:text-3xl" : "text-3xl"
+                                                    )}>
+                                                        {stats?.average ?? "?"}
+                                                    </div>
+                                                    <div className="mt-1 w-4 h-0.5 bg-pr-primary/20 rounded-full" />
+                                                </div>
+                                           </div>
+                                       </div>
+    
+                                        <div className="w-full flex items-center gap-4 mt-0.5 sm:mt-1" style={{justifyContent: "space-between"}}>
+                                            <Button
+                                                variant="ghost"
+                                                onClick={() => setIsRevealModalOpen(true)}
+                                                className="px-3 sm:px-5 py-1 sm:py-1.5 text-[8px] sm:text-[9px] min-h-0 border border-white/10 hover:border-pr-primary/30 bg-black/20 hover:bg-black/40 backdrop-blur-md rounded-lg transition-all duration-300"
+                                            >
+                                                <div className="flex items-center gap-1.5">
+                                                    <ChartBar size={10} className="text-pr-primary opacity-60" />
+                                                    <span className="font-heading font-bold uppercase tracking-[0.2em]">Analysis</span>
+                                                </div>
+                                            </Button>
+   
+                                            {isGM && (
+                                                <Button
+                                                    variant="secondary"
+                                                    onClick={onReroll}
+                                                    disabled={actionsDisabled}
+                                                    className="px-4 sm:px-6 py-1 sm:py-1.5 text-[9px] sm:text-[10px] min-h-0 h-6 sm:h-8 border-pr-secondary/30 hover:border-pr-secondary/60 transition-all duration-500"
+                                                >
+                                                    <RefreshCcw size={10} className="mr-1.5 sm:mr-2 opacity-70" />
+                                                    Reroll Fates
+                                                </Button>
+                                            )}
                                      </div>
                                  </div>
                              )}
                          </>
                      ) : (
-                         <div className="text-pr-text-muted italic opacity-50 tracking-[0.2em] uppercase text-[10px]">
+                         <div className="text-pr-text-muted italic opacity-50 tracking-[0.2em] uppercase text-[9px] sm:text-[10px]">
                              Waiting for destiny...
                          </div>
                      )}
@@ -209,7 +233,7 @@ export function RealmTable({
             </Panel>
 
             {/* Bottom Row Seats */}
-            <div className="flex justify-center gap-8 mt-8 sm:mt-12 w-full">
+            <div className={cn("flex flex-wrap justify-center w-full", gapClass, isCrowded ? "mt-4 sm:mt-6" : "mt-8 sm:mt-12")}>
                 {bottomRow.map(member => (
                      <PlayerSeat 
                         key={member.id} 

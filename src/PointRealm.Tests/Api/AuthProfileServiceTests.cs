@@ -33,12 +33,11 @@ public class AuthProfileServiceTests
             new Claim(ClaimTypes.NameIdentifier, user.Id)
         }));
 
-        var result = await service.UpdateProfileAsync(principal, new UpdateProfileRequest
-        {
-            DisplayName = "New Name",
-            ProfileImageUrl = dataUrl,
-            ProfileEmoji = "🔥"
-        });
+        var result = await service.UpdateProfileAsync(principal, new UpdateProfileRequest(
+            "New Name",
+            dataUrl,
+            "🔥"
+        ));
 
         Assert.IsType<BadRequestObjectResult>(result);
     }

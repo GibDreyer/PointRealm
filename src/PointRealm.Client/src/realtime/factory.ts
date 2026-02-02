@@ -35,7 +35,7 @@ export function createRealmClient(options: CreateRealmClientOptions = {}) {
       const response = await api.post<{
         memberToken?: string;
         memberId?: string;
-      }>(`/v1/realms/${realmCode}/join`, {
+      }>(`/realms/${realmCode}/join`, {
         displayName,
         role,
       });

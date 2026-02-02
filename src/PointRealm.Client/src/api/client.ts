@@ -45,8 +45,8 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   const url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
   
   // Check for realm-specific token in session storage
-  // Endpoints typically look like /realms/{code}/... or /v1/realms/{code}/...
-  const realmMatch = endpoint.match(/\/(?:v1\/)?realms\/([^/]+)/);
+  // Endpoints typically look like /realms/{code}/... or realms/{code}/...
+  const realmMatch = endpoint.match(/(?:\/|^)(?:v1\/)?realms\/([^/]+)/);
   let authHeader = {};
   
   if (realmMatch && realmMatch[1]) {

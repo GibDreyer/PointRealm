@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Eye, Shield, Loader2 } from 'lucide-react';
+import { Eye, Shield, Loader2, Edit2, Check } from 'lucide-react';
 
 import { api } from '../../api/client';
 import {
@@ -25,6 +25,8 @@ import { Panel } from '../../components/ui/Panel';
 import { Input } from '../../components/ui/Input';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Tooltip } from '../../components/ui/Tooltip';
+import { useAuth } from '../auth/AuthContext';
+import { authApi } from '@/api/auth';
 import styles from './joinRealm.module.css';
 
 export type RealmRole = 'participant' | 'observer';
@@ -61,21 +63,26 @@ export function JoinRealmPage() {
   const prefersReducedMotion = useReducedMotion() ?? false;
   const tipUrl = import.meta.env.VITE_TIP_JAR_URL || '/tip';
   const tipIsExternal = /^https?:\/\//i.test(tipUrl);
+  const { user, isAuthenticated, refreshUser } = useAuth();
 
   const [displayName, setDisplayName] = useState('');
   const [realmInput, setRealmInput] = useState(searchParams.get('realmCode') || '');
   const [role, setRole] = useState<RealmRole>('participant');
 
   const [recentRealms, setRecentRealms] = useState<RecentRealmItem[]>([]);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [isUpdatingName, setIsUpdatingName] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [inputError, setInputError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const savedName = localStorage.getItem(STORAGE_KEYS.DISPLAY_NAME) || getProfile().lastDisplayName;
+    const savedName = (isAuthenticated && user?.displayName) 
+      ? user.displayName 
+      : (localStorage.getItem(STORAGE_KEYS.DISPLAY_NAME) || getProfile().lastDisplayName);
     if (savedName) setDisplayName(savedName);
     setRecentRealms(getRecentRealms());
-  }, []);
+  }, [isAuthenticated, user?.displayName]);
 
   useEffect(() => {
     const codeFromUrl = searchParams.get('realmCode');
@@ -88,6 +95,24 @@ export function JoinRealmPage() {
     if (displayName.trim()) {
       localStorage.setItem(STORAGE_KEYS.DISPLAY_NAME, displayName.trim());
       updateProfile({ lastDisplayName: displayName.trim() });
+    }
+  };
+
+  const handleSaveProfileName = async () => {
+    if (!displayName || displayName === user?.displayName) {
+      setIsEditingName(false);
+      return;
+    }
+
+    setIsUpdatingName(true);
+    try {
+      await authApi.updateProfile({ displayName: displayName });
+      await refreshUser();
+      setIsEditingName(false);
+    } catch (err) {
+      console.error("Failed to update profile name:", err);
+    } finally {
+      setIsUpdatingName(false);
     }
   };
 
@@ -118,10 +143,19 @@ export function JoinRealmPage() {
     localStorage.setItem(STORAGE_KEYS.DISPLAY_NAME, nameToUse.trim());
     updateProfile({ lastDisplayName: nameToUse.trim() });
 
+    if (isAuthenticated && nameToUse.trim() !== user?.displayName) {
+      try {
+        await authApi.updateProfile({ displayName: nameToUse.trim() });
+        await refreshUser();
+      } catch (err) {
+        console.error("Failed to update account profile:", err);
+      }
+    }
+
     setIsLoading(true);
 
     try {
-      const response = await api.post<JoinRealmResponse>(`/v1/realms/${code}/join`, {
+      const response = await api.post<JoinRealmResponse>(`/realms/${code}/join`, {
         displayName: nameToUse,
         role: roleToUse
       });
@@ -236,15 +270,42 @@ export function JoinRealmPage() {
                   <div className={styles.field}>
                     <Input
                       label="Display Name"
-                      tooltip="Your name as it appears to the party."
-                      helper="Your party alias"
+                      tooltip={isAuthenticated ? "This is your permanent account identity." : "Your name as it appears to the party."}
+                      helper={isAuthenticated ? "Updates account profile" : "Your party alias"}
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                       onBlur={handleNameBlur}
-                      onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleJoin()}
-                      placeholder="e.g. Archmage"
-                      disabled={isLoading}
+                      onKeyDown={(e) => e.key === 'Enter' && !isLoading && !isUpdatingName && handleJoin()}
+                      placeholder={isAuthenticated ? user?.displayName || "Your Name" : "e.g. Archmage"}
+                      disabled={isLoading || isUpdatingName}
+                      readOnly={isAuthenticated && !isEditingName}
                       className="bg-black/20"
+                      rightElement={isAuthenticated ? (
+                        isEditingName ? (
+                          <Tooltip content="Confirm and save name to your profile">
+                            <button
+                              type="button"
+                              className={styles.randomizeBtn}
+                              onClick={handleSaveProfileName}
+                              disabled={isUpdatingName}
+                              aria-label="Save name"
+                            >
+                              {isUpdatingName ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
+                            </button>
+                          </Tooltip>
+                        ) : (
+                          <Tooltip content="Linked to account. Click to change your profile name.">
+                            <button
+                              type="button"
+                              className={styles.randomizeBtn}
+                              onClick={() => setIsEditingName(true)}
+                              aria-label="Edit name"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                          </Tooltip>
+                        )
+                      ) : undefined}
                     />
                   </div>
                 </div>

@@ -13,6 +13,7 @@ interface PageShellProps {
   backgroundDensity?: 'low' | 'medium' | 'high';
   backgroundVariant?: 'default' | 'realm';
   reducedMotion?: boolean;
+  hideAccountStatus?: boolean;
 }
 
 export const PageShell: React.FC<PageShellProps> = ({
@@ -23,6 +24,7 @@ export const PageShell: React.FC<PageShellProps> = ({
   backgroundDensity = 'medium',
   backgroundVariant = 'default',
   reducedMotion,
+  hideAccountStatus = false,
 }) => {
   const { theme } = useTheme();
   const prefersReducedMotion = useReducedMotion() ?? false;
@@ -49,7 +51,7 @@ export const PageShell: React.FC<PageShellProps> = ({
           <div className="magical-border" />
         </>
       )}
-      <AccountStatus className="fixed top-8 right-8" />
+      {!hideAccountStatus && <AccountStatus className="fixed top-8 right-8" />}
       <main className={cn("relative z-10 min-h-screen w-full", contentClassName)}>
         {children}
       </main>

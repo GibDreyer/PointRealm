@@ -52,6 +52,11 @@ public sealed class Realm : Entity
         Settings = newSettings;
     }
 
+    public void UpdateTheme(string theme)
+    {
+        Theme = theme;
+    }
+
     public void AddMember(PartyMember member)
     {
         if (_members.Any(m => m.Id == member.Id))

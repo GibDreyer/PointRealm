@@ -9,7 +9,8 @@ namespace PointRealm.Server.Application.Commands.Handlers;
 public class ImportQuestsCommandHandler(
     IRealmRepository repository,
     IQuestCsvService csvService,
-    IRealmAuthorizationService authService) : ICommandHandler<ImportQuestsCommand, Result<CsvImportResult>>
+    IRealmAuthorizationService authService,
+    IRealmBroadcaster broadcaster) : ICommandHandler<ImportQuestsCommand, Result<CsvImportResult>>
 {
     public async Task<Result<CsvImportResult>> HandleAsync(ImportQuestsCommand command, CancellationToken cancellationToken = default)
     {
@@ -122,15 +123,28 @@ public class ImportQuestsCommandHandler(
             }
         }
 
-        await repository.SaveChangesAsync(cancellationToken);
+        // Auto-start first quest encounter if no encounter is active
+        if (successCount > 0 && realm.CurrentEncounterId == null)
+        {
+            var firstQuest = realm.Quests.OrderBy(q => q.Order).FirstOrDefault();
+            if (firstQuest != null)
+            {
+                realm.StartEncounter(firstQuest.Id);
+            }
+        }
 
-        var result = new CsvImportResult
+        await repository.SaveChangesAsync(cancellationToken);
+        
+        // Broadcast the new state to all members
+        await broadcaster.BroadcastRealmStateAsync(realm.Id);
+
+        var resultData = new CsvImportResult
         {
             SuccessCount = successCount,
             ErrorCount = errors.Count,
             Errors = errors
         };
 
-        return Result.Success(result);
+        return Result.Success(resultData);
     }
 }

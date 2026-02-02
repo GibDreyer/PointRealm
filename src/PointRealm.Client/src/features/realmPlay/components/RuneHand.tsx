@@ -12,29 +12,74 @@ interface RuneHandProps {
 }
 
 export function RuneHand({ options, selectedValue, disabled, onVote, className }: RuneHandProps) {
+    const cardCount = options.length;
+    const arcAngle = 12; // Total arc spread in degrees
+    const liftAmount = 8; // Vertical offset for arc effect in pixels
+    
+    const getCardTransform = (index: number) => {
+        const middle = (cardCount - 1) / 2;
+        const offset = index - middle;
+        const normalizedOffset = offset / (cardCount / 2);
+        
+        return {
+            rotate: normalizedOffset * (arcAngle / 2),
+            y: Math.abs(normalizedOffset) * liftAmount,
+            originY: 1, // Rotate from bottom
+        };
+    };
+
     return (
-        <div className={cn("fixed bottom-0 left-0 right-0 p-4 sm:p-8 flex items-end justify-center pointer-events-none z-20", className)}>
+        <div className={cn("fixed bottom-0 left-0 right-0 flex flex-col items-center pointer-events-none z-20", className)}>
+            {/* Atmospheric backdrop */}
+            <div className="absolute inset-x-0 bottom-0 h-48 pointer-events-none">
+                {/* Primary gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-pr-bg via-pr-bg/95 to-transparent" />
+                {/* Arcane glow layer */}
+                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-pr-primary/5 to-transparent opacity-60" />
+                {/* Subtle noise texture overlay */}
+                <div className="absolute inset-0 opacity-10 mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
+            </div>
+
+            {/* Card rail / shelf effect */}
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-2xl h-1 bg-gradient-to-r from-transparent via-pr-border/30 to-transparent rounded-full" />
+
+            {/* The Hand of Cards */}
             <motion.div 
-                className="flex items-end -space-x-2 sm:space-x-2 pointer-events-auto pb-safe"
-                initial={{ y: 100, opacity: 0 }}
+                className="relative flex items-end justify-center pointer-events-auto pb-4 sm:pb-6 px-4"
+                initial={{ y: 120, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2, type: "spring", stiffness: 300, damping: 30 }}
+                transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 25 }}
             >
-                {options.map((val) => {
+                {options.map((val, index) => {
                     const isSelected = selectedValue === val;
-                    // Calculate rotation for a fan effect if needed, but keeping it flat for now for cleaner UI as per modern references
-                    // A slight arch could be nice but flat is safer for functionality
+                    const transform = getCardTransform(index);
+                    
                     return (
                         <motion.div
                             key={val}
                             layoutId={`rune-${val}`}
-                            className="relative"
-                            whileHover={!disabled ? { y: -20, zIndex: 10 } : {}}
+                            className="relative -mx-1 sm:mx-0.5"
+                            initial={{ y: 50, opacity: 0, rotate: transform.rotate }}
                             animate={{
-                                y: isSelected ? -30 : 0,
-                                zIndex: isSelected ? 20 : 0,
+                                y: isSelected ? -40 : transform.y,
+                                rotate: isSelected ? 0 : transform.rotate,
+                                zIndex: isSelected ? 30 : 10 - Math.abs(index - (cardCount - 1) / 2),
                                 opacity: disabled && !isSelected ? 0.5 : 1,
+                                scale: isSelected ? 1.1 : 1,
                             }}
+                            whileHover={!disabled ? { 
+                                y: isSelected ? -40 : -25, 
+                                scale: 1.08,
+                                zIndex: 20,
+                                rotate: 0,
+                            } : {}}
+                            transition={{ 
+                                type: "spring", 
+                                stiffness: 400, 
+                                damping: 30,
+                                delay: index * 0.03 // Staggered entrance
+                            }}
+                            style={{ originY: 1 }}
                         >
                             <RuneCard
                                 value={val}
@@ -42,17 +87,23 @@ export function RuneHand({ options, selectedValue, disabled, onVote, className }
                                 disabled={disabled}
                                 onClick={() => onVote(val)}
                                 className={cn(
-                                    "w-14 h-20 sm:w-20 sm:h-28 text-lg sm:text-2xl shadow-xl transition-shadow",
-                                    isSelected && "ring-4 ring-pr-primary/50 shadow-[0_0_20px_rgba(var(--pr-primary-rgb),0.4)]"
+                                    "w-12 h-16 sm:w-16 sm:h-22 md:w-20 md:h-28 shadow-xl transition-shadow duration-300",
+                                    isSelected && "shadow-[0_0_30px_rgba(74,158,255,0.5)]"
                                 )}
                             />
+                            
+                            {/* Selection glow effect */}
+                            {isSelected && (
+                                <motion.div 
+                                    className="absolute -inset-2 rounded-xl bg-pr-primary/20 blur-xl -z-10"
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                />
+                            )}
                         </motion.div>
                     );
                 })}
             </motion.div>
-            
-            {/* Background gradient fade for the bottom area */}
-            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-pr-bg via-pr-bg/80 to-transparent -z-10 pointer-events-none" />
         </div>
     );
 }

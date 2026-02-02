@@ -74,11 +74,21 @@ export function RuneCard({
                     ? "bg-pr-surface-elevated shadow-[0_0_30px_rgba(74,158,255,0.3)]" 
                     : "bg-pr-surface-slate group-hover:bg-pr-surface-elevated shadow-lg"
             )}>
-                {/* Surface Texture Overlay */}
+                {/* Surface Texture Overlay - increased visibility */}
                 <div 
-                    className="absolute inset-0 opacity-40 mix-blend-overlay pointer-events-none bg-cover bg-center"
+                    className="absolute inset-0 opacity-60 mix-blend-overlay pointer-events-none bg-cover bg-center"
                     style={{ backgroundImage: `url(${runeBackground})` }}
                 />
+                
+                {/* Idle shimmer on non-selected cards */}
+                {!isCardSelected && (
+                    <motion.div
+                        className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-transparent pointer-events-none"
+                        initial={{ opacity: 0, x: '-100%' }}
+                        animate={{ opacity: [0, 0.5, 0], x: ['0%', '100%', '100%'] }}
+                        transition={{ duration: 4, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }}
+                    />
+                )}
                 
                 {/* Border Glow (Selection) */}
                 <div className={cn(

@@ -21,7 +21,7 @@ public class RealmMembershipServiceTests
             new ApiServiceTestHelpers.StubMemberTokenService(),
             ApiServiceTestHelpers.CreateUserManager(dbContext));
 
-        var result = await service.JoinRealmAsync("CODE", new PointRealm.Shared.V1.Api.JoinRealmRequest(), string.Empty, new System.Security.Claims.ClaimsPrincipal());
+        var result = await service.JoinRealmAsync("CODE", new PointRealm.Shared.V1.Api.JoinRealmRequest() { DisplayName = "Test" }, string.Empty, new System.Security.Claims.ClaimsPrincipal());
 
         var problem = Assert.IsType<ObjectResult>(result);
         var details = Assert.IsType<ProblemDetails>(problem.Value);

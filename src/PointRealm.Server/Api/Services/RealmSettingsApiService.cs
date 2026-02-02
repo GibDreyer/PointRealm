@@ -17,7 +17,8 @@ public interface IRealmSettingsApiService
 public class RealmSettingsApiService(
     PointRealmDbContext dbContext,
     IRealmSettingsService settingsService,
-    IRealmAuthorizationService authService) : IRealmSettingsApiService
+    IRealmAuthorizationService authService,
+    IRealmBroadcaster broadcaster) : IRealmSettingsApiService
 {
     public async Task<IActionResult> UpdateRealmSettingsAsync(string code, UpdateRealmSettingsRequest request, ClaimsPrincipal user, CancellationToken cancellationToken = default)
     {
@@ -51,10 +52,17 @@ public class RealmSettingsApiService(
                 type: "Realm.Unauthorized");
         }
 
-        var newSettings = settingsService.BuildRealmSettings(request, realm.Settings);
+        var newSettings = settingsService.BuildRealmSettings(request.Settings, realm.Settings);
         realm.UpdateSettings(newSettings);
 
+        if (!string.IsNullOrWhiteSpace(request.ThemeKey))
+        {
+            realm.UpdateTheme(request.ThemeKey);
+        }
+
         await dbContext.SaveChangesAsync(cancellationToken);
+
+        await broadcaster.BroadcastRealmStateAsync(realm.Id);
 
         return new OkObjectResult(settingsService.MapToSettingsDto(newSettings));
     }

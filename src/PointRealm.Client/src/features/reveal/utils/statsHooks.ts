@@ -13,7 +13,7 @@ export function useProphecyStats(encounter: Encounter, partyRoster: PartyMember[
 
   const voteRows = useMemo(() => {
     return partyRoster
-      .filter(member => member.status !== 'disconnected')
+      .filter(member => member.status !== 'disconnected' && !member.isObserver)
       .map(member => ({
         id: member.id,
         name: member.name,

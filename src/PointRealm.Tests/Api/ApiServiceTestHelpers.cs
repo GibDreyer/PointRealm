@@ -63,6 +63,10 @@ public static class ApiServiceTestHelpers
         public Task<Realm?> GetByCodeWithRelationsAsync(string code, CancellationToken cancellationToken = default) => Task.FromResult<Realm?>(null);
         public Task<Realm?> GetByIdWithRelationsAsync(Guid id, CancellationToken cancellationToken = default) => Task.FromResult<Realm?>(null);
         public Task<Realm?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) => Task.FromResult<Realm?>(null);
+        public Task<Realm?> GetByCodeAsync(string code, CancellationToken cancellationToken = default) => Task.FromResult<Realm?>(null);
+        public Task<bool> ExistsByCodeAsync(string code, CancellationToken cancellationToken = default) => Task.FromResult(false);
+        public Task<IReadOnlyList<Realm>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default) => Task.FromResult<IReadOnlyList<Realm>>(new List<Realm>());
+        public Task AddAsync(Realm realm, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task SaveChangesAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 
@@ -70,5 +74,12 @@ public static class ApiServiceTestHelpers
     {
         public Task<bool> IsGm(Guid realmId, string userId) => Task.FromResult(false);
         public Task<bool> IsMemberGm(Guid realmId, Guid memberId) => Task.FromResult(false);
+    }
+
+    public sealed class StubRealmBroadcaster : IRealmBroadcaster
+    {
+        public Task BroadcastRealmStateAsync(Guid realmId) => Task.CompletedTask;
+        public Task SendRealmStateToConnectionAsync(string connectionId, Guid realmId) => Task.CompletedTask;
+        public Task SendRealmSnapshotToConnectionAsync(string connectionId, Shared.V1.Api.LobbySnapshotDto snapshot) => Task.CompletedTask;
     }
 }

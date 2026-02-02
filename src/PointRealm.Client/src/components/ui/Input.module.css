@@ -29,7 +29,12 @@
     0 0 15px color-mix(in srgb, var(--pr-primary), transparent 85%); /* Magical Glow */
 }
 
-.input:disabled {
+.hasRightElement {
+  padding-right: 2.5rem !important;
+}
+
+.input:disabled,
+.input:read-only {
   opacity: 0.7;
   cursor: not-allowed;
 }
@@ -66,6 +71,22 @@
 .tooltipButton:hover,
 .tooltipButton:focus-visible {
   color: var(--pr-text-primary);
+}
+
+.inputContainer {
+  position: relative;
+  width: 100%;
+}
+
+.rightElement {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
 }
 
 .helper {

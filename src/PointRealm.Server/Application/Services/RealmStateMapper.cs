@@ -130,7 +130,7 @@ public sealed class RealmStateMapper : IRealmStateMapper
     {
         // Status logic: ready/choosing/disconnected
         string status = "ready";
-        if (activeEncounter is not null && activeEncounter.Status == EncounterStatus.Voting)
+        if (!m.IsObserver && activeEncounter is not null && activeEncounter.Status == EncounterStatus.Voting)
         {
             var hasVoted = activeEncounter.Votes?.Any(v => v?.PartyMemberId == m.Id) ?? false;
             status = hasVoted ? "ready" : "choosing";
@@ -160,7 +160,7 @@ public sealed class RealmStateMapper : IRealmStateMapper
         var distribution = new Dictionary<string, int>();
         var hasVoted = new Dictionary<Guid, bool>();
 
-        foreach (var member in members.Where(m => !m.IsBanned))
+        foreach (var member in members.Where(m => !m.IsBanned && !m.IsObserver))
         {
             var memberVote = encounter.Votes?.FirstOrDefault(v => v?.PartyMemberId == member.Id);
             var voted = memberVote is not null;

@@ -44,8 +44,15 @@ public class QuestCommandHandler(
             var result = realm.AddQuest(request.Title, request.Description, request.ExternalId, request.ExternalUrl);
             if (result.IsFailure) return CommandResultWithPayloadDto<Guid>.Fail(new CommandErrorDto { ErrorCode = result.Error.Code, Message = result.Error.Description });
             
-            await realmRepository.SaveChangesAsync(cancellationToken);
             var questId = result.Value;
+
+            // Auto-start first quest encounter if no encounter is active
+            if (realm.CurrentEncounterId == null)
+            {
+                realm.StartEncounter(questId);
+            }
+
+            await realmRepository.SaveChangesAsync(cancellationToken);
 
             if (request.CommandId.HasValue) deduplicator.StoreResult(request.MemberId, request.CommandId.Value, CommandResultWithPayloadDto<Guid>.Ok(questId));
             await broadcaster.BroadcastRealmStateAsync(request.RealmId);

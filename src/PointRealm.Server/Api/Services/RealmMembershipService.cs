@@ -51,7 +51,7 @@ public class RealmMembershipService(
         {
             var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
             var isHost = request.Role?.Equals("GM", StringComparison.OrdinalIgnoreCase) ?? false;
-            var isObserver = request.Role?.Equals("Observer", StringComparison.OrdinalIgnoreCase) ?? false;
+            var isObserver = request.IsObserver ?? (request.Role?.Equals("Observer", StringComparison.OrdinalIgnoreCase) ?? false);
 
             member = PartyMember.Create(realm.Id, clientId, request.DisplayName, isHost, userId, isObserver);
             if (!string.IsNullOrWhiteSpace(userId))

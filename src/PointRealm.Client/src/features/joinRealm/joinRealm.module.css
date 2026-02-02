@@ -211,3 +211,28 @@
     padding-top: 4rem;
   }
 }
+
+.randomizeBtn {
+  padding: 0.4rem;
+  background: transparent;
+  border: none;
+  color: var(--pr-secondary);
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.randomizeBtn:hover {
+  opacity: 1;
+  color: #fff;
+  transform: scale(1.1) rotate(15deg);
+  text-shadow: 0 0 8px var(--pr-secondary-gold);
+}
+
+.randomizeBtn:active {
+  transform: scale(0.9);
+}

@@ -44,3 +44,4 @@ Thumbs.db
 .vs/
 Mockups/Landing_page.png
 src/PointRealm.Server/Api/data/pointrealm.db
+src/PointRealm.Server/Api/appsettings.Development.json

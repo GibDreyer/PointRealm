@@ -22,10 +22,16 @@
     width: 100%;
     height: 100%;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
     z-index: 10;
     overflow-y: auto; /* Allow scrolling if content overflows */
+}
+
+/* Centering wrapper that handles overflow better than justify-center */
+.mainContainer > :first-child {
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 /* Sidebar for Quests */
@@ -39,7 +45,7 @@
     backdrop-filter: blur(12px);
     border: 1px solid var(--pr-border);
     border-radius: var(--pr-radius-xl);
-    z-index: 30;
+    z-index: 50;
     box-shadow: var(--pr-shadow-lg);
     display: flex;
     flex-direction: column;

@@ -81,14 +81,14 @@ export function StressTestPage() {
                     hideVoteCounts: hideVoteCounts
                 }
             };
-            const { code } = await api.post<{ code: string }>("v1/realms", createPayload);
+            const { code } = await api.post<{ code: string }>("realms", createPayload);
             setRealmCode(code);
             log(`Realm created: ${code}`);
 
             // 2. Join as GM (Client)
             log("Joining as GM (Observer)...");
             const gmPayload = { displayName: "StressTest GM", role: "GM" };
-            const gmJoin = await api.post<{ memberToken: string, memberId: string }>(`v1/realms/${code}/join`, gmPayload);
+            const gmJoin = await api.post<{ memberToken: string, memberId: string }>(`realms/${code}/join`, gmPayload);
             
             sessionStorage.setItem(`pointrealm:v1:realm:${code}:token`, gmJoin.memberToken);
             sessionStorage.setItem(`pointrealm:v1:realm:${code}:memberId`, gmJoin.memberId);
@@ -157,7 +157,7 @@ export function StressTestPage() {
                 
                 // Join API - Use fetch directly to avoid picking up the GM's auth token
                 const apiBase = import.meta.env.VITE_API_BASE_URL || '/api';
-                const joinRes = await fetch(`${apiBase}/v1/realms/${code}/join`, {
+                const joinRes = await fetch(`${apiBase}/realms/${code}/join`, {
                     method: 'POST',
                     credentials: 'omit',
                     headers: {

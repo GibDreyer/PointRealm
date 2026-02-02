@@ -24,7 +24,8 @@ public class QuestCsvApiServiceTests
             new ImportQuestsCommandHandler(
                 new ApiServiceTestHelpers.StubRealmRepository(),
                 new QuestCsvService(),
-                new ApiServiceTestHelpers.StubRealmAuthorizationService()));
+                new ApiServiceTestHelpers.StubRealmAuthorizationService(),
+                new ApiServiceTestHelpers.StubRealmBroadcaster()));
 
         var file = new FormFile(new MemoryStream(new byte[] { 0x1 }), 0, 1, "file", "quests.txt");
         var result = await service.ImportQuestsCsvAsync("CODE", file, new System.Security.Claims.ClaimsPrincipal());

@@ -20,6 +20,7 @@ public static class DependencyInjection
         services.AddScoped<QuestCommandHandler>();
         services.AddScoped<ImportQuestsCommandHandler>();
         
+        services.AddScoped<IQuestNameGenerator, QuestNameGenerator>();
         services.AddScoped<IRealmStateMapper, RealmStateMapper>();
 
         return services;

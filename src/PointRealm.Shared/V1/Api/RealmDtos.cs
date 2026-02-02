@@ -16,12 +16,17 @@ public record RealmSettingsRequest
     public bool? HideVoteCounts { get; init; }
 }
 
-public record UpdateRealmSettingsRequest : RealmSettingsRequest;
+public record UpdateRealmSettingsRequest
+{
+    public string? ThemeKey { get; init; }
+    public RealmSettingsRequest? Settings { get; init; }
+}
 
 public record JoinRealmRequest
 {
     public required string DisplayName { get; init; }
     public string? Role { get; init; }
+    public bool? IsObserver { get; init; }
 }
 
 public record JoinRealmResponse

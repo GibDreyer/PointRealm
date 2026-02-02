@@ -17,7 +17,8 @@ public interface IRealmCreationService
 public class RealmCreationService(
     PointRealmDbContext dbContext,
     IRealmCodeGenerator codeGenerator,
-    IRealmSettingsService settingsService) : IRealmCreationService
+    IRealmSettingsService settingsService,
+    IQuestNameGenerator questGenerator) : IRealmCreationService
 {
     private const string DefaultTheme = "dark-fantasy-arcane";
 
@@ -45,6 +46,16 @@ public class RealmCreationService(
         }
 
         var realm = result.Value;
+
+        // Create a default quest so the realm is immediately playable
+        var (questTitle, questDescription) = questGenerator.GenerateRandomQuest();
+        var questResult = realm.AddQuest(questTitle, questDescription);
+        
+        if (questResult.IsSuccess)
+        {
+            realm.StartEncounter(questResult.Value);
+        }
+
         dbContext.Realms.Add(realm);
 
         await dbContext.SaveChangesAsync(cancellationToken);
