@@ -8,7 +8,10 @@ import type {
   SetAvatarEmojiRequest,
   SelectRuneRequest,
   StartEncounterRequest,
+  StartNextQuestRequest,
   RevealProphecyRequest,
+
+
   ReRollFatesRequest,
   SealOutcomeRequest,
   AddQuestRequest,
@@ -216,6 +219,10 @@ export class RealmRealtimeClient {
 
   async startEncounter(request: StartEncounterRequest) {
     return this.invoke('StartEncounter', this.withCommandId(request));
+  }
+
+  async startNextQuest(request: StartNextQuestRequest) {
+    return this.invoke('StartNextQuest', this.withCommandId(request));
   }
 
   async revealProphecy(request: RevealProphecyRequest) {

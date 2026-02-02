@@ -16,6 +16,7 @@ interface UseRealmResult {
     joinRealm: (code: string) => Promise<void>;
     selectRune: (value: string) => Promise<void>;
     startEncounter: (questId: string) => Promise<void>;
+    startNextQuest: () => Promise<void>;
     revealProphecy: () => Promise<void>;
     reRollFates: () => Promise<void>;
     sealOutcome: (value: number) => Promise<void>;
@@ -163,6 +164,10 @@ export function useRealm(realmCode?: string): UseRealmResult {
           questVersion: requireVersion(quest?.version ?? null, 'quest'),
         });
       },
+      startNextQuest: () =>
+        wrapAction('startNextQuest', {
+          realmVersion: requireVersion(state?.realmVersion ?? null, 'realm'),
+        }),
       revealProphecy: () =>
         wrapAction('revealProphecy', {
           encounterVersion: requireVersion(resolveEncounterVersion(), 'encounter'),

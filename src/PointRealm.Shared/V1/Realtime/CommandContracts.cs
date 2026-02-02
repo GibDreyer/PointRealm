@@ -55,6 +55,12 @@ public record StartEncounterRequest
     public Guid? CommandId { get; init; }
 }
 
+public record StartNextQuestRequest
+{
+    public required int RealmVersion { get; init; }
+    public Guid? CommandId { get; init; }
+}
+
 public record RevealProphecyRequest
 {
     public required int EncounterVersion { get; init; }

@@ -147,6 +147,12 @@ public class RealmHub : Hub<IRealmClient>
         return await _encounterHandler.HandleAsync(new StartEncounterCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, request.QuestId, request.RealmVersion, request.QuestVersion, request.CommandId));
     }
 
+    public async Task<CommandResultDto> StartNextQuest(StartNextQuestRequest request)
+    {
+        var ctx = await GetCommandContextAsync();
+        return await _questHandler.HandleAsync(new StartNextQuestCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, request.RealmVersion, request.CommandId));
+    }
+
     public async Task<CommandResultDto> RevealProphecy(RevealProphecyRequest request)
     {
         var ctx = await GetCommandContextAsync();

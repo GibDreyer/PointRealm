@@ -19,6 +19,7 @@ interface RealmTableProps {
     onReveal: () => void;
     onReroll: () => void;
     onSealOutcome: (value: string) => Promise<void>;
+    onStartNextQuest: () => void;
     deckValues: string[];
     hideVoteCounts: boolean;
     actionsDisabled?: boolean;
@@ -33,6 +34,7 @@ export function RealmTable({
     onReveal, 
     onReroll, 
     onSealOutcome, 
+    onStartNextQuest,
     deckValues,
     hideVoteCounts,
     actionsDisabled = false,
@@ -99,7 +101,7 @@ export function RealmTable({
                             <motion.div 
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 max-w-5xl mx-auto"
+                                className="flex flex-col items-center justify-center gap-1 sm:gap-2 max-w-5xl mx-auto text-center"
                             >
                                 <h2 className={cn(
                                     "font-serif font-bold text-pr-primary brightness-110 leading-tight shrink-0",
@@ -108,15 +110,12 @@ export function RealmTable({
                                     {quest.title}
                                 </h2>
                                 {quest.description && (
-                                    <>
-                                        <div className="hidden sm:block w-px h-5 bg-white/10" />
-                                        <p className={cn(
-                                            "text-pr-text-muted max-w-md sm:max-w-xl mx-auto sm:mx-0 line-clamp-2 sm:line-clamp-1 text-center sm:text-left",
-                                            isCrowded ? "text-[10px] sm:text-xs" : "text-sm"
-                                        )}>
-                                            {quest.description}
-                                        </p>
-                                    </>
+                                    <p className={cn(
+                                        "text-pr-text-muted max-w-md sm:max-w-lg mx-auto line-clamp-2 sm:line-clamp-3",
+                                        isCrowded ? "text-[10px] sm:text-xs" : "text-xs sm:text-sm"
+                                    )}>
+                                        {quest.description}
+                                    </p>
                                 )}
                             </motion.div>
 
@@ -210,12 +209,11 @@ export function RealmTable({
                                             {isGM && (
                                                 <Button
                                                     variant="secondary"
-                                                    onClick={onReroll}
+                                                    onClick={onStartNextQuest}
                                                     disabled={actionsDisabled}
                                                     className="px-4 sm:px-6 py-1 sm:py-1.5 text-[9px] sm:text-[10px] min-h-0 h-6 sm:h-8 border-pr-secondary/30 hover:border-pr-secondary/60 transition-all duration-500"
                                                 >
-                                                    <RefreshCcw size={10} className="mr-1.5 sm:mr-2 opacity-70" />
-                                                    Reroll Fates
+                                                    Next Quest
                                                 </Button>
                                             )}
                                      </div>
@@ -262,6 +260,7 @@ export function RealmTable({
                         quest={quest!}
                         onSealOutcome={onSealOutcome}
                         onReroll={onReroll}
+                        onStartNextQuest={onStartNextQuest}
                         hideVoteCounts={hideVoteCounts}
                         minimal
                         panelVariant="realm"

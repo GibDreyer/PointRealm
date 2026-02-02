@@ -4,18 +4,21 @@ using PointRealm.Server.Domain.Entities;
 using PointRealm.Server.Domain.ValueObjects;
 using PointRealm.Server.Domain.Primitives;
 using PointRealm.Shared.V1.Realtime;
+using PointRealm.Server.Application.Services;
 
 namespace PointRealm.Server.Application.Commands.Handlers;
 
 public class QuestCommandHandler(
     IRealmRepository realmRepository,
     IRealmBroadcaster broadcaster,
-    ICommandDeduplicator deduplicator)
+    ICommandDeduplicator deduplicator,
+    IQuestNameGenerator questNameGenerator)
     : ICommandHandler<AddQuestCommand, CommandResultWithPayloadDto<Guid>>,
       ICommandHandler<UpdateQuestCommand>,
       ICommandHandler<DeleteQuestCommand>,
       ICommandHandler<ReorderQuestsCommand>,
-      ICommandHandler<SetActiveQuestCommand>
+      ICommandHandler<SetActiveQuestCommand>,
+      ICommandHandler<StartNextQuestCommand>
 {
     private const string StaleMessage = "Your realm view is out of date. Refreshing prophecy…";
 
@@ -125,6 +128,38 @@ public class QuestCommandHandler(
             var result = realm.SetActiveQuest(request.QuestId);
             if (result.IsFailure) return CommandResultDto.Fail(new CommandErrorDto { ErrorCode = result.Error.Code, Message = result.Error.Description });
             
+            return CommandResultDto.Ok();
+        }, cancellationToken);
+    }
+
+    public async Task<CommandResultDto> HandleAsync(StartNextQuestCommand request, CancellationToken cancellationToken = default)
+    {
+        return await ExecuteAsync(request.MemberId, request.RealmId, request.CommandId, request.ClientId, async (realm, member) =>
+        {
+            if (!member.IsHost) return CommandResultDto.Fail(new CommandErrorDto { ErrorCode = "FORBIDDEN", Message = "Only the GM can change quests." });
+            if (realm.Version != request.RealmVersion) return CreateStaleError();
+
+            var currentQuest = realm.Quests.FirstOrDefault(q => q.Id == realm.CurrentQuestId);
+            
+            // Look for the next quest in order that isn't the current one
+            var nextQuest = realm.Quests
+                .Where(q => (currentQuest == null || q.Order > currentQuest.Order))
+                .OrderBy(q => q.Order)
+                .FirstOrDefault();
+
+            if (nextQuest is null)
+            {
+                 var (title, desc) = questNameGenerator.GenerateRandomQuest();
+                 // AddQuest returns Result<Guid>
+                 var result = realm.AddQuest(title, desc);
+                 if (result.IsFailure) return CommandResultDto.Fail(new CommandErrorDto { ErrorCode = result.Error.Code, Message = result.Error.Description });
+                 
+                 nextQuest = realm.Quests.First(q => q.Id == result.Value);
+            }
+
+            var startResult = realm.StartEncounter(nextQuest.Id);
+            if (startResult.IsFailure) return CommandResultDto.Fail(new CommandErrorDto { ErrorCode = startResult.Error.Code, Message = startResult.Error.Description });
+
             return CommandResultDto.Ok();
         }, cancellationToken);
     }

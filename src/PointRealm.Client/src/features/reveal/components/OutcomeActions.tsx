@@ -7,7 +7,7 @@ interface OutcomeActionsProps {
   isGM: boolean;
   isSealed: boolean;
   sealingValue: string | null;
-  onReroll: () => void;
+  onStartNextQuest: () => void;
   onSealOutcome: (value: string) => void;
   actionsDisabled?: boolean;
 }
@@ -19,7 +19,7 @@ export const OutcomeActions: React.FC<OutcomeActionsProps> = ({
   isGM,
   isSealed,
   sealingValue,
-  onReroll,
+  onStartNextQuest,
   onSealOutcome,
   actionsDisabled = false,
 }) => {
@@ -58,10 +58,10 @@ export const OutcomeActions: React.FC<OutcomeActionsProps> = ({
         <button
           type="button"
           className={styles.rerollButton}
-          onClick={onReroll}
-          disabled={isSealed || actionsDisabled}
+          onClick={onStartNextQuest}
+          disabled={actionsDisabled} // Allow even if sealed? Yes.
         >
-          Re-roll
+          Next Quest
         </button>
       </div>
     </div>

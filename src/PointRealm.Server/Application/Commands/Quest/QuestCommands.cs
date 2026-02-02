@@ -61,3 +61,13 @@ public record SetActiveQuestCommand(
     Guid QuestId,
     int QuestLogVersion,
     Guid? CommandId = null);
+
+/// <summary>
+/// Command to progress to the next quest (or generate one).
+/// </summary>
+public record StartNextQuestCommand(
+    Guid MemberId,
+    Guid RealmId,
+    string ClientId,
+    int RealmVersion,
+    Guid? CommandId = null);

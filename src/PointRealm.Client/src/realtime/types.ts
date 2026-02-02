@@ -52,6 +52,12 @@ export interface StartEncounterRequest {
   commandId?: string;
 }
 
+export interface StartNextQuestRequest {
+    realmVersion: number;
+    commandId?: string;
+}
+
+
 export interface RevealProphecyRequest {
   encounterVersion: number;
   commandId?: string;
@@ -127,6 +133,7 @@ export interface HubServerMethods {
   LeavePresence: (request: LeavePresenceRequest) => Promise<CommandResult>;
   SelectRune: (request: SelectRuneRequest) => Promise<CommandResult>;
   StartEncounter: (request: StartEncounterRequest) => Promise<CommandResult>;
+  StartNextQuest: (request: StartNextQuestRequest) => Promise<CommandResult>;
   RevealProphecy: (request: RevealProphecyRequest) => Promise<CommandResult>;
   ReRollFates: (request: ReRollFatesRequest) => Promise<CommandResult>;
   SealOutcome: (request: SealOutcomeRequest) => Promise<CommandResult>;

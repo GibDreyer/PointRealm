@@ -19,6 +19,7 @@ interface ProphecyRevealProps {
   quest?: Quest | null;
   onSealOutcome: (value: string) => Promise<void>;
   onReroll: () => void;
+  onStartNextQuest: () => void;
   className?: string;
   hideVoteCounts?: boolean;
   minimal?: boolean;
@@ -36,6 +37,7 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
   quest,
   onSealOutcome,
   onReroll,
+  onStartNextQuest,
   className,
   hideVoteCounts = false,
   minimal = false,
@@ -189,7 +191,7 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
                   isGM={isGM}
                   isSealed={encounter.outcome !== undefined && encounter.outcome !== null}
                   sealingValue={sealingValue}
-                  onReroll={onReroll}
+                  onStartNextQuest={onStartNextQuest}
                   onSealOutcome={handleSeal}
                   actionsDisabled={actionsDisabled}
                 />

@@ -42,6 +42,6 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 .vs/
-Mockups/Landing_page.png
+Mockups/*
 src/PointRealm.Server/Api/data/pointrealm.db
 src/PointRealm.Server/Api/appsettings.Development.json

@@ -263,6 +263,7 @@ export function RealmScreen() {
                         isGM={!!isGM}
                         onReveal={() => actions.revealProphecy()}
                         onReroll={() => actions.reRollFates()}
+                        onStartNextQuest={() => actions.startNextQuest()}
                         onSealOutcome={async (val) => {
                             const numeric = Number(val);
                             if (Number.isFinite(numeric)) {
