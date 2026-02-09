@@ -20,12 +20,12 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           text-[var(--pr-secondary-gold)] 
           tracking-[0.18em] uppercase font-variant-small-caps
           opacity-90 whitespace-nowrap
-          drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]
+          drop-shadow-[0_1px_2px_var(--pr-bg)]
         ">
           {title}
         </h2>
         {/* Line Separator */}
-        <div className="h-px w-full bg-gradient-to-r from-[rgba(230,176,78,0.4)] to-transparent flex-1" />
+        <div className="h-px w-full bg-gradient-to-r from-[color-mix(in_srgb,var(--pr-secondary),transparent_60%)] to-transparent flex-1" />
       </div>
       
       {subtitle && (
