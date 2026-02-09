@@ -19,6 +19,7 @@ import { SummoningCircle } from '../../components/ui/SummoningCircle';
 import { BackButton } from '../../components/ui/BackButton';
 import { Button } from '../../components/Button';
 import { EmojiPicker } from '../../components/ui/EmojiPicker';
+import { useThemeMode } from '@/theme/ThemeModeProvider';
 import styles from './lobby.module.css';
 import type { RealmStateDto } from '../../types/realm';
 
@@ -45,6 +46,7 @@ export function TavernLobbyPage() {
     const { setThemeKey } = useTheme();
     const client = useRealmClient();
     const prefersReducedMotion = useReducedMotion() ?? false;
+    const { mode } = useThemeMode();
 
     const [snapshot, setSnapshot] = useState<LobbySnapshot | null>(null);
     const [status, setStatus] = useState<'connecting' | 'connected' | 'reconnecting' | 'disconnected'>('connecting');
@@ -77,7 +79,7 @@ export function TavernLobbyPage() {
 
         const onSnapshot = (data: LobbySnapshot) => {
             setSnapshot(data);
-            if (data.realm.themeKey) {
+            if (mode.useRealmTheme && data.realm.themeKey) {
                 setThemeKey(data.realm.themeKey);
             }
             if (data.activeEncounterId) {
@@ -108,7 +110,7 @@ export function TavernLobbyPage() {
             unsubscribeState();
             unsubscribeStatus();
         };
-    }, [realmCode, connectToRealm, setThemeKey, navigate, client]);
+    }, [realmCode, connectToRealm, setThemeKey, navigate, client, mode.useRealmTheme]);
 
     if (!snapshot) {
         return (
@@ -120,18 +122,18 @@ export function TavernLobbyPage() {
                 <ConnectionBanner isConnecting={status !== 'disconnected'} onRetry={connectToRealm} />
                 <div className={styles.shell}>
                     <PageHeader
-                        title="Tavern"
-                        subtitle="Realm Lobby"
+                        title={mode.phrases.lobbyTitle}
+                        subtitle={mode.phrases.lobbySubtitle}
                         size="panel"
                         className={styles.header || ''}
                     />
                     <div className="mt-2">
                         {status === 'disconnected' ? (
                             <Panel className="max-w-md mx-auto text-center py-12">
-                                <h2 className="text-xl font-bold text-pr-danger mb-2">Connection Lost</h2>
-                                <p className="text-pr-text-muted mb-6 px-4">The magical currents are too turbulent. Your connection to the realm has faded.</p>
+                                <h2 className="text-xl font-bold text-pr-danger mb-2">{mode.phrases.connectionLostTitle}</h2>
+                                <p className="text-pr-text-muted mb-6 px-4">{mode.phrases.connectionLostBody}</p>
                                 <button onClick={connectToRealm} className="px-6 py-3 bg-pr-primary text-pr-bg rounded-lg font-bold hover:shadow-lg transition-all">
-                                    Restore Connection
+                                    {mode.phrases.restoreConnection}
                                 </button>
                             </Panel>
                         ) : (
@@ -165,7 +167,7 @@ export function TavernLobbyPage() {
             reducedMotion={prefersReducedMotion}
             contentClassName={styles.page}
         >
-            <SummoningCircle />
+            {mode.showBackdrop && <SummoningCircle />}
             <BackButton to="/" />
             
             {status !== 'connected' && (
@@ -177,8 +179,8 @@ export function TavernLobbyPage() {
 
             <div className={styles.shell}>
                 <PageHeader
-                    title="Tavern"
-                    subtitle="Realm Lobby"
+                    title={mode.phrases.lobbyTitle}
+                    subtitle={mode.phrases.lobbySubtitle}
                     size="panel"
                     className={styles.header || ''}
                 />
@@ -187,8 +189,8 @@ export function TavernLobbyPage() {
                     <Panel variant="realm" className={`${styles.panel} ${styles.panelParty}`}>
                         <div className={styles.panelHeader}>
                             <SectionHeader 
-                                title="Party" 
-                                subtitle="Members"
+                                title={mode.phrases.partyTitle} 
+                                subtitle={mode.phrases.partySubtitle}
                                 className="mb-0"
                             />
                         </div>
@@ -199,10 +201,10 @@ export function TavernLobbyPage() {
                                     <div className="flex items-center justify-between mb-3">
                                         <div>
                                             <p className="text-[10px] uppercase tracking-[0.3em] text-pr-text-muted/70">
-                                                Your Sigil
+                                                {mode.phrases.sigilTitle}
                                             </p>
                                             <p className="text-xs text-pr-text-muted">
-                                                Choose an emoji avatar for the party.
+                                                {mode.phrases.sigilSubtitle}
                                             </p>
                                         </div>
                                     </div>

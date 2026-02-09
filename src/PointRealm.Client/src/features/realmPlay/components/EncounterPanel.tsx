@@ -5,6 +5,7 @@ import { RuneCard } from './RuneCard';
 import { motion } from 'framer-motion';
 import { SectionHeader } from '../../../components/ui/SectionHeader';
 import { Panel } from '../../../components/ui/Panel';
+import { useThemeMode } from '@/theme/ThemeModeProvider';
 import styles from './EncounterPanel.module.css';
 
 interface EncounterPanelProps {
@@ -23,6 +24,8 @@ interface EncounterPanelProps {
 }
 
 export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, canVote, myVote, onVote, onReroll, onReveal, onStartEncounter, onSealOutcome }: EncounterPanelProps) {
+    const { mode } = useThemeMode();
+
     if (!quest) {
         return (
             <div className={styles.noQuest}>
@@ -33,8 +36,8 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                 >
                     <Panel variant="realm" className="py-14 px-10 border-pr-border/30 text-center">
                         <SectionHeader
-                            title="Quiet Realm"
-                            subtitle={isGM ? "Select a quest from the log to begin an encounter." : "Wait for the Game Master to initiate the ordeal."}
+                            title={mode.phrases.quietRealmTitle}
+                            subtitle={isGM ? mode.phrases.quietRealmSubtitleGM : mode.phrases.quietRealmSubtitlePlayer}
                         />
                     </Panel>
                 </motion.div>
@@ -66,7 +69,7 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                     transition={{ duration: 0.28, ease: "easeOut" }}
                     className={styles.header}
                 >
-                    <span className={styles.headerLabel}>Active Quest</span>
+                    <span className={styles.headerLabel}>{mode.phrases.activeQuest}</span>
                     <h1 className={styles.headerTitle}>{quest.title}</h1>
                     {quest.description && (
                         <p className={styles.headerSubtitle}>{quest.description}</p>
@@ -111,9 +114,9 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                                                 disabled={rerollDisabled}
                                                 className={styles.rerollButton}
                                             >
-                                                Re-roll the Fates
+                                                {mode.phrases.rerollFates}
                                             </motion.button>
-                                            <span className={styles.rerollSubtitle}>Clear votes and revote</span>
+                                            <span className={styles.rerollSubtitle}>{mode.phrases.rerollFatesSub}</span>
                                             <motion.button
                                                 type="button"
                                                 whileHover={!revealDisabled ? { y: -2 } : {}}
@@ -123,7 +126,7 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                                                 disabled={revealDisabled}
                                                 className={styles.revealButton}
                                             >
-                                                Reveal Prophecy
+                                                {mode.phrases.revealProphecy}
                                             </motion.button>
                                             <span className={styles.revealSubtitle}>
                                                 {settings.hideVoteCounts ? 'Votes are hidden' : `${readyCount} ready`}
@@ -138,9 +141,9 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                                                 onClick={() => onStartEncounter(quest.id)}
                                                 className={cn(styles.revealButton, "!bg-pr-primary !text-pr-bg px-8")}
                                             >
-                                                Begin Quest
+                                                {mode.phrases.beginQuest}
                                             </motion.button>
-                                            <span className={styles.revealSubtitle}>Commence the ritual</span>
+                                            <span className={styles.revealSubtitle}>{mode.phrases.beginQuestSub}</span>
                                         </div>
                                     )}
                                 </div>
@@ -184,7 +187,7 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                     className={styles.voteTray}
                 >
                     <div className={styles.voteHeader}>
-                        <SectionHeader title="Cast Your Rune" subtitle="Make your estimation" className="mb-0" />
+                        <SectionHeader title={mode.phrases.castYourRune} subtitle={mode.phrases.castYourRuneSub} className="mb-0" />
                     </div>
                     <div className={styles.voteScroller}>
                         {deckValues.map((val: string) => (

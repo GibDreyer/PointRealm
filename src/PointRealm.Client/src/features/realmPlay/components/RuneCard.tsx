@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { Coffee, HelpCircle, Sparkles } from 'lucide-react';
 import { useSound } from '@/hooks/useSound';
 import runeBackground from '@/assets/rune-background.png';
+import { useThemeMode } from '@/theme/ThemeModeProvider';
 
 interface RuneCardProps {
     /** The value displayed on the card */
@@ -34,6 +35,7 @@ export function RuneCard({
     className 
 }: RuneCardProps) {
     const { play } = useSound();
+    const { mode } = useThemeMode();
     const isCardSelected = isSelected ?? selected ?? false;
     
     const handleClick = () => {
@@ -205,7 +207,7 @@ export function RuneCard({
                         ? "text-pr-primary-cyan opacity-100" 
                         : "text-pr-text-dim opacity-40 group-hover:opacity-60"
                 )}>
-                    {label || (value === 'coffee' ? 'Rest' : value === '?' ? 'Unknown' : 'Rune')}
+                    {label || (value === 'coffee' ? 'Rest' : value === '?' ? 'Unknown' : mode.labels.rune)}
                 </div>
             </div>
 

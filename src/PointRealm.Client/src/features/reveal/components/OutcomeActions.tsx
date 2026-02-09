@@ -1,6 +1,7 @@
 ﻿import React from 'react';
 import styles from './OutcomeActions.module.css';
 import { cn } from '@/lib/utils';
+import { useThemeMode } from '@/theme/ThemeModeProvider';
 
 interface OutcomeActionsProps {
   deckValues: string[];
@@ -24,6 +25,7 @@ export const OutcomeActions: React.FC<OutcomeActionsProps> = ({
   actionsDisabled = false,
 }) => {
   if (!isGM) return null;
+  const { mode } = useThemeMode();
 
   const sealOptions = deckValues.filter(isNumericValue);
 
@@ -31,7 +33,7 @@ export const OutcomeActions: React.FC<OutcomeActionsProps> = ({
     <div className={styles.container}>
       <div className={styles.content}>
         <div className={styles.labelGroup}>
-          <span className={styles.label}>Seal Prophecy</span>
+          <span className={styles.label}>{mode.phrases.sealOutcome}</span>
           <div className={styles.labelLine} />
         </div>
 
@@ -61,7 +63,7 @@ export const OutcomeActions: React.FC<OutcomeActionsProps> = ({
           onClick={onStartNextQuest}
           disabled={actionsDisabled} // Allow even if sealed? Yes.
         >
-          Next Quest
+          {`Next ${mode.labels.quest}`}
         </button>
       </div>
     </div>

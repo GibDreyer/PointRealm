@@ -2,6 +2,7 @@ import { CheckCircle2, Circle, CircleDot } from 'lucide-react';
 import { Button } from '../../../components/Button';
 import { useToast } from '../../../components/ui/ToastSystem';
 import { cn } from '../../../lib/utils';
+import { useThemeMode } from '@/theme/ThemeModeProvider';
 import styles from './OnboardingStepper.module.css';
 
 interface Props {
@@ -24,6 +25,7 @@ export function OnboardingStepper({
     canStartEncounter,
 }: Props) {
     const { toast } = useToast();
+    const { mode } = useThemeMode();
     const hasRealm = Boolean(joinUrl);
     const hasInvites = partyCount > 1;
     const hasQuest = questCount > 0;
@@ -32,14 +34,14 @@ export function OnboardingStepper({
     const steps = [
         {
             id: 'realm',
-            title: 'Create/Join Realm',
-            description: 'Realm established and ready for travelers.',
+            title: `Create/Join ${mode.labels.realm}`,
+            description: `${mode.labels.realm} established and ready.`,
             completed: hasRealm,
         },
         {
             id: 'invite',
-            title: 'Invite Team',
-            description: hasInvites ? 'Adventurers have joined your party.' : 'Share the portal link with your team.',
+            title: `Invite ${mode.labels.party}`,
+            description: hasInvites ? `${mode.labels.party} joined.` : `Share the ${mode.labels.realm.toLowerCase()} link with your ${mode.labels.party.toLowerCase()}.`,
             completed: hasInvites,
             actionLabel: 'Copy Invite Link',
             action: async () => {
@@ -54,18 +56,18 @@ export function OnboardingStepper({
         },
         {
             id: 'quest',
-            title: 'Add First Quest',
-            description: hasQuest ? 'Quest log is ready.' : 'Create your first quest in the log.',
+            title: `Add First ${mode.labels.quest}`,
+            description: hasQuest ? `${mode.labels.quest} log is ready.` : `Create your first ${mode.labels.quest.toLowerCase()} in the log.`,
             completed: hasQuest,
-            actionLabel: 'Add Quest',
+            actionLabel: `Add ${mode.labels.quest}`,
             action: onOpenQuestManager,
         },
         {
             id: 'encounter',
-            title: 'Start Encounter',
-            description: hasEncounter ? 'Encounter in progress.' : 'Launch the first encounter.',
+            title: `Start ${mode.labels.encounter}`,
+            description: hasEncounter ? `${mode.labels.encounter} in progress.` : `Launch the first ${mode.labels.encounter.toLowerCase()}.`,
             completed: hasEncounter,
-            actionLabel: 'Start Encounter',
+            actionLabel: `Start ${mode.labels.encounter}`,
             action: onStartEncounter,
             disabled: !canStartEncounter,
         },

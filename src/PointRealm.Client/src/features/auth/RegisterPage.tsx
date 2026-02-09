@@ -11,16 +11,33 @@ import { Panel } from "@/components/ui/Panel";
 import { useToast } from "@/components/ui/ToastSystem";
 import { setAuthToken, setAuthUser } from "@/lib/storage/auth";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { useThemeMode } from "@/theme/ThemeModeProvider";
 
 export function RegisterPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { mode } = useThemeMode();
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const displayNamePlaceholder = mode.key === 'fantasy'
+    ? "Mystic Wanderer"
+    : mode.key === 'sci-fi'
+      ? "Pilot Nova"
+      : "Alex Morgan";
+  const registerTitle = mode.key === 'fantasy'
+    ? "Join the Order"
+    : mode.key === 'sci-fi'
+      ? "Create Crew Profile"
+      : "Create Account";
+  const registerSubtitle = mode.key === 'fantasy'
+    ? "Register your lineage"
+    : mode.key === 'sci-fi'
+      ? "Initialize your profile"
+      : "Set up your profile";
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -66,7 +83,7 @@ export function RegisterPage() {
       <BackButton to="/" />
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <Panel variant="realm" className="max-w-md w-full p-8">
-          <PageHeader title="Join the Order" subtitle="Register your lineage" size="panel" />
+          <PageHeader title={registerTitle} subtitle={registerSubtitle} size="panel" />
           <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
             <Input
               label="Display name"
@@ -75,7 +92,7 @@ export function RegisterPage() {
               autoComplete="nickname"
               value={displayName}
               onChange={(event) => setDisplayName(event.target.value)}
-              placeholder="Mystic Wanderer"
+              placeholder={displayNamePlaceholder}
             />
             <Input
               label="Email"
@@ -110,7 +127,7 @@ export function RegisterPage() {
               minLength={8}
             />
             {error && <p className="text-xs text-pr-danger/80">{error}</p>}
-            <Tooltip content="Create your account and jump into the tavern.">
+            <Tooltip content={`Create your account and jump into ${mode.phrases.lobbyTitle.toLowerCase()}.`}>
               <Button type="submit" variant="primary" fullWidth disabled={isSubmitting}>
                 {isSubmitting ? "Creating..." : "Create Account"}
               </Button>

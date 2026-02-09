@@ -1,8 +1,12 @@
 import { Theme } from '../types';
 import { darkFantasyArcane } from './dark-fantasy-arcane';
+import { neonVoid } from './neon-void';
+import { minimalSlate } from './minimal-slate';
 
 const themes: Record<string, Theme> = {
   [darkFantasyArcane.key]: darkFantasyArcane,
+  [neonVoid.key]: neonVoid,
+  [minimalSlate.key]: minimalSlate,
 };
 
 // Stubs for other themes

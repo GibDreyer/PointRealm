@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
+import { useThemeMode } from '@/theme/ThemeModeProvider';
 
 interface SectionHeaderProps {
   title: string;
@@ -12,24 +13,27 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   subtitle, 
   className,
 }) => {
+  const { mode } = useThemeMode();
+
   return (
     <div className={cn("flex flex-col gap-0.5", className)}>
       <div className="flex items-center justify-between gap-4 w-full">
-        <h2 className="
-          text-[0.75rem] font-bold font-heading 
-          text-[var(--pr-secondary-gold)] 
-          tracking-[0.18em] uppercase font-variant-small-caps
-          opacity-90 whitespace-nowrap
-          drop-shadow-[0_1px_2px_var(--pr-bg)]
-        ">
+        <h2 className={cn(
+          "text-[0.75rem] font-bold font-heading opacity-90 whitespace-nowrap",
+          "drop-shadow-[0_1px_2px_var(--pr-bg)]",
+          mode.styles.sectionTitle
+        )}>
           {title}
         </h2>
         {/* Line Separator */}
-        <div className="h-px w-full bg-gradient-to-r from-[color-mix(in_srgb,var(--pr-secondary),transparent_60%)] to-transparent flex-1" />
+        <div className={cn(
+          "h-px w-full bg-gradient-to-r to-transparent flex-1",
+          mode.styles.sectionDivider
+        )} />
       </div>
       
       {subtitle && (
-        <p className="text-[0.85rem] text-pr-text-muted/75 text-left">
+        <p className={cn("text-[0.85rem] text-left", mode.styles.sectionSubtitle)}>
           {subtitle}
         </p>
       )}
