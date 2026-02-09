@@ -43,8 +43,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (payload: LoginPayload) => {
     const response = await authApi.login(payload);
-    setStorageToken(response.accessToken);
-    setStorageUser(response.user);
+    setStorageToken(response.accessToken, { persist: payload.rememberMe });
+    setStorageUser(response.user, { persist: payload.rememberMe });
     setUser(response.user);
   };
 
