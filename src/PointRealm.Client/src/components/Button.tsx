@@ -41,8 +41,8 @@ const ButtonSVG = ({ variant }: { variant: ButtonVariant }) => {
         </radialGradient>
 
         <linearGradient id={`topSheen-${variant}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="white" stopOpacity="0.4"></stop>
-          <stop offset="1" stopColor="white" stopOpacity="0"></stop>
+          <stop offset="0" stopColor="var(--pr-text)" stopOpacity="0.4"></stop>
+          <stop offset="1" stopColor="var(--pr-text)" stopOpacity="0"></stop>
         </linearGradient>
 
         <filter id={`texture-${variant}`} x="0" y="0" width="100%" height="100%">
@@ -64,25 +64,25 @@ const ButtonSVG = ({ variant }: { variant: ButtonVariant }) => {
         </filter>
 
         <linearGradient id={`diamondGrad-${variant}`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="white"></stop>
+          <stop offset="0" stopColor="var(--pr-text)"></stop>
           <stop offset="0.5" stopColor="var(--btn-accent-light)"></stop>
           <stop offset="1" stopColor="var(--btn-accent-main)"></stop>
         </linearGradient>
       </defs>
 
-      <path d="M12 100 H648" stroke="black" strokeOpacity="0.3" strokeWidth="2"></path>
+      <path d="M12 100 H648" stroke="var(--pr-bg)" strokeOpacity="0.3" strokeWidth="2"></path>
 
-      <rect x="8" y="18" width="644" height="88" rx="6" fill="black" opacity="0.4"></rect>
+      <rect x="8" y="18" width="644" height="88" rx="6" fill="var(--pr-bg)" opacity="0.4"></rect>
       
       <rect x="10" y="20" width="640" height="84" rx="6" fill={`url(#fillGrad-${variant})`} filter={`url(#texture-${variant})`}></rect>
       
       <rect x="10" y="20" width="640" height="84" rx="6" fill="none" stroke={`url(#frameStroke-${variant})`} strokeWidth="3"></rect>
 
-      <rect x="14" y="24" width="632" height="76" rx="5" fill="none" stroke="white" strokeOpacity="0.15" strokeWidth="1.5"></rect>
-      <rect x="16" y="26" width="628" height="72" rx="4" fill="none" stroke="black" strokeOpacity="0.2" strokeWidth="1.2"></rect>
+      <rect x="14" y="24" width="632" height="76" rx="5" fill="none" stroke="var(--pr-text)" strokeOpacity="0.15" strokeWidth="1.5"></rect>
+      <rect x="16" y="26" width="628" height="72" rx="4" fill="none" stroke="var(--pr-bg)" strokeOpacity="0.2" strokeWidth="1.2"></rect>
 
       <path d="M14 26 H646 A4 4 0 0 1 650 30 V46 H10 V30 A4 4 0 0 1 14 26 Z" fill={`url(#topSheen-${variant})`} opacity="0.5"></path>
-      <g opacity="0.4" fill="white">
+      <g opacity="0.4" fill="var(--pr-text)">
         <path d="M18 28 l10 0 l-6 6 l-6 0 z" />
         <path d="M18 96 l10 0 l-6 -6 l-6 0 z" />
         <path d="M642 28 l-10 0 l6 6 l6 0 z" />
@@ -112,7 +112,7 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
     '--btn-accent-dark': `color-mix(in srgb, ${baseColorVar}, black 85%)`,
   } as React.CSSProperties;
 
-  const textColor = variant === 'ghost' ? 'var(--pr-text-muted)' : '#ffffff';
+  const textColor = variant === 'ghost' ? 'var(--pr-text-muted)' : 'var(--pr-text)';
   const glowShadow = variant === 'ghost' ? '' : `0 0 40px color-mix(in srgb, ${baseColorVar}, transparent 55%)`;
 
   const mergedStyle = {
@@ -131,7 +131,7 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
         "group relative inline-flex items-center justify-center font-heading font-black tracking-[0.12em] transition-all duration-300",
         "px-16 py-6 min-h-[72px] text-xl select-none overflow-visible",
         "bg-transparent border-none active:scale-95", 
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:ring-primary",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--pr-bg)] focus-visible:ring-primary",
         fullWidth ? "w-full" : "w-auto",
         className
       )}
@@ -153,7 +153,7 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
       />
       
       <motion.span 
-        className="relative z-10 flex items-center gap-2 drop-shadow-[0_2px_8px_rgba(0,0,0,1)]"
+        className="relative z-10 flex items-center gap-2 drop-shadow-[0_2px_8px_var(--pr-bg)]"
         variants={{
           initial: { scale: 1, y: 0 },
           hover: { scale: 1.05, y: -1 }
@@ -168,7 +168,7 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
           transition={{ duration: 0.3 }}
         >
           <motion.span 
-            className="absolute inset-0 w-[150%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-[35deg]"
+            className="absolute inset-0 w-[150%] h-full bg-gradient-to-r from-transparent via-[color-mix(in_srgb,var(--pr-text),transparent_80%)] to-transparent -skew-x-[35deg]"
             animate={{ 
               x: ["-100%", "200%"] 
             }}

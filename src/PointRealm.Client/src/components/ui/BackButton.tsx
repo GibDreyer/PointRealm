@@ -62,12 +62,12 @@ export const BackButton: React.FC<BackButtonProps> = ({
         className="
           flex items-center justify-center
           w-[44px] h-[44px] rounded-full
-          text-[var(--pr-text-muted)] bg-black/40
-          border border-[var(--pr-surface-border)]
+          text-[var(--pr-text-muted)] bg-[color-mix(in_srgb,var(--pr-surface),transparent_40%)]
+          border border-[var(--pr-border)]
           transition-all duration-300 ease-[var(--pr-ease-out)]
-          hover:text-white hover:border-[var(--pr-primary-cyan)]
-          hover:bg-[rgba(74,158,255,0.15)]
-          hover:scale-110 hover:shadow-[0_0_15px_rgba(74,158,255,0.2)]
+          hover:text-[var(--pr-text)] hover:border-[var(--pr-primary)]
+          hover:bg-[color-mix(in_srgb,var(--pr-primary),transparent_85%)]
+          hover:scale-110 hover:shadow-[0_0_15px_color-mix(in_srgb,var(--pr-primary),transparent_80%)]
           backdrop-blur-sm group pr-interactive
         "
       >

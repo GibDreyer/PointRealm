@@ -36,10 +36,10 @@ export function Dialog({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[color-mix(in_srgb,var(--pr-bg),transparent_20%)] backdrop-blur-md animate-in fade-in duration-300">
             <div 
                 className={cn(
-                    "w-full max-w-lg bg-[#0f1218] border border-pr-border/40 rounded-[var(--pr-radius-xl)] shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col max-h-[90vh] relative overflow-hidden animate-in zoom-in-95 duration-200", 
+                    "w-full max-w-lg bg-[var(--pr-surface)] border border-pr-border/40 rounded-[var(--pr-radius-xl)] shadow-[var(--pr-shadow-soft)] flex flex-col max-h-[90vh] relative overflow-hidden animate-in zoom-in-95 duration-200", 
                     className
                 )}
                 role="dialog"
@@ -62,7 +62,7 @@ export function Dialog({
                                 onClick={onClose} 
                                 className={cn(
                                     "text-pr-text-muted hover:text-pr-text hover:bg-pr-surface-2 rounded-full transition-all z-50",
-                                    title ? "p-2" : "absolute top-4 right-4 p-2 bg-black/20 backdrop-blur-sm"
+                                    title ? "p-2" : "absolute top-4 right-4 p-2 bg-[color-mix(in_srgb,var(--pr-bg),transparent_80%)] backdrop-blur-sm"
                                 )}
                                 aria-label="Close"
                             >

@@ -33,7 +33,7 @@ export const PortalPreviewCard: React.FC = () => {
         <div 
           className="inline-flex items-center justify-center px-4 py-2 font-mono text-xl font-bold rounded-lg w-full mb-2 tracking-widest"
           style={{ 
-            backgroundColor: 'rgba(0,0,0,0.3)', 
+            backgroundColor: 'color-mix(in srgb, var(--pr-bg), transparent 70%)', 
             color: 'var(--pr-primary)',
             fontFamily: 'var(--pr-mono-font)',
             border: '1px solid var(--pr-border)'
@@ -52,7 +52,7 @@ export const PortalPreviewCard: React.FC = () => {
       </div>
 
       {/* Rune Cards Section */}
-      <div className="p-6 pt-2 bg-black/20">
+      <div className="p-6 pt-2 bg-[color-mix(in_srgb,var(--pr-bg),transparent_80%)]">
         <div className="flex justify-between items-center space-x-2">
           {[1, 2, 3, 5, 8].map((val, i) => (
             <div 
@@ -61,7 +61,7 @@ export const PortalPreviewCard: React.FC = () => {
               style={{
                 backgroundColor: 'var(--pr-surface)',
                 borderColor: 'var(--pr-border)',
-                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
+                boxShadow: 'inset 0 1px 0 color-mix(in srgb, var(--pr-text), transparent 95%)',
                 transform: `rotate(${i % 2 === 0 ? 2 : -2}deg)`
               }}
             >
