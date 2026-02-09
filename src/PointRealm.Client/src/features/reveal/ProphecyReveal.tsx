@@ -9,6 +9,7 @@ import { SuggestedOathPanel } from './components/SuggestedOathPanel';
 import { OutcomeActions } from './components/OutcomeActions';
 import { VignettePulse } from './components/VignettePulse';
 import { useProphecyStats, getNumericVote } from './utils/statsHooks';
+import { useThemeMode } from '@/theme/ThemeModeProvider';
 import styles from './ProphecyReveal.module.css';
 
 interface ProphecyRevealProps {
@@ -47,6 +48,7 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
   const revealed = encounter.isRevealed;
   const prefersReducedMotion = useReducedMotion() ?? false;
   const { toast } = useToast();
+  const { mode } = useThemeMode();
   const [showVignette, setShowVignette] = useState(false);
   const [sealingValue, setSealingValue] = useState<string | null>(null);
   const [lastOutcome, setLastOutcome] = useState<number | null>(null);
@@ -130,8 +132,14 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4 }}
             >
-              <h1 className={styles.mainTitle}>{minimal ? 'The Prophecy' : 'Prophecy Revealed'}</h1>
-              {!minimal && <p className={styles.subtitle}>The runes have spoken</p>}
+              <h1 className={styles.mainTitle}>
+                {minimal ? mode.labels.prophecy : `${mode.labels.prophecy} Revealed`}
+              </h1>
+              {!minimal && (
+                <p className={styles.subtitle}>
+                  {mode.key === 'fantasy' ? 'The runes have spoken' : 'The votes are in'}
+                </p>
+              )}
             </motion.div>
           </div>
 
@@ -152,8 +160,8 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
-            <span className={styles.bannerLabel}>Quest</span>
-            <strong className={styles.bannerTitle}>{quest?.title ?? 'Unknown Quest'}</strong>
+            <span className={styles.bannerLabel}>{mode.labels.quest}</span>
+            <strong className={styles.bannerTitle}>{quest?.title ?? `Unknown ${mode.labels.quest}`}</strong>
             {quest?.externalId && <span className={styles.bannerId}>{quest.externalId}</span>}
             {encounter.outcome !== undefined && encounter.outcome !== null && (
                <span className={styles.stamp}>✓ Sealed</span>

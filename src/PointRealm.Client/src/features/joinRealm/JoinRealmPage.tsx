@@ -27,6 +27,7 @@ import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Tooltip } from '../../components/ui/Tooltip';
 import { useAuth } from '../auth/AuthContext';
 import { authApi } from '@/api/auth';
+import { formatThemeCopy, useThemeMode } from '@/theme/ThemeModeProvider';
 import styles from './joinRealm.module.css';
 
 export type RealmRole = 'participant' | 'observer';
@@ -64,6 +65,7 @@ export function JoinRealmPage() {
   const tipUrl = import.meta.env.VITE_TIP_JAR_URL || '/tip';
   const tipIsExternal = /^https?:\/\//i.test(tipUrl);
   const { user, isAuthenticated, refreshUser } = useAuth();
+  const { mode } = useThemeMode();
 
   const [displayName, setDisplayName] = useState('');
   const [realmInput, setRealmInput] = useState(searchParams.get('realmCode') || '');
@@ -233,8 +235,8 @@ export function JoinRealmPage() {
           <Panel variant="realm" className={styles.panel}>
             <div className={styles.panelInner}>
               <PageHeader
-                title="Enter the Realm"
-                subtitle="Join a session."
+                title={formatThemeCopy("Enter the {realm}", mode.labels)}
+                subtitle={formatThemeCopy("Join a {realm} session.", mode.labels)}
                 size="panel"
                 className={styles.header || ''}
               />
@@ -250,8 +252,8 @@ export function JoinRealmPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
                   <div className={styles.field}>
                     <Input
-                      label="Realm Code or Link"
-                      tooltip="Paste a full invite link or a short realm code."
+                      label={formatThemeCopy("{realm} Code or Link", mode.labels)}
+                      tooltip={formatThemeCopy("Paste a full invite link or a short {realm} code.", mode.labels)}
                       helper="Paste an invite"
                       value={realmInput}
                       onChange={(e) => {
@@ -260,7 +262,7 @@ export function JoinRealmPage() {
                       }}
                       onPaste={handlePaste}
                       onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleJoin()}
-                      placeholder="Realm code..."
+                      placeholder={formatThemeCopy("{realm} code...", mode.labels)}
                       disabled={isLoading}
                       error={inputError || undefined}
                       className="bg-black/20"
@@ -270,8 +272,8 @@ export function JoinRealmPage() {
                   <div className={styles.field}>
                     <Input
                       label="Display Name"
-                      tooltip={isAuthenticated ? "This is your permanent account identity." : "Your name as it appears to the party."}
-                      helper={isAuthenticated ? "Updates account profile" : "Your party alias"}
+                      tooltip={isAuthenticated ? "This is your permanent account identity." : `Your name as it appears to the ${mode.labels.party.toLowerCase()}.`}
+                      helper={isAuthenticated ? "Updates account profile" : `${mode.labels.party} alias`}
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                       onBlur={handleNameBlur}
@@ -313,7 +315,7 @@ export function JoinRealmPage() {
                 <section className={styles.section}>
                   <SectionHeader 
                       title="Role" 
-                      subtitle="Choose your archetype" 
+                      subtitle="Choose your role" 
                       className="mb-2"
                   />
                   <div className={styles.roleGrid} role="radiogroup" aria-label="Choose your role">
@@ -357,7 +359,7 @@ export function JoinRealmPage() {
                 </section>
 
                 <div className="pt-4">
-                  <Tooltip content="Connect to the realm with the selected role and name.">
+                  <Tooltip content={formatThemeCopy("Connect to the {realm} with the selected role and name.", mode.labels)}>
                     <Button
                       onClick={() => handleJoin()}
                       disabled={isLoading || !realmInput.trim() || !displayName.trim()}
@@ -371,7 +373,7 @@ export function JoinRealmPage() {
                           Joining...
                         </>
                       ) : (
-                        'Enter Realm'
+                        formatThemeCopy("Enter {realm}", mode.labels)
                       )}
                     </Button>
                   </Tooltip>

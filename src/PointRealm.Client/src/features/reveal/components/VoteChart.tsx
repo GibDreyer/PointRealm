@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { cn } from '@/lib/utils';
 import { ConsensusIndicator } from './ConsensusIndicator';
+import { useThemeMode } from '@/theme/ThemeModeProvider';
 import styles from './VoteChart.module.css';
 
 export interface ChartDataItem {
@@ -26,6 +27,7 @@ export const VoteChart: React.FC<VoteChartProps> = ({
   spread = null,
 }) => {
   const prefersReducedMotion = useReducedMotion() ?? false;
+  const { mode } = useThemeMode();
   
   const maxCount = useMemo(() => Math.max(...data.map(d => d.count), 1), [data]);
   
@@ -65,13 +67,13 @@ export const VoteChart: React.FC<VoteChartProps> = ({
     return (
       <div className={styles.wrapper}>
         {compact ? (
-          <SectionHeader title="Vote Analysis" className="mb-0" />
+          <SectionHeader title={`${mode.labels.rune} Analysis`} className="mb-0" />
         ) : (
-          <SectionHeader title="Vote Analysis" subtitle="Results" className="mb-0" />
+          <SectionHeader title={`${mode.labels.rune} Analysis`} subtitle="Results" className="mb-0" />
         )}
         <div className={styles.empty}>
           <div className={styles.emptyIcon}>📊</div>
-          <div className={styles.emptyText}>Awaiting revelation...</div>
+          <div className={styles.emptyText}>{mode.key === 'fantasy' ? 'Awaiting revelation...' : 'Awaiting results...'}</div>
         </div>
       </div>
     );
@@ -80,9 +82,9 @@ export const VoteChart: React.FC<VoteChartProps> = ({
   return (
     <div className={cn(styles.wrapper, compact && "gap-4")}>
       {compact ? (
-        <SectionHeader title="Vote Analysis" className="mb-0" />
+        <SectionHeader title={`${mode.labels.rune} Analysis`} className="mb-0" />
       ) : (
-        <SectionHeader title="Vote Analysis" subtitle="Results" className="mb-0" />
+        <SectionHeader title={`${mode.labels.rune} Analysis`} subtitle="Results" className="mb-0" />
       )}
       
       {/* Stats Row */}
@@ -103,7 +105,7 @@ export const VoteChart: React.FC<VoteChartProps> = ({
           </div>
           <div className={styles.statCard}>
             <div className={styles.statValue}>{totalVotes}</div>
-            <div className={styles.statLabel}>VOTES</div>
+            <div className={styles.statLabel}>{`${mode.labels.rune.toUpperCase()}S`}</div>
           </div>
         </motion.div>
       )}

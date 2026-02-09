@@ -27,6 +27,7 @@ import { ToggleSettingRow } from "@/components/ui/ToggleSettingRow";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { DECKS } from "./constants";
 import { BackButton } from "@/components/ui/BackButton";
+import { formatThemeCopy, useThemeMode } from "@/theme/ThemeModeProvider";
 import styles from "./createRealm.module.css";
 
 // --- Schema ---
@@ -100,6 +101,7 @@ const getErrorMessage = (error: unknown) => {
 export function CreateRealmPage() {
   const navigate = useNavigate();
   const { setThemeKey } = useTheme();
+  const { mode } = useThemeMode();
   const client = useRealmClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -130,6 +132,11 @@ export function CreateRealmPage() {
   });
 
   const { watch, handleSubmit, control, setValue, formState: { errors } } = form;
+  const realmNamePlaceholder = mode.key === 'fantasy'
+    ? "e.g. The Emerald Sanctum..."
+    : mode.key === 'sci-fi'
+      ? "e.g. Sigma Outpost..."
+      : "e.g. Sprint Alpha...";
 
   const selectedDeckType = watch("deckType");
   const deckTooltips: Record<"FIBONACCI" | "SHORT_FIBONACCI" | "TSHIRT" | "CUSTOM", string> = {
@@ -226,7 +233,7 @@ export function CreateRealmPage() {
         } else {
           const addQuestResult = await client.addQuest({
             title: questName,
-            description: "Your journey begins here. Cast your runes to estimate the complexity of this task.",
+            description: formatThemeCopy("Your work starts here. Share your {rune} to estimate complexity.", mode.labels),
             questLogVersion,
           });
           const questId = addQuestResult.success ? addQuestResult.payload : undefined;
@@ -266,9 +273,9 @@ export function CreateRealmPage() {
       reducedMotion={prefersReducedMotion}
       contentClassName={styles.page}
     >
-      <SummoningCircle />
+      {mode.showBackdrop && <SummoningCircle />}
       
-      <BackButton to="/" label="Back to Tavern" position="absolute" />
+      <BackButton to="/" label={`Back to ${mode.phrases.lobbyTitle}`} position="absolute" />
 
       <motion.div
         initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.95, y: 10 }}
@@ -278,8 +285,8 @@ export function CreateRealmPage() {
       >
         <Panel variant="realm" className="w-[100%] max-w-[900px]">
           <PageHeader
-            title="Create Realm"
-            subtitle="Inscribe the laws of your new dominion"
+            title={mode.phrases.createRealm}
+            subtitle={formatThemeCopy("Define your {realm} and estimation flow.", mode.labels)}
             size="panel"
             className={styles.header}
           />
@@ -303,20 +310,20 @@ export function CreateRealmPage() {
                   </div>
                   <div className={styles.field}>
                     <Input
-                      label="Realm Name"
-                      tooltip="Optional. Leave blank to keep the generated name."
+                      label={formatThemeCopy("{realm} Name", mode.labels)}
+                      tooltip={formatThemeCopy("Optional. Leave blank to keep the generated {realm} name.", mode.labels)}
                       {...form.register("realmName")}
-                      placeholder="e.g. The Emerald Sanctum..."
+                      placeholder={realmNamePlaceholder}
                       disabled={isSubmitting}
                       error={errors.realmName?.message}
                       className="bg-black/20"
                       rightElement={
-                        <Tooltip content="Generate a fresh random realm name.">
+                        <Tooltip content={formatThemeCopy("Generate a fresh {realm} name.", mode.labels)}>
                           <button
                             type="button"
                             className={styles.randomizeBtn}
                             onClick={() => setValue("realmName", generateRandomRealmName())}
-                            aria-label="Generate random realm name"
+                            aria-label={formatThemeCopy("Generate random {realm} name", mode.labels)}
                           >
                             <Sparkles size={16} />
                           </button>
@@ -327,9 +334,9 @@ export function CreateRealmPage() {
                   <div className={styles.field}>
                     <Input
                       label="Your Name"
-                      tooltip={isAuthenticated ? "This is your permanent account identity." : "This name is shown to everyone in the realm."}
+                      tooltip={isAuthenticated ? "This is your permanent account identity." : formatThemeCopy("This name is shown to everyone in the {realm}.", mode.labels)}
                       {...form.register("displayName")}
-                      placeholder={isAuthenticated ? user?.displayName || "Your Name" : "e.g. Archmage Aethelgard"}
+                      placeholder={isAuthenticated ? user?.displayName || "Your Name" : mode.key === 'fantasy' ? "e.g. Archmage Aethelgard" : "e.g. Morgan"}
                       disabled={isSubmitting || isUpdatingName}
                       readOnly={isAuthenticated && !isEditingName}
                       error={errors.displayName?.message}

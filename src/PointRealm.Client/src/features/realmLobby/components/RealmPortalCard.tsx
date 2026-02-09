@@ -5,6 +5,7 @@ import { Button } from '../../../components/Button';
 import { SectionHeader } from '../../../components/ui/SectionHeader';
 import { useToast } from '../../../components/ui/ToastSystem';
 import { cn } from '../../../lib/utils';
+import { useThemeMode } from '@/theme/ThemeModeProvider';
 import styles from './RealmPortalCard.module.css';
 
 interface Props {
@@ -14,13 +15,16 @@ interface Props {
 
 export function RealmPortalCard({ joinUrl, className }: Props) {
     const { toast } = useToast();
+    const { mode } = useThemeMode();
     const [ripple, setRipple] = useState(false);
+    const portalLabel = mode.key === 'fantasy' ? 'Portal' : mode.key === 'sci-fi' ? 'Gateway' : 'Link';
+    const inviteLabel = mode.key === 'fantasy' ? 'Invite Link' : 'Share Link';
 
     const handleCopy = async () => {
         try {
             await navigator.clipboard.writeText(joinUrl);
             triggerRipple();
-            toast('Portal copied', 'success');
+            toast(`${portalLabel} copied`, 'success');
         } catch (err) {
             console.error('Failed to copy', err);
             toast('Copy failed', 'error');
@@ -35,8 +39,8 @@ export function RealmPortalCard({ joinUrl, className }: Props) {
     return (
         <Panel className={cn("relative overflow-hidden", className)}>
             <SectionHeader 
-                title="Realm Portal" 
-                subtitle="Invite Link" 
+                title={`${mode.labels.realm} ${portalLabel}`} 
+                subtitle={inviteLabel} 
                 className="mb-4"
             />
 

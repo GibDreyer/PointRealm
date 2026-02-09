@@ -16,6 +16,8 @@ import { AccountStatus } from '@/components/ui/AccountStatus';
 import { QuestDialog } from './components/QuestDialog';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/theme/ThemeProvider';
+import { ThemeModeToggle } from '@/components/ui/ThemeModeToggle';
+import { useThemeMode } from '@/theme/ThemeModeProvider';
 
 import styles from './realmScreen.module.css';
 
@@ -37,12 +39,13 @@ export function RealmScreen() {
 
 
     const { setThemeKey } = useTheme();
+    const { mode } = useThemeMode();
 
     useEffect(() => {
-        if (state?.themeKey) {
+        if (mode.useRealmTheme && state?.themeKey) {
             setThemeKey(state.themeKey);
         }
-    }, [state?.themeKey, setThemeKey]);
+    }, [state?.themeKey, setThemeKey, mode.useRealmTheme]);
 
     useEffect(() => {
         if (error) {
@@ -86,8 +89,8 @@ export function RealmScreen() {
                         <div className="absolute inset-0 rounded-full border-4 border-pr-primary/20" />
                         <div className="absolute inset-0 rounded-full border-4 border-t-pr-primary animate-spin" />
                     </div>
-                    <div className="mt-4 text-pr-primary font-black uppercase tracking-[0.3em] text-sm animate-pulse">
-                        Entering the Realm
+                        <div className="mt-4 text-pr-primary font-black uppercase tracking-[0.3em] text-sm animate-pulse">
+                        {mode.phrases.enteringRealm}
                     </div>
                 </div>
             </PageShell>
@@ -182,6 +185,7 @@ export function RealmScreen() {
             reducedMotion={prefersReducedMotion}
             contentClassName={styles.page}
             hideAccountStatus={true}
+            showThemeToggle={false}
         >
             <AnimatePresence>
                 {connectionStatus !== 'connected' && (
@@ -205,21 +209,22 @@ export function RealmScreen() {
                      </div>
 
                      <div className="pointer-events-auto flex items-center gap-3">
+                        <ThemeModeToggle />
                         <AccountStatus />
                         <button
                             onClick={handleCopyLink}
                             className="px-4 py-3 bg-pr-surface/80 backdrop-blur border border-pr-border/50 rounded-xl hover:bg-pr-surface hover:border-pr-primary/50 transition-all text-pr-text-muted hover:text-pr-text shadow-lg relative group flex items-center gap-2"
-                            title="Copy Realm Link"
+                            title={mode.phrases.copyLink}
                         >
                             {copied ? (
                                 <>
                                     <Check size={20} className="text-green-500" />
-                                    <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-green-500">Copied!</span>
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-green-500">{mode.phrases.copied}</span>
                                 </>
                             ) : (
                                 <>
                                     <Link2 size={20} />
-                                    <span className="text-[10px] font-bold uppercase tracking-[0.1em]">Copy Link</span>
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.1em]">{mode.phrases.copyLink}</span>
                                 </>
                             )}
                         </button>

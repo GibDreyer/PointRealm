@@ -9,6 +9,7 @@ import styles from '../lobby.module.css';
 import { cn } from '../../../lib/utils';
 import { useRealmStore } from '../../../state/realmStore';
 import { useRealmClient } from '@/app/providers/RealtimeProvider';
+import { useThemeMode } from '@/theme/ThemeModeProvider';
 
 interface Props {
     activeQuestId: string | undefined;
@@ -38,6 +39,7 @@ export function GMPanel({
     const realmVersion = useRealmStore((s) => s.realmSnapshot?.realmVersion ?? null);
     const questLog = useRealmStore((s) => s.realmSnapshot?.questLog?.quests ?? []);
     const client = useRealmClient();
+    const { mode } = useThemeMode();
 
     useEffect(() => {
         if (activeQuestId) {
@@ -71,8 +73,8 @@ export function GMPanel({
         <Panel variant="realm" className={cn("relative overflow-hidden", className)}>
             <div className={styles.panelHeader}>
                 <SectionHeader 
-                    title="Game Master" 
-                    subtitle="Facilitator" 
+                    title={mode.labels.facilitator}
+                    subtitle={mode.phrases.facilitatorTitle}
                     className="mb-2"
                 />
             </div>
@@ -82,7 +84,7 @@ export function GMPanel({
                     <Crown size={28} />
                 </div>
                 <div className={styles.gmName}>{gmName}</div>
-                <div className={styles.gmRole}>Facilitator</div>
+                <div className={styles.gmRole}>{mode.phrases.facilitatorTitle}</div>
             </div>
 
             <OnboardingStepper
@@ -98,13 +100,13 @@ export function GMPanel({
             <div className={styles.gmActions}>
                 {quests.length > 0 && (
                      <div className="mb-2">
-                        <label className="text-[10px] font-black text-pr-text-muted uppercase tracking-widest block mb-1">Active Quest</label>
+                        <label className="text-[10px] font-black text-pr-text-muted uppercase tracking-widest block mb-1">{mode.phrases.activeQuest}</label>
                         <select 
                             value={targetId} 
                             onChange={(e) => setSelectedQuestId(e.target.value)}
                             className="w-full h-10 px-3 rounded-[var(--pr-radius-md)] bg-pr-bg border border-pr-border text-pr-text text-sm focus:border-pr-secondary outline-none transition-colors appearance-none"
                         >
-                            <option value="" disabled>Choose a journey...</option>
+                            <option value="" disabled>{`Choose a ${mode.labels.quest.toLowerCase()}...`}</option>
                             {quests.map(q => (
                                 <option key={q.id} value={q.id}>{q.title}</option>
                             ))}
@@ -119,7 +121,7 @@ export function GMPanel({
                     fullWidth
                     className="h-11 py-0 shadow-none disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                    Begin Quest
+                    {mode.phrases.beginQuest}
                 </Button>
                 <Button
                     onClick={onManageSettings}
@@ -127,7 +129,7 @@ export function GMPanel({
                     fullWidth
                     className="h-11 py-0 border border-pr-secondary/40 text-pr-secondary hover:text-pr-secondary hover:bg-pr-secondary/10 shadow-none"
                 >
-                    Realm Settings
+                    {`${mode.labels.realm} Settings`}
                 </Button>
                 <Button
                     onClick={() => setIsManaging(true)}
@@ -135,7 +137,7 @@ export function GMPanel({
                     fullWidth
                     className="h-11 py-0 border border-pr-secondary/40 text-pr-secondary hover:text-pr-secondary hover:bg-pr-secondary/10 shadow-none"
                 >
-                    Quest Management
+                    {`${mode.labels.quest} Management`}
                 </Button>
             </div>
 

@@ -2,6 +2,7 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { cn } from '@/lib/utils';
+import { useThemeMode } from '@/theme/ThemeModeProvider';
 import styles from './PartyVotesList.module.css';
 
 export interface PartyVoteRow {
@@ -37,6 +38,7 @@ export const PartyVotesList: React.FC<PartyVotesListProps> = ({
   compact = false,
 }) => {
   const prefersReducedMotion = useReducedMotion() ?? false;
+  const { mode } = useThemeMode();
   const [sortMode, setSortMode] = useState<SortMode>('rune');
 
   const sorted = useMemo(() => {
@@ -84,8 +86,8 @@ export const PartyVotesList: React.FC<PartyVotesListProps> = ({
     <div className={styles.section}>
       <div className={styles.headerRow}>
         <SectionHeader 
-          title="Party Votes" 
-          subtitle={compact ? undefined : "Votes"} 
+          title={`${mode.labels.party} ${mode.labels.rune}s`}
+          subtitle={compact ? undefined : mode.labels.rune} 
           className="mb-0" 
         />
         <button
@@ -93,7 +95,7 @@ export const PartyVotesList: React.FC<PartyVotesListProps> = ({
           className={styles.sortButton}
           onClick={() => setSortMode(sortMode === 'rune' ? 'name' : 'rune')}
         >
-          Sort: {sortMode === 'rune' ? 'Rune' : 'Name'}
+          Sort: {sortMode === 'rune' ? mode.labels.rune : 'Name'}
         </button>
       </div>
 

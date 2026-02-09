@@ -5,6 +5,7 @@ import { User, LogOut, Shield } from "lucide-react";
 import { useAuth } from "@/features/auth/AuthContext";
 import { Button } from "@/components/Button";
 import { cn } from "@/lib/utils";
+import { useThemeMode } from "@/theme/ThemeModeProvider";
 
 interface AccountStatusProps {
   className?: string;
@@ -13,6 +14,7 @@ interface AccountStatusProps {
 export const AccountStatus: React.FC<AccountStatusProps> = ({ className }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const { mode } = useThemeMode();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -58,7 +60,7 @@ export const AccountStatus: React.FC<AccountStatusProps> = ({ className }) => {
           <User size={14} />
         </div>
         <span className="text-sm font-medium text-pr-text/90 group-hover:text-white">
-          Hi, {displayName}
+          {mode.phrases.accountWelcome}, {displayName}
         </span>
       </button>
 

@@ -5,6 +5,7 @@ import { Button } from '@/components/Button';
 import { PageShell } from '@/components/shell/PageShell';
 import { PageFooter } from '@/components/ui/PageFooter';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { useThemeMode } from '@/theme/ThemeModeProvider';
 import styles from './landing.module.css';
 
 export const LandingPage: React.FC = () => {
@@ -15,6 +16,7 @@ export const LandingPage: React.FC = () => {
   const enter = { opacity: 1, y: 0 };
   const enterFrom = { opacity: 0, y: 14 };
   const easeOut = "easeOut";
+  const { mode } = useThemeMode();
 
   return (
     <PageShell
@@ -31,7 +33,7 @@ export const LandingPage: React.FC = () => {
         >
           <PageHeader
             title="PointRealm"
-            subtitle="Co-op estimation"
+            subtitle={mode.phrases.tagline}
             size="hero"
             showOrnaments
           />
@@ -55,7 +57,7 @@ export const LandingPage: React.FC = () => {
               onClick={() => navigate('/create')}
               className={styles.heroButton}
             >
-              Create Realm
+              {mode.phrases.createRealm}
             </Button>
           </motion.div>
           <motion.div variants={{ hidden: enterFrom, show: enter }}>
@@ -64,7 +66,7 @@ export const LandingPage: React.FC = () => {
               onClick={() => navigate('/join')}
               className={styles.heroButton}
             >
-              Join Realm
+              {mode.phrases.joinRealm}
             </Button>
           </motion.div>
         </motion.div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '../lib/utils';
 import { motion, HTMLMotionProps, type MotionStyle } from 'framer-motion';
+import { useThemeMode } from '@/theme/ThemeModeProvider';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
 
@@ -99,6 +100,8 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
   className,
   ...props
 }, ref) => {
+  const { mode } = useThemeMode();
+  const isMinimal = mode.key === 'minimal';
   const { style, ...filteredProps } = props;
 
   const baseColorVar = variant === 'secondary' ? 'var(--pr-secondary)' : 
@@ -120,6 +123,35 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
     ...cssVariables,
     color: textColor,
   } as MotionStyle;
+
+  if (isMinimal) {
+    const minimalVariants: Record<ButtonVariant, string> = {
+      primary: 'bg-pr-primary text-pr-bg hover:bg-pr-primary/90',
+      secondary: 'bg-pr-secondary text-pr-bg hover:bg-pr-secondary/90',
+      danger: 'bg-pr-danger text-pr-bg hover:bg-pr-danger/90',
+      ghost: 'bg-transparent text-pr-text-muted hover:text-pr-text border border-pr-border',
+    };
+
+    return (
+      <motion.button
+        ref={ref}
+        whileHover="hover"
+        whileTap="tap"
+        initial="initial"
+        className={cn(
+          "inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm font-semibold transition-all duration-200",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--pr-bg)] focus-visible:ring-primary",
+          minimalVariants[variant],
+          fullWidth ? "w-full" : "w-auto",
+          className
+        )}
+        style={style}
+        {...filteredProps}
+      >
+        {children}
+      </motion.button>
+    );
+  }
 
   return (
     <motion.button 

@@ -5,6 +5,7 @@ import { SectionHeader } from '../../../components/ui/SectionHeader';
 import { Button } from '../../../components/Button';
 import { QuestListItem } from './QuestListItem';
 import { cn } from '../../../lib/utils';
+import { useThemeMode } from '@/theme/ThemeModeProvider';
 
 interface QuestLogPanelProps {
     quests: Quest[];
@@ -29,19 +30,20 @@ export function QuestLogPanel({
     minimal = false
 }: QuestLogPanelProps) {
     const [isEditing, setIsEditing] = useState(false);
+    const { mode } = useThemeMode();
 
     return (
         <div className="flex flex-col h-full">
             <header className={cn("px-6 pt-6 pb-4 border-b border-pr-border/10 flex items-center justify-between", minimal ? "bg-transparent" : "bg-black/40")}>
                 {!minimal && <SectionHeader
-                    title="Quest Log"
-                    subtitle="Active encounters"
+                    title={mode.phrases.questLogTitle}
+                    subtitle={mode.phrases.questLogSubtitle}
                     className="mb-0"
                 />}
                 {minimal && (
                     <div className="flex flex-col">
-                        <h3 className="text-sm font-bold text-pr-primary uppercase tracking-widest">Quests</h3>
-                        <p className="text-[10px] text-pr-text-muted">Manage active encounters</p>
+                        <h3 className="text-sm font-bold text-pr-primary uppercase tracking-widest">{mode.labels.quest}s</h3>
+                        <p className="text-[10px] text-pr-text-muted">{mode.phrases.questLogSubtitle}</p>
                     </div>
                 )}
                 {isGM && (
@@ -51,7 +53,7 @@ export function QuestLogPanel({
                                 onClick={onAddQuest}
                                 variant="ghost"
                                 className="w-10 h-10 min-h-0 px-0 py-0 border-pr-border/30 hover:border-pr-primary/50"
-                                title="Add Quest"
+                                title={mode.phrases.addQuest}
                             >
                                 <Plus size={18} />
                             </Button>
@@ -67,7 +69,7 @@ export function QuestLogPanel({
                             onClick={onOpenSettings}
                             variant="ghost"
                             className="w-10 h-10 min-h-0 px-0 py-0 border-pr-border/30 hover:border-pr-secondary/50"
-                            title="Realm Settings"
+                            title={`${mode.labels.realm} Settings`}
                         >
                             <Settings size={20} />
                         </Button>
@@ -80,13 +82,13 @@ export function QuestLogPanel({
                     {quests.length === 0 ? (
                         <div className="text-center py-16 text-pr-text-muted/50 flex flex-col items-center gap-3">
                             <Scroll size={32} className="opacity-30" />
-                            <p className="text-[10px] uppercase tracking-[0.3em] font-bold">No active quests</p>
+                            <p className="text-[10px] uppercase tracking-[0.3em] font-bold">{mode.phrases.noActiveQuests}</p>
                             {isGM && isEditing && (
                                 <button
                                     onClick={onAddQuest}
                                     className="text-[10px] text-pr-primary/70 hover:text-pr-primary transition-colors font-bold uppercase tracking-[0.2em]"
                                 >
-                                    Add quest
+                                    {mode.phrases.addQuest}
                                 </button>
                             )}
                         </div>

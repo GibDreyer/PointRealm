@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Panel } from "@/components/ui/Panel";
 import { useToast } from "@/components/ui/ToastSystem";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { useThemeMode } from "@/theme/ThemeModeProvider";
 
 import { useAuth } from "./AuthContext";
 
@@ -16,6 +17,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const { toast } = useToast();
+  const { mode } = useThemeMode();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
@@ -40,12 +42,23 @@ export function LoginPage() {
     }
   };
 
+  const loginTitle = mode.key === 'fantasy'
+    ? "Inscribe Your Presence"
+    : mode.key === 'sci-fi'
+      ? "Access Control"
+      : "Sign In";
+  const loginSubtitle = mode.key === 'fantasy'
+    ? `Enter the ${mode.phrases.lobbyTitle}`
+    : mode.key === 'sci-fi'
+      ? "Enter the briefing bay"
+      : "Use your account details";
+
   return (
     <PageShell backgroundDensity="medium">
       <BackButton to="/" />
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <Panel variant="realm" className="max-w-md w-full p-8">
-          <PageHeader title="Inscribe Your Presence" subtitle="Enter the Tavern" size="panel" />
+          <PageHeader title={loginTitle} subtitle={loginSubtitle} size="panel" />
           <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
             <Input
               label="Email"
