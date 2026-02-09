@@ -1,0 +1,105 @@
+.stepper {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--pr-border) 65%, transparent);
+  background: color-mix(in srgb, var(--pr-surface) 85%, transparent);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  color: var(--pr-text-muted);
+}
+
+.progressText {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--pr-text-muted);
+}
+
+.progressBar {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pr-border) 70%, transparent);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--pr-primary), var(--pr-secondary));
+  transition: width 250ms ease;
+}
+
+.steps {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+}
+
+.stepActive {
+  background: color-mix(in srgb, var(--pr-primary) 8%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pr-primary) 15%, transparent);
+}
+
+.stepComplete {
+  opacity: 0.85;
+}
+
+.indicator {
+  margin-top: 2px;
+  color: var(--pr-text-muted);
+}
+
+.indicatorActive {
+  color: var(--pr-primary);
+}
+
+.indicatorComplete {
+  color: var(--pr-secondary);
+}
+
+.stepTitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--pr-text);
+}
+
+.stepDescription {
+  font-size: 0.7rem;
+  color: var(--pr-text-muted);
+  margin-top: 0.25rem;
+}
+
+.stepStatus {
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--pr-text-muted);
+  margin-top: 2px;
+}
+
+.stepActions {
+  margin-top: 0.5rem;
+}

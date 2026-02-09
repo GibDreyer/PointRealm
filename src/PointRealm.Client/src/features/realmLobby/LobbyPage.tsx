@@ -241,6 +241,10 @@ export function TavernLobbyPage() {
                             quests={snapshot.questLogSummary.quests || []}
                             onManageSettings={() => setShowSettings(true)}
                             gmName={gmName}
+                            joinUrl={snapshot.portal.joinUrl}
+                            partyCount={snapshot.party.length}
+                            questCount={snapshot.questLogSummary.totalQuests}
+                            activeEncounterId={snapshot.activeEncounterId}
                             className={`${styles.panel} ${styles.panelGM}`}
                         />
                     )}
