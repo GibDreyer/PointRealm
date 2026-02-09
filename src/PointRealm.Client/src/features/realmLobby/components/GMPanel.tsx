@@ -4,6 +4,7 @@ import { Panel } from '../../../components/ui/Panel';
 import { Button } from '../../../components/Button';
 import { SectionHeader } from '../../../components/ui/SectionHeader';
 import { QuestManagementDialog } from './QuestManagementDialog';
+import { OnboardingStepper } from './OnboardingStepper';
 import styles from '../lobby.module.css';
 import { cn } from '../../../lib/utils';
 import { useRealmStore } from '../../../state/realmStore';
@@ -14,10 +15,24 @@ interface Props {
     quests: { id: string; title: string; }[];
     onManageSettings: () => void;
     gmName: string;
+    joinUrl: string;
+    partyCount: number;
+    questCount: number;
+    activeEncounterId?: string;
     className?: string;
 }
 
-export function GMPanel({ activeQuestId, quests, onManageSettings, gmName, className }: Props) {
+export function GMPanel({
+    activeQuestId,
+    quests,
+    onManageSettings,
+    gmName,
+    joinUrl,
+    partyCount,
+    questCount,
+    activeEncounterId,
+    className,
+}: Props) {
     const [selectedQuestId, setSelectedQuestId] = useState<string>(activeQuestId || "");
     const [isManaging, setIsManaging] = useState(false);
     const realmVersion = useRealmStore((s) => s.realmSnapshot?.realmVersion ?? null);
@@ -33,17 +48,19 @@ export function GMPanel({ activeQuestId, quests, onManageSettings, gmName, class
         }
     }, [activeQuestId, quests, selectedQuestId]);
 
+    const selectedQuest = questLog.find((quest) => quest.id === selectedQuestId);
+    const canStartEncounter = Boolean(selectedQuest?.version && realmVersion !== null);
+
     const handleBeginEncounter = () => {
         if (selectedQuestId) {
-            const quest = questLog.find((q) => q.id === selectedQuestId);
-            if (!quest?.version || realmVersion === null) {
+            if (!selectedQuest?.version || realmVersion === null) {
                 console.warn("Missing realm or quest version for StartEncounter.");
                 return;
             }
             client.startEncounter({
                 questId: selectedQuestId,
                 realmVersion,
-                questVersion: quest.version,
+                questVersion: selectedQuest.version,
             }).catch(console.error);
         }
     };
@@ -67,6 +84,16 @@ export function GMPanel({ activeQuestId, quests, onManageSettings, gmName, class
                 <div className={styles.gmName}>{gmName}</div>
                 <div className={styles.gmRole}>Facilitator</div>
             </div>
+
+            <OnboardingStepper
+                joinUrl={joinUrl}
+                partyCount={partyCount}
+                questCount={questCount}
+                activeEncounterId={activeEncounterId}
+                onOpenQuestManager={() => setIsManaging(true)}
+                onStartEncounter={handleBeginEncounter}
+                canStartEncounter={canStartEncounter}
+            />
 
             <div className={styles.gmActions}>
                 {quests.length > 0 && (
