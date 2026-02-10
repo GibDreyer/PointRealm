@@ -101,7 +101,7 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                             deckValues={deckValues}
                             quest={quest}
                             onSealOutcome={onSealOutcome}
-                            onReroll={onReroll}
+                            onStartNextQuest={() => onStartEncounter(quest.id)}
                             hideVoteCounts={encounter.shouldHideVoteCounts ?? settings.hideVoteCounts}
                         />
                     </motion.div>

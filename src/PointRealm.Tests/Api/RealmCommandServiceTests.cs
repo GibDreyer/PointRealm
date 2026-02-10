@@ -12,6 +12,7 @@ using PointRealm.Server.Infrastructure.Persistence;
 using PointRealm.Server.Infrastructure.Persistence.Repositories;
 using PointRealm.Shared.V1.Api;
 using PointRealm.Shared.V1.Realtime;
+using PointRealm.Tests.TestDoubles;
 using Xunit;
 
 namespace PointRealm.Tests.Api;
@@ -310,7 +311,7 @@ public class RealmCommandServiceTests
         IRealmBroadcaster broadcaster,
         ICommandDeduplicator deduplicator)
     {
-        private readonly QuestCommandHandler _questHandler = new(new RealmRepository(context), broadcaster, deduplicator);
+        private readonly QuestCommandHandler _questHandler = new(new RealmRepository(context), broadcaster, deduplicator, new StubQuestNameGenerator());
         private readonly EncounterCommandHandler _encounterHandler = new(new RealmRepository(context), broadcaster, deduplicator);
 
         public Task<CommandResultDto> UpdateQuestAsync(RealmCommandContext ctx, UpdateQuestRequest req)

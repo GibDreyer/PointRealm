@@ -3,6 +3,7 @@ import { CreateRealmPage } from './CreateRealmPage';
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '../../theme/ThemeProvider';
+import { ThemeModeProvider } from '../../theme/ThemeModeProvider';
 import { api } from '../../api/client';
 import { AuthProvider } from '../auth/AuthContext';
 
@@ -10,6 +11,7 @@ const mockClient = {
   connect: vi.fn().mockResolvedValue(undefined),
   addQuest: vi.fn().mockResolvedValue('quest-1'),
   startEncounter: vi.fn().mockResolvedValue(undefined),
+  requestFullSnapshot: vi.fn().mockResolvedValue(undefined),
 };
 
 vi.mock('@/app/providers/RealtimeProvider', () => ({
@@ -42,7 +44,9 @@ describe('CreateRealmPage', () => {
       <BrowserRouter>
         <AuthProvider>
           <ThemeProvider>
-            <CreateRealmPage />
+            <ThemeModeProvider>
+              <CreateRealmPage />
+            </ThemeModeProvider>
           </ThemeProvider>
         </AuthProvider>
       </BrowserRouter>
@@ -119,5 +123,9 @@ describe('CreateRealmPage', () => {
 
     // Resolve
     resolveApi!({ code: 'DONE' });
+
+    await waitFor(() => {
+      expect(submitBtn).not.toBeDisabled();
+    });
   });
 });

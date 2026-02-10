@@ -11,9 +11,9 @@ public sealed class Realm : Entity
     private readonly List<PartyMember> _members = new();
 
     public string? Name { get; private set; }
-    public string Code { get; private set; }
-    public string Theme { get; private set; }
-    public RealmSettings Settings { get; private set; }
+    public string Code { get; private set; } = string.Empty;
+    public string Theme { get; private set; } = string.Empty;
+    public RealmSettings Settings { get; private set; } = null!;
     public int Version { get; private set; }
     public int QuestLogVersion { get; private set; }
     public Guid? CurrentQuestId { get; private set; }

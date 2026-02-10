@@ -1,7 +1,21 @@
-﻿import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
 import '@testing-library/jest-dom';
 import type { Encounter, PartyMember, Quest } from '@/types/realm';
+import { ProphecyReveal } from './ProphecyReveal';
+import { ToastProvider } from '@/components/ui/ToastSystem';
+import { ThemeProvider } from '@/theme/ThemeProvider';
+import { ThemeModeProvider } from '@/theme/ThemeModeProvider';
+
+let reducedMotion = false;
+
+vi.mock('framer-motion', async () => {
+  const actual = await vi.importActual<typeof import('framer-motion')>('framer-motion');
+  return {
+    ...actual,
+    useReducedMotion: () => reducedMotion,
+  };
+});
 
 const baseEncounter = (overrides?: Partial<Encounter>): Encounter => ({
   questId: 'quest-1',
@@ -24,44 +38,36 @@ const quest: Quest = {
   orderIndex: 1,
 };
 
-const renderReveal = async (opts: {
+const renderReveal = (opts: {
   encounter?: Encounter;
   isGM?: boolean;
   reducedMotion?: boolean;
 }) => {
-  const reduced = opts.reducedMotion ?? false;
-  vi.resetModules();
-  vi.doMock('framer-motion', async () => {
-    const actual = await vi.importActual<typeof import('framer-motion')>('framer-motion');
-    return { ...actual, useReducedMotion: () => reduced };
-  });
-
-  const { ProphecyReveal } = await import('./ProphecyReveal');
-  const { ToastProvider } = await import('@/components/ui/ToastSystem');
+  reducedMotion = opts.reducedMotion ?? false;
 
   return render(
-    <ToastProvider>
-      <ProphecyReveal
-        encounter={opts.encounter ?? baseEncounter()}
-        partyRoster={partyRoster}
-        isGM={opts.isGM ?? false}
-        deckValues={['1', '2', '3', '5', '8']}
-        quest={quest}
-        onSealOutcome={async () => {}}
-        onReroll={() => {}}
-        hideVoteCounts={false}
-      />
-    </ToastProvider>
+    <ThemeProvider>
+      <ThemeModeProvider>
+        <ToastProvider>
+          <ProphecyReveal
+            encounter={opts.encounter ?? baseEncounter()}
+            partyRoster={partyRoster}
+            isGM={opts.isGM ?? false}
+            deckValues={['1', '2', '3', '5', '8']}
+            quest={quest}
+            onSealOutcome={async () => {}}
+            onStartNextQuest={() => {}}
+            hideVoteCounts={false}
+          />
+        </ToastProvider>
+      </ThemeModeProvider>
+    </ThemeProvider>
   );
 };
 
 describe('ProphecyReveal', () => {
-  beforeEach(() => {
-    vi.resetModules();
-  });
-
-  it('does not render vote values when not revealed', async () => {
-    await renderReveal({
+  it('does not render vote values when not revealed', () => {
+    renderReveal({
       encounter: baseEncounter({
         isRevealed: false,
         votes: { m1: '13', m2: '8' },
@@ -73,8 +79,8 @@ describe('ProphecyReveal', () => {
     expect(screen.queryByText('8')).not.toBeInTheDocument();
   });
 
-  it('renders GM-only seal options only for GM', async () => {
-    await renderReveal({
+  it('renders GM-only seal options only for GM', () => {
+    renderReveal({
       encounter: baseEncounter({
         isRevealed: true,
         votes: {},
@@ -85,8 +91,8 @@ describe('ProphecyReveal', () => {
     expect(screen.queryByText('5')).not.toBeInTheDocument();
   });
 
-  it('disables flips when reduced motion is enabled', async () => {
-    const { container } = await renderReveal({
+  it('disables flips when reduced motion is enabled', () => {
+    const { container } = renderReveal({
       encounter: baseEncounter({
         isRevealed: true,
         votes: { m1: '5', m2: '8' },

@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using PointRealm.Server.Application.Services;
-using PointRealm.Server.Application.Services;
 using PointRealm.Server.Application.Commands.Handlers;
 using PointRealm.Server.Application.Abstractions;
 

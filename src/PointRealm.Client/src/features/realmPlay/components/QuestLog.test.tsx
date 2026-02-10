@@ -22,8 +22,8 @@ vi.mock('framer-motion', async () => {
           {/* Expose a way to trigger reorder for testing if needed, or just skip drag test */}
         </div>
       ),
-      Item: ({ children, value, ...props }: { children: ReactNode; value: { id: string }; [key: string]: unknown }) => (
-         <div data-testid={`reorder-item-${value.id}`} {...props}>
+      Item: ({ children, value }: { children: ReactNode; value: { id: string }; [key: string]: unknown }) => (
+         <div data-testid={`reorder-item-${value.id}`}>
             {children}
          </div>
       ),

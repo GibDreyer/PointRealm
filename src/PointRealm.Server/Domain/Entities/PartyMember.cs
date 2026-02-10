@@ -4,8 +4,8 @@ namespace PointRealm.Server.Domain.Entities;
 
 public sealed class PartyMember : Entity
 {
-    public string ClientInstanceId { get; private set; }
-    public string Name { get; private set; }
+    public string ClientInstanceId { get; private set; } = string.Empty;
+    public string Name { get; private set; } = string.Empty;
     public bool IsHost { get; private set; }
     public bool IsObserver { get; private set; }
     public bool IsBanned { get; private set; }

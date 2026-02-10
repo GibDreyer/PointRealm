@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using PointRealm.Server.Application.Abstractions;
@@ -44,7 +45,7 @@ public static class ApiServiceTestHelpers
             passwordValidators,
             normalizer,
             describer,
-            null,
+            new ServiceCollection().BuildServiceProvider(),
             NullLogger<UserManager<ApplicationUser>>.Instance);
     }
 

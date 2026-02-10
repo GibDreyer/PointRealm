@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PointRealm.Server.Api.Services;
 using PointRealm.Server.Application.Services;
+using PointRealm.Tests.TestDoubles;
 using PointRealm.Shared.V1.Api;
 using Xunit;
 
@@ -20,7 +21,8 @@ public class RealmCreationServiceTests
         var service = new RealmCreationService(
             dbContext,
             new ApiServiceTestHelpers.StubCodeGenerator("ABC123"),
-            new RealmSettingsService());
+            new RealmSettingsService(),
+            new StubQuestNameGenerator());
 
         var request = new CreateRealmRequest
         {
