@@ -1,9 +1,10 @@
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { cn } from '../../../lib/utils';
 import { PartyMember } from '../../../types/realm';
 import { Check, WifiOff, Crown, Eye } from 'lucide-react';
 import runeBackground from '@/assets/rune-background.png';
+import { useEffect, useRef, useState } from 'react';
 
 
 
@@ -20,10 +21,22 @@ export function PlayerSeat({ member, vote, isRevealed, position, className }: Pl
     const isDisconnected = !member.isOnline || member.status === 'disconnected';
     const avatarImageUrl = member.profileImageUrl?.trim();
     const avatarEmoji = member.avatarEmoji?.trim() ?? member.profileEmoji?.trim();
-    
+    const shouldReduceMotion = useReducedMotion();
+    const prevRevealed = useRef(isRevealed);
+    const [shouldFlip, setShouldFlip] = useState(false);
+
     const isGM = member.role === 'GM';
     const isObserver = member.role === 'Observer';
 
+    useEffect(() => {
+        if (!prevRevealed.current && isRevealed) {
+            setShouldFlip(true);
+        }
+        if (!isRevealed) {
+            setShouldFlip(false);
+        }
+        prevRevealed.current = isRevealed;
+    }, [isRevealed]);
     
     return (
         <div className={cn(
@@ -46,15 +59,34 @@ export function PlayerSeat({ member, vote, isRevealed, position, className }: Pl
                 )}
 
                 {/* The Vote Card */}
-                <div className="h-16 w-12 sm:h-20 sm:w-14 relative flex items-center justify-center mb-2">
+                <div
+                    className="h-20 w-14 sm:h-24 sm:w-16 relative flex items-center justify-center mb-2"
+                    style={{ perspective: '900px' }}
+                >
                     <AnimatePresence mode="wait">
                         {hasVoted ? (
                             <motion.div
                                 key={isRevealed ? 'revealed' : 'hidden'}
-                                initial={{ rotateY: 90, scale: 0.8, opacity: 0 }}
-                                animate={{ rotateY: 0, scale: 1, opacity: 1 }}
-                                exit={{ rotateY: -90, scale: 0.8, opacity: 0 }}
-                                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                                initial={
+                                    shouldReduceMotion
+                                        ? { opacity: 0, scale: 0.98 }
+                                        : { rotateY: isRevealed && !shouldFlip ? 180 : 0, opacity: 0, scale: 0.9 }
+                                }
+                                animate={
+                                    shouldReduceMotion
+                                        ? { opacity: 1, scale: 1 }
+                                        : { rotateY: isRevealed ? 180 : 0, opacity: 1, scale: 1 }
+                                }
+                                exit={
+                                    shouldReduceMotion
+                                        ? { opacity: 0 }
+                                        : { rotateY: isRevealed ? 180 : 0, opacity: 0, scale: 0.9 }
+                                }
+                                transition={
+                                    shouldReduceMotion
+                                        ? { duration: 0.15 }
+                                        : { type: "spring", stiffness: 260, damping: 22 }
+                                }
                                 className={cn(
                                     "absolute inset-0 rounded-lg shadow-lg overflow-hidden",
                                     "border",
@@ -64,46 +96,54 @@ export function PlayerSeat({ member, vote, isRevealed, position, className }: Pl
                                 )}
                                 style={{ transformStyle: 'preserve-3d' }}
                             >
-                                {isRevealed ? (
-                                    /* Revealed card face */
-                                    <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-pr-surface-elevated to-pr-surface relative">
-                                        {/* Ornate frame texture (subtle) */}
-                                        <div 
-                                            className="absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none bg-cover bg-center"
-                                            style={{ backgroundImage: `url(${runeBackground})` }}
-                                        />
-                                        {/* Value */}
-                                        <span className="relative z-10 font-heading font-black text-xl sm:text-2xl text-pr-primary drop-shadow-[0_0_8px_rgba(74,158,255,0.5)]">
-                                            {vote || "?"}
-                                        </span>
-                                        {/* Glow effect */}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-pr-primary/10 to-transparent pointer-events-none" />
-                                    </div>
-                                ) : (
-                                    /* Face-down card with rune texture */
-                                    <div className="w-full h-full relative">
-                                        {/* Rune background texture */}
-                                        <div 
-                                            className="absolute inset-0 bg-cover bg-center opacity-70"
-                                            style={{ backgroundImage: `url(${runeBackground})` }}
-                                        />
-                                        {/* Overlay gradient for depth */}
-                                        <div className="absolute inset-0 bg-gradient-to-b from-pr-primary/20 via-transparent to-pr-primary/10" />
-                                        {/* Subtle center emblem */}
-                                        <div className="absolute inset-0 flex items-center justify-center">
-                                            <div className="w-6 h-6 opacity-30 rounded-full border-2 border-pr-primary/50 flex items-center justify-center">
-                                                <div className="w-2 h-2 rounded-full bg-pr-primary/50" />
-                                            </div>
+                                {/* Face-down card with rune texture */}
+                                <div
+                                    className="w-full h-full relative"
+                                    style={{ backfaceVisibility: 'hidden' }}
+                                >
+                                    {/* Rune background texture */}
+                                    <div 
+                                        className="absolute inset-0 bg-cover bg-center opacity-70"
+                                        style={{ backgroundImage: `url(${runeBackground})` }}
+                                    />
+                                    {/* Overlay gradient for depth */}
+                                    <div className="absolute inset-0 bg-gradient-to-b from-pr-primary/20 via-transparent to-pr-primary/10" />
+                                    {/* Subtle center emblem */}
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <div className="w-6 h-6 opacity-30 rounded-full border-2 border-pr-primary/50 flex items-center justify-center">
+                                            <div className="w-2 h-2 rounded-full bg-pr-primary/50" />
                                         </div>
-                                        {/* Shimmer animation */}
+                                    </div>
+                                    {/* Shimmer animation */}
+                                    {!shouldReduceMotion && (
                                         <motion.div 
                                             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
                                             initial={{ x: '-100%' }}
                                             animate={{ x: '200%' }}
                                             transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
                                         />
-                                    </div>
-                                )}
+                                    )}
+                                </div>
+
+                                {/* Revealed card face */}
+                                <div
+                                    className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-pr-surface-elevated to-pr-surface relative"
+                                    style={{ transform: 'rotateY(180deg)', backfaceVisibility: 'hidden' }}
+                                >
+                                    {/* Ornate frame texture (subtle) */}
+                                    <div 
+                                        className="absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none bg-cover bg-center"
+                                        style={{ backgroundImage: `url(${runeBackground})` }}
+                                    />
+                                    {/* Value */}
+                                    {isRevealed && (
+                                        <span className="relative z-10 font-heading font-black text-xl sm:text-2xl text-pr-primary drop-shadow-[0_0_8px_rgba(74,158,255,0.5)]">
+                                            {vote || "?"}
+                                        </span>
+                                    )}
+                                    {/* Glow effect */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-pr-primary/10 to-transparent pointer-events-none" />
+                                </div>
                             </motion.div>
                         ) : (
                             /* Empty slot - waiting for vote */
