@@ -59,6 +59,7 @@ export const BackButton: React.FC<BackButtonProps> = ({
         type="button"
         onClick={handleClick}
         aria-label={label}
+        title={label}
         className="
           flex items-center justify-center
           w-[44px] h-[44px] rounded-full

@@ -68,6 +68,8 @@ export function ConnectionStatusBanner({ status, onRetry, className }: Props) {
             onClick={onRetry}
             disabled={isWorking}
             className="relative z-10 px-4 py-1.5 rounded-full text-[10px] uppercase tracking-[0.35em] font-black border border-pr-primary/30 text-pr-primary hover:text-pr-text hover:border-pr-primary/60 transition-all disabled:opacity-50 bg-black/30"
+            aria-label="Retry connection"
+            title="Retry connection"
           >
             {isWorking ? 'Stabilizing…' : 'Relink'}
           </button>

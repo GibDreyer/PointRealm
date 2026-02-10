@@ -230,6 +230,8 @@ export function RealmScreen() {
                         <button 
                             onClick={() => setQuestSidebarOpen(!isQuestSidebarOpen)}
                             className="p-3 bg-pr-surface/80 backdrop-blur border border-pr-border/50 rounded-xl hover:bg-pr-surface hover:border-pr-primary/50 transition-all text-pr-text-muted hover:text-pr-text shadow-lg"
+                            aria-label="Toggle quest log"
+                            title="Toggle quest log"
                         >
                              <Menu size={24} />
                         </button>
@@ -284,6 +286,8 @@ export function RealmScreen() {
                             <button
                                 onClick={() => setSettingsOpen(true)}
                                 className="p-3 bg-pr-surface/80 backdrop-blur border border-pr-border/50 rounded-xl hover:bg-pr-surface hover:border-pr-primary/50 transition-all text-pr-text-muted hover:text-pr-text shadow-lg"
+                                aria-label="Open realm settings"
+                                title="Open realm settings"
                             >
                                 <Settings size={24} />
                             </button>
@@ -291,6 +295,8 @@ export function RealmScreen() {
                          <button
                            onClick={() => navigate('/')}
                            className="p-3 bg-pr-surface/80 backdrop-blur border border-pr-border/50 rounded-xl hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-500 transition-all text-pr-text-muted shadow-lg"
+                           aria-label="Leave realm"
+                           title="Leave realm"
                         >
                              <LogOut size={24} />
                         </button>
@@ -382,7 +388,7 @@ export function RealmScreen() {
                             >
                                 <div className="p-4 border-b border-pr-border flex justify-between items-center bg-pr-surface">
                                     <h2 className="text-lg font-serif font-bold text-pr-text">Quest Log</h2>
-                                    <button onClick={() => setQuestSidebarOpen(false)} className="p-1 hover:bg-white/10 rounded-lg">
+                                    <button onClick={() => setQuestSidebarOpen(false)} className="p-1 hover:bg-white/10 rounded-lg" aria-label="Close quest log" title="Close quest log">
                                         <X size={20} />
                                     </button>
                                 </div>
