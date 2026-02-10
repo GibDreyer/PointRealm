@@ -91,7 +91,7 @@ export function GMPanel({
                 joinUrl={joinUrl}
                 partyCount={partyCount}
                 questCount={questCount}
-                activeEncounterId={activeEncounterId}
+                {...(activeEncounterId ? { activeEncounterId } : {})}
                 onOpenQuestManager={() => setIsManaging(true)}
                 onStartEncounter={handleBeginEncounter}
                 canStartEncounter={canStartEncounter}

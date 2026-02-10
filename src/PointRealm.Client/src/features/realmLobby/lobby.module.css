@@ -141,7 +141,116 @@
 
   .panelParty,
   .panelPortal,
-  .panelGM {
+  .panelGM,
+  .panelQuest {
+    order: 0;
+  }
+}
+
+.panelQuest {
+  order: 4;
+}
+
+.questStatusGrid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.questStatusColumn {
+  border: 1px solid color-mix(in srgb, var(--pr-border) 70%, transparent);
+  border-radius: var(--pr-radius-md);
+  padding: 0.6rem;
+  background: color-mix(in srgb, var(--pr-surface) 70%, transparent);
+}
+
+.questStatusLabel {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--pr-text-muted);
+  margin-bottom: 0.45rem;
+}
+
+.questStatusCards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.questStatusCard {
+  border: 1px solid color-mix(in srgb, var(--pr-primary) 25%, transparent);
+  border-radius: var(--pr-radius-sm);
+  padding: 0.45rem 0.55rem;
+  font-size: 0.8rem;
+  color: var(--pr-text);
+  background: color-mix(in srgb, var(--pr-bg) 65%, transparent);
+}
+
+.questEmpty {
+  font-size: 0.75rem;
+  color: var(--pr-text-muted);
+  opacity: 0.8;
+}
+
+.questReorderSection {
+  margin-top: 1rem;
+}
+
+.questReorderLabel {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--pr-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.questReorderList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.questReorderItem {
+  list-style: none;
+}
+
+.questReorderItemBody {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--pr-border) 75%, transparent);
+  border-radius: var(--pr-radius-sm);
+  padding: 0.45rem 0.55rem;
+  background: color-mix(in srgb, var(--pr-surface) 80%, transparent);
+}
+
+.questDragHandle {
+  color: var(--pr-text-muted);
+  opacity: 0.8;
+}
+
+.questReorderTitle {
+  flex: 1;
+  font-size: 0.82rem;
+}
+
+.questBadge {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--pr-text-muted);
+}
+
+@media (min-width: 768px) {
+  .questStatusGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .panelQuest {
     order: 0;
   }
 }

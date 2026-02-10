@@ -59,6 +59,7 @@ public class PortalInfoDto
 public class QuestLogSummaryDto
 {
     public int TotalQuests { get; set; }
+    public int QuestLogVersion { get; set; }
     public string? ActiveQuestId { get; set; }
     public string? ActiveQuestTitle { get; set; }
     public List<LobbyQuestDto> Quests { get; set; } = new();
@@ -68,4 +69,6 @@ public class LobbyQuestDto
 {
     public string Id { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
+    public string Status { get; set; } = "Ready";
+    public int OrderIndex { get; set; }
 }

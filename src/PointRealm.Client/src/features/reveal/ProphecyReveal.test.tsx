@@ -21,7 +21,7 @@ const quest: Quest = {
   title: 'Forge the Estimate',
   description: '',
   status: 'Open',
-  order: 1,
+  orderIndex: 1,
 };
 
 const renderReveal = async (opts: {

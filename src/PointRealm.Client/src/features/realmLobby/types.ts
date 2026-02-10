@@ -35,11 +35,21 @@ export interface PortalInfo {
     joinUrl: string;
 }
 
+export type LobbyQuestStatus = "Ready" | "Estimating" | "Estimated";
+
+export interface LobbyQuest {
+    id: string;
+    title: string;
+    status: LobbyQuestStatus;
+    orderIndex: number;
+}
+
 export interface QuestLogSummary {
     totalQuests: number;
+    questLogVersion: number;
     activeQuestId?: string;
     activeQuestTitle?: string;
-    quests: { id: string; title: string; }[];
+    quests: LobbyQuest[];
 }
 
 export interface LobbySnapshot {

@@ -39,7 +39,7 @@ public class QuestCommandHandlerTests
 
         result.Success.Should().BeTrue();
         realm.QuestLogVersion.Should().Be(originalQuestLogVersion + 1);
-        realm.Quests.OrderBy(q => q.Order).Select(q => q.Id).Should().Equal(questOrder);
+        realm.Quests.OrderBy(q => q.OrderIndex).Select(q => q.Id).Should().Equal(questOrder);
         repository.SaveChangesCalled.Should().BeTrue();
     }
 }

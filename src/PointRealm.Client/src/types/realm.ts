@@ -11,7 +11,7 @@ export interface Quest {
     title: string;
     description: string;
     status: "Pending" | "Active" | "Completed" | "Open" | "Sealed";
-    order: number;
+    orderIndex: number;
     externalUrl?: string; // Optional, might be added later
     externalId?: string;
     sealedEstimate?: string; // For sealed quests
