@@ -145,7 +145,7 @@ export const Button = React.forwardRef<HTMLButtonElement, MotionButtonProps>(({
           fullWidth ? "w-full" : "w-auto",
           className
         )}
-        style={style}
+        style={mergedStyle}
         {...filteredProps}
       >
         {children}
