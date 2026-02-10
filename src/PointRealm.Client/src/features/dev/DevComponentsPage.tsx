@@ -14,10 +14,10 @@ export const DevComponentsPage: React.FC = () => {
   const { toast } = useToast();
 
   const [quests] = useState<Quest[]>([
-    { id: '1', title: 'Determine Project Scope', description: '', status: 'Active', order: 1 },
-    { id: '2', title: 'Select Tech Stack', description: '', status: 'Completed', order: 2, sealedEstimate: '5' },
-    { id: '3', title: 'Design Database Schema', description: '', status: 'Pending', order: 3 },
-    { id: '4', title: 'Implement Authentication', description: '', status: 'Pending', order: 4 },
+    { id: '1', title: 'Determine Project Scope', description: '', status: 'Active', orderIndex: 1 },
+    { id: '2', title: 'Select Tech Stack', description: '', status: 'Completed', orderIndex: 2, sealedEstimate: '5' },
+    { id: '3', title: 'Design Database Schema', description: '', status: 'Pending', orderIndex: 3 },
+    { id: '4', title: 'Implement Authentication', description: '', status: 'Pending', orderIndex: 4 },
   ]);
 
   const [members] = useState<PartyMember[]>([

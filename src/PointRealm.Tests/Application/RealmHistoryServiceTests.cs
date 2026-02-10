@@ -18,8 +18,8 @@ public class RealmHistoryServiceTests
         realm.AddQuest("Quest One", "First");
         realm.AddQuest("Quest Two", "Second");
 
-        var questOneId = realm.Quests.First(q => q.Order == 1).Id;
-        var questTwoId = realm.Quests.First(q => q.Order == 2).Id;
+        var questOneId = realm.Quests.First(q => q.OrderIndex == 1).Id;
+        var questTwoId = realm.Quests.First(q => q.OrderIndex == 2).Id;
 
         realm.StartEncounter(questOneId);
         var encounterOne = realm.Encounters.Last();

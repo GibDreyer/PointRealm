@@ -143,8 +143,8 @@ public class QuestCommandHandler(
             
             // Look for the next quest in order that isn't the current one
             var nextQuest = realm.Quests
-                .Where(q => (currentQuest == null || q.Order > currentQuest.Order))
-                .OrderBy(q => q.Order)
+                .Where(q => (currentQuest == null || q.OrderIndex > currentQuest.OrderIndex))
+                .OrderBy(q => q.OrderIndex)
                 .FirstOrDefault();
 
             if (nextQuest is null)

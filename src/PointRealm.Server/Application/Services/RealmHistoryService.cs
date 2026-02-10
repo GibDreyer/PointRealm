@@ -8,7 +8,7 @@ public sealed class RealmHistoryService : IRealmHistoryService
     public RealmHistoryResponse BuildRealmHistory(Realm realm)
     {
         var questHistories = realm.Quests
-            .OrderBy(q => q.Order)
+            .OrderBy(q => q.OrderIndex)
             .Select(quest =>
             {
                 var completedEncounters = realm.Encounters
@@ -48,7 +48,7 @@ public sealed class RealmHistoryService : IRealmHistoryService
                     Description = quest.Description,
                     ExternalId = quest.ExternalId,
                     ExternalUrl = quest.ExternalUrl,
-                    Order = quest.Order,
+                    Order = quest.OrderIndex,
                     Encounters = completedEncounters
                 };
             }).ToList();

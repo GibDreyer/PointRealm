@@ -12,6 +12,9 @@ public sealed class RealmStateMapper : IRealmStateMapper
         var activeQuest = realm.CurrentQuestId.HasValue
             ? realm.Quests.FirstOrDefault(q => q.Id == realm.CurrentQuestId)
             : null;
+        var activeEncounter = realm.CurrentEncounterId.HasValue
+            ? realm.Encounters.FirstOrDefault(e => e.Id == realm.CurrentEncounterId)
+            : null;
 
         return new LobbySnapshotDto
         {
@@ -56,12 +59,15 @@ public sealed class RealmStateMapper : IRealmStateMapper
             QuestLogSummary = new QuestLogSummaryDto
             {
                 TotalQuests = realm.Quests.Count,
+                QuestLogVersion = realm.QuestLogVersion,
                 ActiveQuestId = activeQuest?.Id.ToString(),
                 ActiveQuestTitle = activeQuest?.Title,
-                Quests = realm.Quests.OrderBy(q => q.Order).Select(q => new LobbyQuestDto
+                Quests = realm.Quests.OrderBy(q => q.OrderIndex).Select(q => new LobbyQuestDto
                 {
                     Id = q.Id.ToString(),
-                    Title = q.Title
+                    Title = q.Title,
+                    Status = MapLobbyQuestStatus(q, activeEncounter),
+                    OrderIndex = q.OrderIndex
                 }).ToList()
             },
             ActiveEncounterId = realm.CurrentEncounterId?.ToString()
@@ -112,13 +118,13 @@ public sealed class RealmStateMapper : IRealmStateMapper
             },
             QuestLog = new QuestLogDto
             {
-                Quests = realm.Quests.OrderBy(q => q.Order).Select(q => new QuestDto
+                Quests = realm.Quests.OrderBy(q => q.OrderIndex).Select(q => new QuestDto
                 {
                     Id = q.Id,
                     Title = q.Title ?? "Untitled Quest",
                     Description = q.Description ?? "",
                     Status = q.Status.ToString(),
-                    Order = q.Order,
+                    OrderIndex = q.OrderIndex,
                     Version = q.Version,
                     SealedOutcome = q.SealedOutcome
                 }).ToList()
@@ -189,6 +195,22 @@ public sealed class RealmStateMapper : IRealmStateMapper
             HasVoted = hasVoted,
             ShouldHideVoteCounts = hideVoteCounts
         };
+    }
+
+
+    private static string MapLobbyQuestStatus(Quest quest, Encounter? activeEncounter)
+    {
+        if (quest.Status == QuestStatus.Completed)
+        {
+            return "Estimated";
+        }
+
+        if (activeEncounter is not null && activeEncounter.QuestId == quest.Id)
+        {
+            return activeEncounter.Status == EncounterStatus.Revealed ? "Estimated" : "Estimating";
+        }
+
+        return "Ready";
     }
 
     private string GetVoteState(PartyMember member, Realm realm)

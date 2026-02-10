@@ -10,6 +10,7 @@ import { PartyMemberCard } from './components/PartyMemberCard';
 import { RealmPortalCard } from './components/RealmPortalCard';
 import { GMPanel } from './components/GMPanel';
 import { ConnectionBanner } from './components/ConnectionBanner';
+import { QuestList } from './components/QuestList';
 import { RealmSettingsDialog } from './components/RealmSettingsDialog';
 import { PageShell } from '../../components/shell/PageShell';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -232,6 +233,14 @@ export function TavernLobbyPage() {
                         </div>
                     </Panel>
 
+
+                    <QuestList
+                        quests={snapshot.questLogSummary.quests || []}
+                        questLogVersion={snapshot.questLogSummary.questLogVersion}
+                        canReorder={isGM}
+                        isConnected={status === 'connected'}
+                    />
+
                     <RealmPortalCard
                         joinUrl={snapshot.portal.joinUrl}
                         className={`${styles.panel} ${styles.panelPortal}`}
@@ -246,7 +255,7 @@ export function TavernLobbyPage() {
                             joinUrl={snapshot.portal.joinUrl}
                             partyCount={snapshot.party.length}
                             questCount={snapshot.questLogSummary.totalQuests}
-                            activeEncounterId={snapshot.activeEncounterId}
+                            {...(snapshot.activeEncounterId ? { activeEncounterId: snapshot.activeEncounterId } : {})}
                             className={`${styles.panel} ${styles.panelGM}`}
                         />
                     )}

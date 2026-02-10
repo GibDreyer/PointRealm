@@ -161,7 +161,7 @@ public sealed class Realm : Entity
         for (int i = 0; i < newOrder.Count; i++)
         {
             var quest = _quests.First(q => q.Id == newOrder[i]);
-            quest.SetOrder(i + 1);
+            quest.SetOrderIndex(i + 1);
         }
 
         QuestLogVersion++;

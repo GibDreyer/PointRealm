@@ -116,7 +116,7 @@ public class QuestCsvApiService(
                 type: "Realm.NotFound");
         }
 
-        var csvRows = realm.Quests.OrderBy(q => q.Order).Select(quest =>
+        var csvRows = realm.Quests.OrderBy(q => q.OrderIndex).Select(quest =>
         {
             var sealedEncounter = realm.Encounters
                 .Where(e => e.QuestId == quest.Id && e.Outcome.HasValue)
@@ -129,7 +129,7 @@ public class QuestCsvApiService(
                 Description = quest.Description,
                 ExternalId = quest.ExternalId,
                 ExternalUrl = quest.ExternalUrl,
-                Order = quest.Order,
+                Order = quest.OrderIndex,
                 SealedOutcome = sealedEncounter?.Outcome
             };
         }).ToList();

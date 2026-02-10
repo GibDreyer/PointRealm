@@ -51,7 +51,7 @@ public class ImportQuestsCommandHandler(
         // Import quests
         var successCount = 0;
         var errors = new List<CsvValidationError>();
-        var currentMaxOrder = realm.Quests.Any() ? realm.Quests.Max(q => q.Order) : 0;
+        var currentMaxOrder = realm.Quests.Any() ? realm.Quests.Max(q => q.OrderIndex) : 0;
 
         for (int i = 0; i < rows.Count; i++)
         {
@@ -102,12 +102,12 @@ public class ImportQuestsCommandHandler(
                 // Set custom order if provided
                 if (row.Order.HasValue)
                 {
-                    newQuest.SetOrder(row.Order.Value);
+                    newQuest.SetOrderIndex(row.Order.Value);
                 }
                 
                 if (!row.Order.HasValue) 
                 {
-                    newQuest.SetOrder(order);
+                    newQuest.SetOrderIndex(order);
                 }
 
                 successCount++;
@@ -126,7 +126,7 @@ public class ImportQuestsCommandHandler(
         // Auto-start first quest encounter if no encounter is active
         if (successCount > 0 && realm.CurrentEncounterId == null)
         {
-            var firstQuest = realm.Quests.OrderBy(q => q.Order).FirstOrDefault();
+            var firstQuest = realm.Quests.OrderBy(q => q.OrderIndex).FirstOrDefault();
             if (firstQuest != null)
             {
                 realm.StartEncounter(firstQuest.Id);

@@ -13,7 +13,7 @@ public sealed class Quest : Entity
 {
     public string Title { get; private set; }
     public string Description { get; private set; }
-    public int Order { get; private set; }
+    public int OrderIndex { get; private set; }
     public QuestStatus Status { get; private set; }
     public Guid RealmId { get; private set; }
     public string? ExternalId { get; private set; }
@@ -26,7 +26,7 @@ public sealed class Quest : Entity
         RealmId = realmId;
         Title = title;
         Description = description;
-        Order = order;
+        OrderIndex = order;
         Status = QuestStatus.Pending;
         ExternalId = externalId;
         ExternalUrl = externalUrl;
@@ -50,9 +50,9 @@ public sealed class Quest : Entity
         Description = description;
     }
 
-    public void SetOrder(int order)
+    public void SetOrderIndex(int orderIndex)
     {
-        Order = order;
+        OrderIndex = orderIndex;
     }
 
     public void SetExternalFields(string? externalId, string? externalUrl)
