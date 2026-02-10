@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { SectionHeader } from '../../../components/ui/SectionHeader';
 import { Panel } from '../../../components/ui/Panel';
 import { useThemeMode } from '@/theme/ThemeModeProvider';
+import { getMemberInitials } from '@/lib/memberAvatar';
 import styles from './EncounterPanel.module.css';
 
 interface EncounterPanelProps {
@@ -168,7 +169,7 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                             {visibleMembers.map((member, index) => {
                                 const hasVoted = member.status === 'ready';
                                 const isDisconnected = !member.isOnline || member.status === 'disconnected';
-                                const initials = member.name.trim().slice(0, 2);
+                                const initials = getMemberInitials(member.name);
                                 return (
                                     <div
                                         key={member.id}

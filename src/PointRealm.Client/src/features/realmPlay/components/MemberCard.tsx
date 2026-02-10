@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Crown, WifiOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PartyMember } from '@/types/realm';
+import { resolveMemberAvatar } from '@/lib/memberAvatar';
 
 interface MemberCardProps {
     /** The party member data */
@@ -16,8 +17,7 @@ interface MemberCardProps {
 export function MemberCard({ member, isSelf }: MemberCardProps) {
     const isGM = member.role === 'GM';
     const isOnline = member.isOnline;
-    const avatarImageUrl = member.profileImageUrl?.trim();
-    const avatarEmoji = member.avatarEmoji?.trim() ?? member.profileEmoji?.trim();
+    const { imageUrl: avatarImageUrl, emoji: avatarEmoji, initials } = resolveMemberAvatar(member);
     
     const statusText = !isOnline
         ? 'Disconnected'
@@ -56,7 +56,7 @@ export function MemberCard({ member, isSelf }: MemberCardProps) {
                             </span>
                         ) : (
                             <span className="text-xs font-bold tracking-wide uppercase">
-                                {member.name.substring(0, 2)}
+                                {initials}
                             </span>
                         )}
                     </div>
