@@ -162,6 +162,18 @@
   color: color-mix(in srgb, var(--pr-text-muted) 70%, var(--pr-text));
 }
 
+.voteProgress {
+  position: absolute;
+  left: 50%;
+  bottom: 18%;
+  transform: translateX(-50%);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  color: color-mix(in srgb, var(--pr-text-muted) 74%, var(--pr-text));
+  white-space: nowrap;
+}
+
 .seats {
   position: absolute;
   inset: 0;

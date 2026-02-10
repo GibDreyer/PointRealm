@@ -55,8 +55,16 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
 
     const visibleMembers = partyRoster.members.slice(0, 12);
     const seatCount = Math.max(3, visibleMembers.length);
-    const hasVotes = partyRoster.members.some((member) => member.status === 'ready');
-    const readyCount = partyRoster.members.filter((member) => member.status === 'ready').length;
+    const votingMembers = partyRoster.members.filter(
+        (member) => member.role !== 'Observer' && !member.isObserver && !member.isBanned
+    );
+    const snapshotHasVoted = encounter?.hasVoted;
+    const hasSnapshotVotes = !!snapshotHasVoted;
+    const votedCount = hasSnapshotVotes
+        ? votingMembers.filter((member) => snapshotHasVoted?.[member.id]).length
+        : votingMembers.filter((member) => member.status === 'ready').length;
+    const hasVotes = votedCount > 0;
+    const shouldHideVoteCounts = encounter?.shouldHideVoteCounts ?? settings.hideVoteCounts;
     const rerollDisabled = !hasVotes || !!encounter?.isRevealed;
     const revealDisabled = !hasVotes || !!encounter?.isRevealed;
 
@@ -129,7 +137,9 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                                                 {mode.phrases.revealProphecy}
                                             </motion.button>
                                             <span className={styles.revealSubtitle}>
-                                                {settings.hideVoteCounts ? 'Votes are hidden' : `${readyCount} ready`}
+                                                {shouldHideVoteCounts
+                                                    ? 'Votes are hidden'
+                                                    : `${votedCount} of ${votingMembers.length} voted`}
                                             </span>
                                         </>
                                     ) : (
@@ -147,6 +157,10 @@ export function EncounterPanel({ quest, encounter, settings, partyRoster, isGM, 
                                         </div>
                                     )}
                                 </div>
+                            )}
+
+                            {encounter && !isGM && !shouldHideVoteCounts && (
+                                <div className={styles.voteProgress}>{votedCount} of {votingMembers.length} voted</div>
                             )}
                         </div>
 
