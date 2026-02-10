@@ -41,6 +41,7 @@ public class PartyMemberSnapshotDto
 {
     public string MemberId { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
+    public string Role { get; set; } = "Participant";
     public string? AvatarEmoji { get; set; }
     public string? ProfileImageUrl { get; set; }
     public string? ProfileEmoji { get; set; }

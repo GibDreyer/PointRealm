@@ -22,7 +22,7 @@ export interface PartyMember {
     classBadgeKey?: string;
     presence: "Online" | "Offline";
     voteState: "NotVoting" | "Choosing" | "LockedIn";
-    isGM: boolean;
+    role: "GM" | "Participant" | "Observer";
 }
 
 export interface MyInfo {

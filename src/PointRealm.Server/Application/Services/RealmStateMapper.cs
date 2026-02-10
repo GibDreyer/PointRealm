@@ -41,6 +41,7 @@ public sealed class RealmStateMapper : IRealmStateMapper
             {
                 MemberId = m.Id.ToString(),
                 DisplayName = m.Name,
+                Role = m.IsHost ? "GM" : (m.IsObserver ? "Observer" : "Participant"),
                 AvatarEmoji = m.AvatarEmoji,
                 ProfileImageUrl = m.ProfileImageUrl,
                 ProfileEmoji = m.ProfileEmoji,
