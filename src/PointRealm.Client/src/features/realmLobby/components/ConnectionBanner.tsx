@@ -39,6 +39,8 @@ export function ConnectionBanner({ isConnecting, onRetry }: Props) {
                     onClick={onRetry}
                     disabled={isConnecting}
                     className="px-4 py-1.5 rounded-full bg-black/30 text-pr-primary border border-pr-primary/30 hover:border-pr-primary/60 font-black text-[10px] uppercase tracking-[0.35em] transition-all flex items-center gap-2 disabled:opacity-50 shadow-sm"
+                    aria-label="Retry connection"
+                    title="Retry connection"
                 >
                     {isConnecting ? 'Stabilizing…' : (
                         <>

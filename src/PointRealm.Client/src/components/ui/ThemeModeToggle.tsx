@@ -37,6 +37,8 @@ export const ThemeModeToggle: React.FC<{ className?: string }> = ({ className })
               isActive ? mode.styles.toggleActive : 'text-pr-text-muted'
             )}
             aria-pressed={isActive}
+            aria-label={`Switch to ${option.label} theme`}
+            title={`Switch to ${option.label} theme`}
           >
             <Icon size={12} />
             {option.label}

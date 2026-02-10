@@ -49,6 +49,8 @@ export const AccountStatus: React.FC<AccountStatusProps> = ({ className }) => {
     <div className={cn("relative z-50", className)} ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
+        aria-label="Toggle account menu"
+        title="Toggle account menu"
         className={cn(
           "flex items-center gap-2 px-3 py-1.5 rounded-full",
           "bg-black/20 border border-white/10 hover:bg-black/40 hover:border-pr-primary/50",
@@ -85,6 +87,8 @@ export const AccountStatus: React.FC<AccountStatusProps> = ({ className }) => {
                   navigate("/account");
                 }}
                 className="flex items-center w-full gap-2 px-3 py-2 text-sm text-pr-text hover:bg-white/5 rounded-md transition-colors"
+                aria-label="View account"
+                title="View account"
               >
                 <Shield size={16} className="text-pr-primary" />
                 View Account
@@ -96,6 +100,8 @@ export const AccountStatus: React.FC<AccountStatusProps> = ({ className }) => {
                   logout();
                 }}
                 className="flex items-center w-full gap-2 px-3 py-2 text-sm text-pr-danger hover:bg-pr-danger/10 rounded-md transition-colors"
+                aria-label="Log out"
+                title="Log out"
               >
                 <LogOut size={16} />
                 Log Out
