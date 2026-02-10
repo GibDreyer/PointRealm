@@ -5,6 +5,7 @@ using PointRealm.Server.Application.Commands;
 using PointRealm.Server.Application.Commands.Encounter;
 using PointRealm.Server.Application.Commands.Handlers;
 using PointRealm.Server.Application.Commands.Quest;
+using PointRealm.Server.Application.Services;
 using PointRealm.Server.Domain.Entities;
 using PointRealm.Server.Domain.ValueObjects;
 using PointRealm.Server.Infrastructure.Persistence;
