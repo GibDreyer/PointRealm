@@ -19,7 +19,6 @@ interface ProphecyRevealProps {
   deckValues: string[];
   quest?: Quest | null;
   onSealOutcome: (value: string) => Promise<void>;
-  onReroll: () => void;
   onStartNextQuest: () => void;
   className?: string;
   hideVoteCounts?: boolean;
@@ -37,7 +36,6 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
   deckValues,
   quest,
   onSealOutcome,
-  onReroll,
   onStartNextQuest,
   className,
   hideVoteCounts = false,

@@ -79,7 +79,7 @@ export const DevComponentsPage: React.FC = () => {
                             isGM={true}
                             deckValues={['1','2','3','5','8','13','?']}
                             onSealOutcome={async (val) => toast(`Sealed: ${val}`, 'success')}
-                            onReroll={() => toast('Rerolled!', 'info')}
+                            onStartNextQuest={() => toast('Next quest!', 'success')}
                             hideVoteCounts={hideVotes}
                         />
                     </div>

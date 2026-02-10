@@ -67,6 +67,7 @@ public class RealmSettingsServiceTests
 
         var dto = service.MapToSettingsDto(settings);
 
+        Assert.NotNull(dto.Deck);
         Assert.Equal("Short Fibonacci", dto.Deck.Name);
         Assert.Contains(dto.Deck.Cards, card => card.Label == "5" && card.Value == 5);
         Assert.True(dto.AutoReveal);

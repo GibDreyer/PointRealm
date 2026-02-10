@@ -11,8 +11,8 @@ public enum QuestStatus
 
 public sealed class Quest : Entity
 {
-    public string Title { get; private set; }
-    public string Description { get; private set; }
+    public string Title { get; private set; } = string.Empty;
+    public string Description { get; private set; } = string.Empty;
     public int OrderIndex { get; private set; }
     public QuestStatus Status { get; private set; }
     public Guid RealmId { get; private set; }

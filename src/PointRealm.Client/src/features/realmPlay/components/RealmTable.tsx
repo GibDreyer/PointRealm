@@ -259,7 +259,6 @@ export function RealmTable({
                         deckValues={deckValues}
                         quest={quest!}
                         onSealOutcome={onSealOutcome}
-                        onReroll={onReroll}
                         onStartNextQuest={onStartNextQuest}
                         hideVoteCounts={hideVoteCounts}
                         minimal

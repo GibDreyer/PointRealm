@@ -44,7 +44,7 @@ public class QuestCommandHandler(
 
         try
         {
-            var result = realm.AddQuest(request.Title, request.Description, request.ExternalId, request.ExternalUrl);
+            var result = realm.AddQuest(request.Title, request.Description ?? string.Empty, request.ExternalId, request.ExternalUrl);
             if (result.IsFailure) return CommandResultWithPayloadDto<Guid>.Fail(new CommandErrorDto { ErrorCode = result.Error.Code, Message = result.Error.Description });
             
             var questId = result.Value;
@@ -84,7 +84,7 @@ public class QuestCommandHandler(
             
             if (quest.Version != request.QuestVersion) return CreateStaleError();
 
-            var result = realm.UpdateQuest(request.QuestId, request.Title, request.Description, request.ExternalId, request.ExternalUrl);
+            var result = realm.UpdateQuest(request.QuestId, request.Title, request.Description ?? string.Empty, request.ExternalId, request.ExternalUrl);
             if (result.IsFailure) return CommandResultDto.Fail(new CommandErrorDto { ErrorCode = result.Error.Code, Message = result.Error.Description });
             
             return CommandResultDto.Ok();

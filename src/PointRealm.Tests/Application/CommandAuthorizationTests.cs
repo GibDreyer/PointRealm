@@ -4,6 +4,7 @@ using PointRealm.Server.Application.Commands.Handlers;
 using PointRealm.Server.Application.Commands.Quest;
 using PointRealm.Server.Domain.Entities;
 using PointRealm.Server.Domain.ValueObjects;
+using PointRealm.Tests.TestDoubles;
 using Xunit;
 
 namespace PointRealm.Tests.Application;
@@ -50,7 +51,7 @@ public class CommandAuthorizationTests
         realm.AddQuest("Quest B", "Desc");
 
         var repository = new FakeRealmRepository { Realm = realm };
-        var handler = new QuestCommandHandler(repository, new FakeRealmBroadcaster(), new FakeCommandDeduplicator());
+        var handler = new QuestCommandHandler(repository, new FakeRealmBroadcaster(), new FakeCommandDeduplicator(), new StubQuestNameGenerator());
 
         var result = await handler.HandleAsync(new ReorderQuestsCommand(
             member.Id,

@@ -48,7 +48,7 @@ const renderReveal = async (opts: {
         deckValues={['1', '2', '3', '5', '8']}
         quest={quest}
         onSealOutcome={async () => {}}
-        onReroll={() => {}}
+        onStartNextQuest={() => {}}
         hideVoteCounts={false}
       />
     </ToastProvider>
