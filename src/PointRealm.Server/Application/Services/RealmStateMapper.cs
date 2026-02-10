@@ -29,6 +29,7 @@ public sealed class RealmStateMapper : IRealmStateMapper
                     AutoReveal = realm.Settings?.AutoReveal ?? true,
                     AllowAbstain = realm.Settings?.AllowAbstain ?? true,
                     HideVoteCounts = realm.Settings?.HideVoteCounts ?? false,
+                    AllowEmojiReactions = realm.Settings?.AllowEmojiReactions ?? true,
                     CustomDeckValues = (realm.Settings?.Deck?.Name ?? "FIBONACCI") == "Custom"
                         ? realm.Settings!.Deck.Cards.Select(c => c.Label).ToList()
                         : null
@@ -106,7 +107,8 @@ public sealed class RealmStateMapper : IRealmStateMapper
                     : null,
                 AutoReveal = settings.AutoReveal,
                 AllowAbstain = settings.AllowAbstain,
-                HideVoteCounts = settings.HideVoteCounts
+                HideVoteCounts = settings.HideVoteCounts,
+                AllowEmojiReactions = settings.AllowEmojiReactions
             },
             PartyRoster = new PartyRosterDto
             {

@@ -43,6 +43,7 @@ const formSchema = z.object({
   autoReveal: z.boolean(),
   allowAbstain: z.boolean(),
   hideVoteCounts: z.boolean(),
+  allowEmojiReactions: z.boolean(),
   participateInVoting: z.boolean(),
 }).superRefine((data, ctx) => {
   if (data.deckType === "CUSTOM") {
@@ -127,6 +128,7 @@ export function CreateRealmPage() {
       autoReveal: true,
       allowAbstain: true,
       hideVoteCounts: false,
+      allowEmojiReactions: true,
       participateInVoting: false,
     },
   });
@@ -200,7 +202,8 @@ export function CreateRealmPage() {
           customDeckValues: customDeckValues,
           autoReveal: data.autoReveal,
           allowAbstain: data.allowAbstain,
-          hideVoteCounts: data.hideVoteCounts
+          hideVoteCounts: data.hideVoteCounts,
+          allowEmojiReactions: data.allowEmojiReactions
         }
       };
 

@@ -30,6 +30,7 @@ interface UseRealmResult {
     reorderQuests: (newOrderKeys: string[]) => Promise<void>;
     setDisplayName: (name: string) => Promise<void>;
     setAvatarEmoji: (emoji: string) => Promise<void>;
+    throwEmojiReaction: (emoji: string) => Promise<void>;
   };
   connect: (code: string) => Promise<void>;
 }
@@ -215,6 +216,10 @@ export function useRealm(realmCode?: string): UseRealmResult {
         }),
       setAvatarEmoji: (emoji) =>
         wrapAction('setAvatarEmoji', {
+          emoji,
+        }),
+      throwEmojiReaction: (emoji) =>
+        wrapAction('throwEmojiReaction', {
           emoji,
         }),
     },

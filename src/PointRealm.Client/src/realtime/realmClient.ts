@@ -21,6 +21,7 @@ import type {
   SetActiveQuestRequest,
   JoinPresenceRequest,
   LeavePresenceRequest,
+  ThrowEmojiReactionRequest,
 } from './types';
 
 type EventHandler<T> = (payload: T) => void;
@@ -257,6 +258,10 @@ export class RealmRealtimeClient {
     return this.invoke('SetActiveQuest', this.withCommandId(request));
   }
 
+  async throwEmojiReaction(request: ThrowEmojiReactionRequest) {
+    return this.invoke('ThrowEmojiReaction', request);
+  }
+
   private async invoke<K extends keyof HubServerMethods>(
     method: K,
     ...args: Parameters<HubServerMethods[K]>
@@ -340,6 +345,9 @@ export class RealmRealtimeClient {
     connection.on('Toast', (message: HubClientEvents['Toast']) => {
       this.emitter.emit('toast', message);
     });
+    connection.on('EmojiReactionThrown', (payload: HubClientEvents['EmojiReactionThrown']) => {
+      this.emitter.emit('emojiReactionThrown', payload);
+    });
 
     connection.onreconnecting(() => {
       this.setStatus('reconnecting');
@@ -376,6 +384,7 @@ export class RealmRealtimeClient {
     this.connection.off('PartyPresenceUpdated');
     this.connection.off('EncounterUpdated');
     this.connection.off('Toast');
+    this.connection.off('EmojiReactionThrown');
     this.handlersRegistered = false;
   }
 

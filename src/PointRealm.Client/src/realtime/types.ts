@@ -116,12 +116,24 @@ export interface LeavePresenceRequest {
   commandId?: string;
 }
 
+export interface ThrowEmojiReactionRequest {
+  emoji: string;
+}
+
+export interface EmojiReactionDto {
+  emoji: string;
+  thrownByMemberId: string;
+  thrownByName: string;
+  occurredAtUtc: string;
+}
+
 export interface HubClientEvents {
   RealmSnapshot: LobbySnapshot;
   RealmStateUpdated: RealmStateDto;
   PartyPresenceUpdated: PartyRosterDto;
   EncounterUpdated: EncounterDto;
   Toast: string;
+  EmojiReactionThrown: EmojiReactionDto;
 }
 
 export interface HubServerMethods {
@@ -142,6 +154,7 @@ export interface HubServerMethods {
   DeleteQuest: (request: DeleteQuestRequest) => Promise<CommandResult>;
   ReorderQuests: (request: ReorderQuestsRequest) => Promise<CommandResult>;
   SetActiveQuest: (request: SetActiveQuestRequest) => Promise<CommandResult>;
+  ThrowEmojiReaction: (request: ThrowEmojiReactionRequest) => Promise<CommandResult>;
 }
 
 export type RealtimeEventMap = {
@@ -151,5 +164,6 @@ export type RealtimeEventMap = {
   encounterUpdated: EncounterDto;
   toast: string;
   connectionStatusChanged: ConnectionStatus;
+  emojiReactionThrown: EmojiReactionDto;
   error: { code: string; message: string; cause?: unknown };
 };

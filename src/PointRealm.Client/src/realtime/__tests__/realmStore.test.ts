@@ -18,7 +18,7 @@ describe('realmStore', () => {
     const snapshot: RealmStateDto = {
       realmCode: 'ABC',
       themeKey: 'dark-fantasy-arcane',
-      settings: { deckType: 'FIBONACCI', autoReveal: false, allowAbstain: true, hideVoteCounts: false },
+      settings: { deckType: 'FIBONACCI', autoReveal: false, allowAbstain: true, hideVoteCounts: false, allowEmojiReactions: true },
       partyRoster: { members: [] },
       questLog: { quests: [] },
       encounter: null,
@@ -36,7 +36,7 @@ describe('realmStore', () => {
     const baseSnapshot: RealmStateDto & { revision: number } = {
       realmCode: 'ABC',
       themeKey: 'dark-fantasy-arcane',
-      settings: { deckType: 'FIBONACCI', autoReveal: false, allowAbstain: true, hideVoteCounts: false },
+      settings: { deckType: 'FIBONACCI', autoReveal: false, allowAbstain: true, hideVoteCounts: false, allowEmojiReactions: true },
       partyRoster: { members: [] },
       questLog: { quests: [] },
       encounter: null,

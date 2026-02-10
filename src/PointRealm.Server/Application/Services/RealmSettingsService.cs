@@ -28,8 +28,9 @@ public sealed class RealmSettingsService : IRealmSettingsService
         var autoReveal = request?.AutoReveal ?? existing?.AutoReveal ?? false;
         var allowAbstain = request?.AllowAbstain ?? existing?.AllowAbstain ?? true;
         var hideVoteCounts = request?.HideVoteCounts ?? existing?.HideVoteCounts ?? false;
+        var allowEmojiReactions = request?.AllowEmojiReactions ?? existing?.AllowEmojiReactions ?? true;
 
-        return new RealmSettings(deck, autoReveal, allowAbstain, hideVoteCounts);
+        return new RealmSettings(deck, autoReveal, allowAbstain, hideVoteCounts, allowEmojiReactions);
     }
 
     public RealmSettingsDto MapToSettingsDto(RealmSettings settings)
@@ -47,7 +48,8 @@ public sealed class RealmSettingsService : IRealmSettingsService
             },
             AutoReveal = settings.AutoReveal,
             AllowAbstain = settings.AllowAbstain,
-            HideVoteCounts = settings.HideVoteCounts
+            HideVoteCounts = settings.HideVoteCounts,
+            AllowEmojiReactions = settings.AllowEmojiReactions
         };
     }
 }

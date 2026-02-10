@@ -9,7 +9,7 @@ import { PageShell } from '../../components/shell/PageShell';
 import { RealmSettingsDialog } from '../realmLobby/components/RealmSettingsDialog';
 import { RealmTable } from './components/RealmTable';
 import { RuneHand } from './components/RuneHand';
-import { Menu, Settings, X, LogOut, Link2, Check, Smile } from 'lucide-react';
+import { Menu, Settings, X, LogOut, Link2, Check, Smile, Sparkles } from 'lucide-react';
 import { Dialog } from '../../components/ui/Dialog';
 import { EmojiPicker } from '../../components/ui/EmojiPicker';
 import { AccountStatus } from '@/components/ui/AccountStatus';
@@ -18,6 +18,8 @@ import { cn } from '@/lib/utils';
 import { useTheme } from '@/theme/ThemeProvider';
 import { ThemeModeToggle } from '@/components/ui/ThemeModeToggle';
 import { useThemeMode } from '@/theme/ThemeModeProvider';
+import { useRealmClient } from '@/app/providers/RealtimeProvider';
+import type { EmojiReactionDto } from '@/realtime';
 
 import styles from './realmScreen.module.css';
 
@@ -34,12 +36,15 @@ export function RealmScreen() {
     const [isSettingsOpen, setSettingsOpen] = useState(false);
     const [isEmojiPickerOpen, setEmojiPickerOpen] = useState(false);
     const [isQuestDialogOpen, setQuestDialogOpen] = useState(false);
+    const [isReactionPickerOpen, setReactionPickerOpen] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [emojiBursts, setEmojiBursts] = useState<Array<EmojiReactionDto & { id: string; xOffsetPercent: number }>>([]);
     const prefersReducedMotion = useReducedMotion() ?? false;
 
 
     const { setThemeKey } = useTheme();
     const { mode } = useThemeMode();
+    const realtimeClient = useRealmClient();
 
     useEffect(() => {
         if (mode.useRealmTheme && state?.themeKey) {
@@ -52,6 +57,17 @@ export function RealmScreen() {
             console.error("Realm Error:", error);
         }
     }, [error]);
+
+    useEffect(() => {
+        const unsubscribe = realtimeClient.on('emojiReactionThrown', (reaction) => {
+            const id = `${Date.now().toString(16)}-${Math.random().toString(16).slice(2, 8)}`;
+            const xOffsetPercent = Math.random() * 72 + 14;
+            setEmojiBursts((prev) => [...prev, { ...reaction, id, xOffsetPercent }]);
+        });
+
+        return () => unsubscribe();
+    }, [realtimeClient]);
+
 
     const encounter = state?.encounter ?? null;
 
@@ -148,6 +164,17 @@ export function RealmScreen() {
         setTimeout(() => setCopied(false), 2000);
     };
 
+    const throwReaction = async (emoji: string | null) => {
+        if (!emoji || !settings.allowEmojiReactions || !isConnected) return;
+
+        try {
+            await actions.throwEmojiReaction(emoji);
+            setReactionPickerOpen(false);
+        } catch {
+            // Errors are surfaced via realm store.
+        }
+    };
+
     const handleAvatarEmojiSelect = async (emoji: string) => {
         try {
             await actions.setAvatarEmoji(emoji);
@@ -242,6 +269,17 @@ export function RealmScreen() {
                             )}
                         </button>
 
+                        {settings.allowEmojiReactions && (
+                            <button
+                                onClick={() => setReactionPickerOpen(true)}
+                                disabled={!isConnected}
+                                className="p-3 bg-pr-surface/80 backdrop-blur border border-pr-border/50 rounded-xl hover:bg-pr-surface hover:border-pr-primary/50 transition-all text-pr-text-muted hover:text-pr-text shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Throw reaction emoji"
+                            >
+                                <Sparkles size={24} />
+                            </button>
+                        )}
+
                         {isGM && (
                             <button
                                 onClick={() => setSettingsOpen(true)}
@@ -258,6 +296,27 @@ export function RealmScreen() {
                         </button>
                      </div>
                 </header>
+
+                <div className={styles.emojiReactionLayer} aria-hidden="true">
+                    <AnimatePresence>
+                        {emojiBursts.map((burst) => (
+                            <motion.div
+                                key={burst.id}
+                                className={styles.emojiReactionItem}
+                                initial={{ opacity: 0, y: 120, scale: 0.7 }}
+                                animate={{ opacity: [0, 1, 1, 0], y: -220, scale: [0.7, 1.15, 0.95], rotate: [0, -8, 8, 0] }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 2.1, ease: 'easeOut' }}
+                                style={{ left: `${burst.xOffsetPercent}%` }}
+                                onAnimationComplete={() => {
+                                    setEmojiBursts((prev) => prev.filter((item) => item.id !== burst.id));
+                                }}
+                            >
+                                <span>{burst.emoji}</span>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+                </div>
 
                 {/* Main Table Area */}
                 <main className={styles.mainContainer}>
@@ -368,6 +427,19 @@ export function RealmScreen() {
                     selectedEmoji={currentEmoji}
                     onSelect={handleAvatarEmojiSelect}
                     disabled={!isConnected}
+                />
+            </Dialog>
+
+            <Dialog
+                isOpen={isReactionPickerOpen}
+                onClose={() => setReactionPickerOpen(false)}
+                title="Throw a Realm Emoji"
+                subtitle="Everyone in the realm will see it"
+            >
+                <EmojiPicker
+                    selectedEmoji={null}
+                    onSelect={throwReaction}
+                    disabled={!isConnected || !settings.allowEmojiReactions}
                 />
             </Dialog>
 

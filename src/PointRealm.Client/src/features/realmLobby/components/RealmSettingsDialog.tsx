@@ -1,6 +1,6 @@
 import { useState, useEffect, type ReactNode } from 'react';
 import { cn } from '../../../lib/utils';
-import { Save, Loader2, Eye, EyeOff, UserX } from 'lucide-react';
+import { Save, Loader2, Eye, EyeOff, UserX, Sparkles } from 'lucide-react';
 import { RealmSettings } from '../types';
 import { ThemePicker } from '../../createRealm/components/ThemePicker';
 import { api } from '../../../api/client';
@@ -84,6 +84,14 @@ export function RealmSettingsDialog({ realmCode, currentSettings, currentThemeKe
                             icon={<EyeOff size={18} />}
                             checked={settings.hideVoteCounts}
                             onChange={() => toggle('hideVoteCounts')}
+                            disabled={isSaving}
+                            />
+                            <ToggleRow 
+                            label="Allow Emoji Reactions" 
+                            description="Players can throw emojis on screen"
+                            icon={<Sparkles size={18} />}
+                            checked={settings.allowEmojiReactions}
+                            onChange={() => toggle('allowEmojiReactions')}
                             disabled={isSaving}
                             />
                         </div>
