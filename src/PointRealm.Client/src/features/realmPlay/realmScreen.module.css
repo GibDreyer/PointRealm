@@ -87,3 +87,19 @@
       border-radius: 0 20px 20px 0;
   }
 }
+
+.emojiReactionLayer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 30;
+    overflow: hidden;
+}
+
+.emojiReactionItem {
+    position: absolute;
+    bottom: 12%;
+    font-size: clamp(1.8rem, 2.8vw, 2.8rem);
+    filter: drop-shadow(0 0 12px rgb(0 0 0 / 0.4));
+    will-change: transform, opacity;
+}

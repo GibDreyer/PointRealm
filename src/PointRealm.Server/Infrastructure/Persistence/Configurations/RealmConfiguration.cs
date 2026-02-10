@@ -34,6 +34,7 @@ public sealed class RealmConfiguration : IEntityTypeConfiguration<Realm>
             settingsBuilder.Property(s => s.AutoReveal);
             settingsBuilder.Property(s => s.AllowAbstain);
             settingsBuilder.Property(s => s.HideVoteCounts);
+            settingsBuilder.Property(s => s.AllowEmojiReactions);
         });
 
         builder.HasMany(x => x.Quests)

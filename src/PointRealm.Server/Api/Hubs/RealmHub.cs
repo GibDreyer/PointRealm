@@ -201,6 +201,47 @@ public class RealmHub : Hub<IRealmClient>
         return await _questHandler.HandleAsync(new SetActiveQuestCommand(ctx.MemberId, ctx.RealmId, ctx.ClientId, request.QuestId, request.QuestLogVersion, request.CommandId));
     }
 
+    public async Task<CommandResultDto> ThrowEmojiReaction(ThrowEmojiReactionRequest request)
+    {
+        var (realmId, memberId, _) = await GetCallerIdsAsync();
+
+        var realm = await _dbContext.Realms
+            .Include(r => r.Members)
+            .FirstOrDefaultAsync(r => r.Id == realmId);
+
+        if (realm == null)
+        {
+            throw new HubException("Realm not found.");
+        }
+
+        if (!(realm.Settings?.AllowEmojiReactions ?? true))
+        {
+            return CommandResultDto.Fail(new CommandErrorDto
+            {
+                ErrorCode = "emoji_reactions_disabled",
+                Message = "Emoji reactions are disabled by the GM for this realm."
+            });
+        }
+
+        var member = realm.Members.FirstOrDefault(m => m.Id == memberId);
+        if (member == null)
+        {
+            throw new HubException("Member not found in realm.");
+        }
+
+        var sanitizedEmoji = string.IsNullOrWhiteSpace(request.Emoji) ? "✨" : request.Emoji.Trim();
+        var reaction = new EmojiReactionDto
+        {
+            Emoji = sanitizedEmoji,
+            ThrownByMemberId = member.Id.ToString(),
+            ThrownByName = member.Name,
+            OccurredAtUtc = DateTime.UtcNow
+        };
+
+        await Clients.Group(realmId.ToString()).EmojiReactionThrown(reaction);
+        return CommandResultDto.Ok();
+    }
+
     private async Task<RealmCommandContext> GetCommandContextAsync()
     {
         var (realmId, memberId, connectionId) = await GetCallerIdsAsync();

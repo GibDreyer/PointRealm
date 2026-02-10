@@ -4,6 +4,7 @@ export interface RealmSettings {
     autoReveal: boolean;
     allowAbstain: boolean;
     hideVoteCounts: boolean;
+    allowEmojiReactions: boolean;
 }
 
 export interface Quest {

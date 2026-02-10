@@ -14,6 +14,7 @@ public record RealmSettingsRequest
     public bool? AutoReveal { get; init; }
     public bool? AllowAbstain { get; init; }
     public bool? HideVoteCounts { get; init; }
+    public bool? AllowEmojiReactions { get; init; }
 }
 
 public record UpdateRealmSettingsRequest

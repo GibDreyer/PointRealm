@@ -49,7 +49,7 @@ public class RealmSettingsServiceTests
     public void BuildRealmSettings_FallsBackToExistingSettings_WhenRequestIsNull()
     {
         var service = new RealmSettingsService();
-        var existing = new RealmSettings(RuneDeck.Fibonacci(), true, false, true);
+        var existing = new RealmSettings(RuneDeck.Fibonacci(), true, false, true, true);
 
         var settings = service.BuildRealmSettings(null, existing);
 
@@ -63,7 +63,7 @@ public class RealmSettingsServiceTests
     public void MapToSettingsDto_MapsDeckAndFlags()
     {
         var service = new RealmSettingsService();
-        var settings = new RealmSettings(RuneDeck.ShortFibonacci(), true, true, false);
+        var settings = new RealmSettings(RuneDeck.ShortFibonacci(), true, true, false, true);
 
         var dto = service.MapToSettingsDto(settings);
 

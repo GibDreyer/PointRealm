@@ -14,7 +14,7 @@ public class RealmStateMapperTests
         var realm = Realm.Create("realm", "Realm", "theme", RealmSettings.Default()).Value;
         var host = PartyMember.Create(realm.Id, "client", "GM", true);
         realm.AddMember(host);
-        realm.UpdateSettings(new RealmSettings(RuneDeck.Custom(new[] { "1", "2" }), true, true, false));
+        realm.UpdateSettings(new RealmSettings(RuneDeck.Custom(new[] { "1", "2" }), true, true, false, true));
 
         var mapper = new RealmStateMapper();
         var snapshot = mapper.MapToLobbySnapshot(realm, host);
@@ -40,7 +40,7 @@ public class RealmStateMapperTests
         encounter.CastVote(active.Id, new RuneCardValue("1", 1));
         encounter.CastVote(banned.Id, new RuneCardValue("2", 2));
         encounter.Reveal();
-        realm.UpdateSettings(new RealmSettings(RuneDeck.Standard(), false, true, true));
+        realm.UpdateSettings(new RealmSettings(RuneDeck.Standard(), false, true, true, true));
 
         var mapper = new RealmStateMapper();
         var state = mapper.MapToRealmStateDto(realm);
@@ -78,7 +78,7 @@ public class RealmStateMapperTests
         realm.StartEncounter(realm.CurrentQuestId!.Value);
         var encounter = realm.Encounters.First();
         encounter.CastVote(member.Id, new RuneCardValue("3", 3));
-        realm.UpdateSettings(new RealmSettings(RuneDeck.Standard(), false, true, true));
+        realm.UpdateSettings(new RealmSettings(RuneDeck.Standard(), false, true, true, true));
 
         var mapper = new RealmStateMapper();
         var state = mapper.MapToRealmStateDto(realm);

@@ -47,7 +47,7 @@ describe('RealmRealtimeClient', () => {
     await client.connect({ realmCode: 'ABC', memberToken: 'token', clientId: 'client-1' });
 
     expect(buildConnection).toHaveBeenCalledTimes(1);
-    expect(connection.on).toHaveBeenCalledTimes(5);
+    expect(connection.on).toHaveBeenCalledTimes(6);
   });
 
   it('disconnect stops connection and removes handlers', async () => {

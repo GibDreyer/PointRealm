@@ -21,6 +21,7 @@ public class RealmSettingsDto
     public bool AutoReveal { get; set; }
     public bool AllowAbstain { get; set; }
     public bool HideVoteCounts { get; set; }
+    public bool AllowEmojiReactions { get; set; }
 }
 
 public class QuestLogDto

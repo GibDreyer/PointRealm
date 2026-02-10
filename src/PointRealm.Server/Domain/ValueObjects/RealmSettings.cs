@@ -9,6 +9,7 @@ public sealed class RealmSettings : ValueObject
     public bool AutoReveal { get; private set; }
     public bool AllowAbstain { get; private set; }
     public bool HideVoteCounts { get; private set; }
+    public bool AllowEmojiReactions { get; private set; }
 
     private RealmSettings()
     {
@@ -16,15 +17,16 @@ public sealed class RealmSettings : ValueObject
     }
 
     [JsonConstructor]
-    public RealmSettings(RuneDeck deck, bool autoReveal, bool allowAbstain, bool hideVoteCounts)
+    public RealmSettings(RuneDeck deck, bool autoReveal, bool allowAbstain, bool hideVoteCounts, bool allowEmojiReactions)
     {
         Deck = deck;
         AutoReveal = autoReveal;
         AllowAbstain = allowAbstain;
         HideVoteCounts = hideVoteCounts;
+        AllowEmojiReactions = allowEmojiReactions;
     }
     
-    public static RealmSettings Default() => new(RuneDeck.Standard(), false, true, false);
+    public static RealmSettings Default() => new(RuneDeck.Standard(), false, true, false, true);
 
     public override IEnumerable<object> GetAtomicValues()
     {
@@ -32,5 +34,6 @@ public sealed class RealmSettings : ValueObject
         yield return AutoReveal;
         yield return AllowAbstain;
         yield return HideVoteCounts;
+        yield return AllowEmojiReactions;
     }
 }

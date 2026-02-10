@@ -128,3 +128,9 @@ public record LeavePresenceRequest
 {
     public Guid? CommandId { get; init; }
 }
+
+
+public record ThrowEmojiReactionRequest
+{
+    public required string Emoji { get; init; }
+}
