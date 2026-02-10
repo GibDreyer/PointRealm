@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Eye, Shield, Loader2, Edit2, Check } from 'lucide-react';
+import { Eye, Shield, Loader2, Edit2, Check, Sparkles } from 'lucide-react';
 
 import { api } from '../../api/client';
 import {
@@ -15,6 +15,7 @@ import {
   STORAGE_KEYS
 } from '../../lib/storage';
 import { parseRealmCode } from './utils';
+import { generateRandomDisplayName } from '@/lib/realmNames';
 import { RecentRealmsList } from './components/RecentRealmsList';
 import { Button } from '../../components/Button';
 import { PageShell } from '../../components/shell/PageShell';
@@ -307,7 +308,18 @@ export function JoinRealmPage() {
                             </button>
                           </Tooltip>
                         )
-                      ) : undefined}
+                      ) : (
+                        <Tooltip content="Generate a fantasy adventurer name.">
+                          <button
+                            type="button"
+                            className={styles.randomizeBtn}
+                            onClick={() => setDisplayName(generateRandomDisplayName())}
+                            aria-label="Generate random display name"
+                          >
+                            <Sparkles size={16} />
+                          </button>
+                        </Tooltip>
+                      )}
                     />
                   </div>
                 </div>

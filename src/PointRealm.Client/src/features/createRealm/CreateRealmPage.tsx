@@ -5,7 +5,7 @@ import * as z from "zod";
 import { useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { Eye, EyeOff, Loader2, UserX, Sparkles, Edit2, Check, UserPlus } from "lucide-react";
-import { generateRandomRealmName, generateRandomQuestName } from "@/lib/realmNames";
+import { generateRandomDisplayName, generateRandomRealmName, generateRandomQuestName } from "@/lib/realmNames";
 import { SummoningCircle } from "@/components/ui/SummoningCircle";
 
 import { useTheme } from "@/theme/ThemeProvider";
@@ -369,7 +369,18 @@ export function CreateRealmPage() {
                             </button>
                           </Tooltip>
                         )
-                      ) : undefined}
+                      ) : (
+                        <Tooltip content="Generate a fantasy adventurer name.">
+                          <button
+                            type="button"
+                            className={styles.randomizeBtn}
+                            onClick={() => form.setValue("displayName", generateRandomDisplayName(), { shouldValidate: true })}
+                            aria-label="Generate random display name"
+                          >
+                            <Sparkles size={16} />
+                          </button>
+                        </Tooltip>
+                      )}
                     />
                   </div>
                 </section>

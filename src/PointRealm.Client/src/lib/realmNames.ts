@@ -60,3 +60,19 @@ export function generateBotName(): string {
   const cls = BOT_CLASSES[Math.floor(Math.random() * BOT_CLASSES.length)];
   return `${adj} ${cls}`;
 }
+
+const DISPLAY_TITLES = [
+  "Arcanist", "Warden", "Seer", "Ranger", "Scholar", "Sentinel", "Wayfinder",
+  "Invoker", "Alchemist", "Vanguard", "Mystic", "Oracle", "Spellblade", "Nomad"
+];
+
+const DISPLAY_NAMES = [
+  "Lyra", "Thorne", "Kael", "Mira", "Rowan", "Astra", "Dorian", "Selene", "Nyx",
+  "Orion", "Riven", "Vale", "Cassia", "Ember", "Kieran", "Sorrel", "Briar", "Lumen"
+];
+
+export function generateRandomDisplayName(): string {
+  const title = DISPLAY_TITLES[Math.floor(Math.random() * DISPLAY_TITLES.length)];
+  const name = DISPLAY_NAMES[Math.floor(Math.random() * DISPLAY_NAMES.length)];
+  return `${title} ${name}`;
+}
