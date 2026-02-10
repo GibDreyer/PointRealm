@@ -77,9 +77,14 @@ export function MemberCard({ member, isSelf }: MemberCardProps) {
                             {member.name}
                         </span>
                         {isGM && (
-                            <span className="text-[8px] uppercase tracking-[0.25em] text-pr-secondary/70 border border-pr-secondary/30 rounded-full px-2 py-0.5">
-                                GM
-                            </span>
+                            <>
+                                <span className="text-[8px] uppercase tracking-[0.25em] text-pr-secondary/70 border border-pr-secondary/30 rounded-full px-2 py-0.5">
+                                    GM
+                                </span>
+                                <span className="text-[8px] uppercase tracking-[0.2em] text-pr-primary/70 border border-pr-primary/30 rounded-full px-2 py-0.5">
+                                    Facilitator
+                                </span>
+                            </>
                         )}
                         {isSelf && (
                             <span className="text-[8px] uppercase tracking-[0.2em] text-pr-primary/40">

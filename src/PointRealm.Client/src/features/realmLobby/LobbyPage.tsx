@@ -147,7 +147,7 @@ export function TavernLobbyPage() {
 
     const me = snapshot.me;
     const isGM = me.role === 'GM';
-    const gmName = snapshot.party.find(member => member.isGM)?.displayName || me.displayName;
+    const gmName = snapshot.party.find(member => member.role === 'GM')?.displayName || me.displayName;
     const currentMember = snapshot.party.find(member => member.memberId === me.memberId);
     const currentEmoji = currentMember?.avatarEmoji ?? null;
 

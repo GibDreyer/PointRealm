@@ -22,6 +22,7 @@ public class RealmStateMapperTests
         Assert.Equal("CUSTOM", snapshot.Realm.Settings.DeckType);
         Assert.Equal(new[] { "1", "2" }, snapshot.Realm.Settings.CustomDeckValues);
         Assert.Equal("GM", snapshot.Me.Role);
+        Assert.Equal("GM", snapshot.Party.Single().Role);
     }
 
     [Fact]

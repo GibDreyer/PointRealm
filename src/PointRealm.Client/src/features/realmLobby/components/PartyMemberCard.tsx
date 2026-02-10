@@ -20,6 +20,7 @@ const getIcon = (key?: string) => {
 
 export function PartyMemberCard({ member }: Props) {
     const isOffline = member.presence === 'Offline';
+    const isGM = member.role === 'GM';
     const { imageUrl: avatarImageUrl, emoji: avatarEmoji } = resolveMemberAvatar(member);
     
     let statusText = "Ready";
@@ -78,7 +79,7 @@ export function PartyMemberCard({ member }: Props) {
                         <span className="text-lg" aria-label={`${member.displayName} avatar`}>
                             {avatarEmoji}
                         </span>
-                    ) : member.isGM ? (
+                    ) : isGM ? (
                         <Crown size={20} className="text-pr-text-muted/80" />
                     ) : (
                         getIcon(member.classBadgeKey)
@@ -94,8 +95,11 @@ export function PartyMemberCard({ member }: Props) {
                         )} title={member.displayName}>
                             {member.displayName}
                         </span>
-                        {member.isGM && (
-                           <span className="text-[8px] font-black tracking-widest uppercase bg-pr-secondary/10 border border-pr-secondary/30 text-pr-secondary px-1.5 py-0.5 rounded-sm">GM</span>
+                        {isGM && (
+                           <>
+                               <span className="text-[8px] font-black tracking-widest uppercase bg-pr-secondary/10 border border-pr-secondary/30 text-pr-secondary px-1.5 py-0.5 rounded-sm">GM</span>
+                               <span className="text-[8px] font-black tracking-[0.2em] uppercase bg-pr-primary/10 border border-pr-primary/30 text-pr-primary px-1.5 py-0.5 rounded-sm">Facilitator</span>
+                           </>
                         )}
                     </div>
                     <span className={cn(
