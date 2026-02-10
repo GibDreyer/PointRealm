@@ -5,6 +5,7 @@ import { PartyMember } from '../../../types/realm';
 import { Check, WifiOff, Crown, Eye } from 'lucide-react';
 import runeBackground from '@/assets/rune-background.png';
 import { useEffect, useRef, useState } from 'react';
+import { resolveMemberAvatar } from '@/lib/memberAvatar';
 
 
 
@@ -19,8 +20,7 @@ interface PlayerSeatProps {
 export function PlayerSeat({ member, vote, isRevealed, position, className }: PlayerSeatProps) {
     const hasVoted = member.status === 'ready';
     const isDisconnected = !member.isOnline || member.status === 'disconnected';
-    const avatarImageUrl = member.profileImageUrl?.trim();
-    const avatarEmoji = member.avatarEmoji?.trim() ?? member.profileEmoji?.trim();
+    const { imageUrl: avatarImageUrl, emoji: avatarEmoji, initials } = resolveMemberAvatar(member);
     const shouldReduceMotion = useReducedMotion();
     const prevRevealed = useRef(isRevealed);
     const [shouldFlip, setShouldFlip] = useState(false);
@@ -191,7 +191,7 @@ export function PlayerSeat({ member, vote, isRevealed, position, className }: Pl
                                 </span>
                             ) : (
                                 <span className="text-[10px] sm:text-xs font-bold text-pr-text-muted">
-                                    {member.name.slice(0, 2).toUpperCase()}
+                                    {initials}
                                 </span>
                             )}
                         </div>

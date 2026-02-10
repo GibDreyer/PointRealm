@@ -3,6 +3,7 @@ import { User, Crown, Sword, Scroll, Wand2 } from 'lucide-react';
 import { PartyMember } from '../types';
 import { Panel } from '../../../components/ui/Panel';
 import { cn } from '../../../lib/utils';
+import { resolveMemberAvatar } from '@/lib/memberAvatar';
 
 interface Props {
     member: PartyMember;
@@ -19,8 +20,7 @@ const getIcon = (key?: string) => {
 
 export function PartyMemberCard({ member }: Props) {
     const isOffline = member.presence === 'Offline';
-    const avatarImageUrl = member.profileImageUrl?.trim();
-    const avatarEmoji = member.avatarEmoji?.trim() ?? member.profileEmoji?.trim();
+    const { imageUrl: avatarImageUrl, emoji: avatarEmoji } = resolveMemberAvatar(member);
     
     let statusText = "Ready";
     let statusClasses = "text-pr-success";
