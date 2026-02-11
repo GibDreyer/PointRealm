@@ -5,4 +5,6 @@ export const STORAGE_KEYS = {
     DISPLAY_NAME: 'pointrealm.displayName',
     AUTH_TOKEN: 'pointrealm:auth:token',
     AUTH_USER: 'pointrealm:auth:user',
+    AUTH_SESSION: 'pointrealm:auth:session',
+    AUTH_NOTICE: 'pointrealm:auth:notice',
 } as const;

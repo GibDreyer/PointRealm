@@ -35,7 +35,7 @@ public class UserTokenService(IOptions<UserTokenSettings> settings, IOptions<Mem
             claims.Add(new("displayName", user.DisplayName));
         }
 
-        var expiresAt = DateTime.UtcNow.AddHours(_settings.ExpirationHours);
+        var expiresAt = DateTime.UtcNow.AddMinutes(_settings.GetEffectiveLifetimeMinutes());
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

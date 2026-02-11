@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ApiError } from "@/api/client";
 import { Button } from "@/components/Button";
@@ -12,6 +12,7 @@ import { Tooltip } from "@/components/ui/Tooltip";
 import { useThemeMode } from "@/theme/ThemeModeProvider";
 
 import { useAuth } from "./AuthContext";
+import { consumeAuthNotice } from "@/lib/storage/auth";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -23,6 +24,15 @@ export function LoginPage() {
   const [rememberMe, setRememberMe] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+
+  useEffect(() => {
+    const notice = consumeAuthNotice();
+    if (notice) {
+      setError(notice);
+      toast(notice, "error");
+    }
+  }, [toast]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();

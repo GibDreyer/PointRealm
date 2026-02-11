@@ -42,6 +42,13 @@ public class AuthController(
         return sessionService.LogoutAsync();
     }
 
+    [HttpPost("refresh")]
+    [Authorize(AuthenticationSchemes = "Identity.Application,Bearer")]
+    public Task<IActionResult> Refresh()
+    {
+        return sessionService.RefreshAsync(User);
+    }
+
     [HttpGet("whoami")]
     [Authorize(AuthenticationSchemes = "Identity.Application,Bearer")]
     public Task<IActionResult> WhoAmI()

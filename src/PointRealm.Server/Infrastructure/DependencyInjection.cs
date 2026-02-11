@@ -80,17 +80,38 @@ public static class DependencyInjection
                     ValidateLifetime = true
                 };
 
-                // SignalR sends access token in query string
+                // SignalR browsers send access token in the query string during WebSocket/SSE negotiation.
+                // We only allow this for the Realm hub path and only when Authorization header is absent.
                 options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
                 {
                     OnMessageReceived = context =>
                     {
-                        var accessToken = context.Request.Query["access_token"];
                         var path = context.HttpContext.Request.Path;
-                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/realm"))
+                        if (!path.StartsWithSegments("/hubs/realm"))
+                        {
+                            return Task.CompletedTask;
+                        }
+
+                        if (context.Request.Headers.ContainsKey("Authorization"))
+                        {
+                            return Task.CompletedTask;
+                        }
+
+                        var isRealtimeTransport = string.Equals(context.Request.Query["transport"], "webSockets", StringComparison.OrdinalIgnoreCase)
+                            || string.Equals(context.Request.Query["transport"], "serverSentEvents", StringComparison.OrdinalIgnoreCase)
+                            || context.HttpContext.WebSockets.IsWebSocketRequest;
+
+                        if (!isRealtimeTransport)
+                        {
+                            return Task.CompletedTask;
+                        }
+
+                        var accessToken = context.Request.Query["access_token"];
+                        if (!string.IsNullOrEmpty(accessToken))
                         {
                             context.Token = accessToken;
                         }
+
                         return Task.CompletedTask;
                     }
                 };
