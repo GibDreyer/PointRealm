@@ -9,7 +9,7 @@ import { PageShell } from '../../components/shell/PageShell';
 import { RealmSettingsDialog } from '../realmLobby/components/RealmSettingsDialog';
 import { RealmTable } from './components/RealmTable';
 import { RuneHand } from './components/RuneHand';
-import { Menu, Settings, X, LogOut, Link2, Check, Smile, Sparkles } from 'lucide-react';
+import { Menu, Settings, X, LogOut, Link2, Check, Smile, Sparkles, ScrollText } from 'lucide-react';
 import { Dialog } from '../../components/ui/Dialog';
 import { EmojiPicker } from '../../components/ui/EmojiPicker';
 import { AccountStatus } from '@/components/ui/AccountStatus';
@@ -279,6 +279,17 @@ export function RealmScreen() {
                                 title="Throw reaction emoji"
                             >
                                 <Sparkles size={24} />
+                            </button>
+                        )}
+
+                        {isGM && (
+                            <button
+                                onClick={() => navigate(`/realm/${code}/recap`)}
+                                className="p-3 bg-pr-surface/80 backdrop-blur border border-pr-border/50 rounded-xl hover:bg-pr-surface hover:border-pr-primary/50 transition-all text-pr-text-muted hover:text-pr-text shadow-lg"
+                                aria-label="Open session recap"
+                                title="Open session recap"
+                            >
+                                <ScrollText size={24} />
                             </button>
                         )}
 
