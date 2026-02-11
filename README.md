@@ -28,15 +28,21 @@ PointRealm is a full-stack tabletop companion that keeps every party member (and
    ```bash
    cd src/PointRealm.Client
    npm install
+   cd ../..
    ```
-3. Run the backend API:
+3. Run the backend API (terminal 1):
    ```bash
    dotnet run --project src/PointRealm.Server/Api
    ```
-4. Run the frontend:
+4. Run the frontend (terminal 2):
    ```bash
+   cd src/PointRealm.Client
    npm run dev
    ```
+
+Runtime defaults:
+- REST API base path: `/api/v1`
+- SignalR hub path: `/hubs/realm`
 
 ## Docs & Next Steps (Pick Your Quest)
 - Architecture deep dive: [`docs/architecture.md`](docs/architecture.md)
