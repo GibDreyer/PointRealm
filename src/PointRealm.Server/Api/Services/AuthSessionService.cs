@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,7 @@ public interface IAuthSessionService
     Task<IActionResult> RegisterAsync(RegisterRequest request);
     Task<IActionResult> LoginAsync(LoginRequest request);
     Task<IActionResult> LogoutAsync();
+    Task<IActionResult> RefreshAsync(ClaimsPrincipal principal);
 }
 
 public class AuthSessionService(
@@ -76,6 +78,28 @@ public class AuthSessionService(
     {
         await signInManager.SignOutAsync();
         return new OkResult();
+    }
+
+
+    public async Task<IActionResult> RefreshAsync(ClaimsPrincipal principal)
+    {
+        var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return new UnauthorizedResult();
+        }
+
+        var user = await userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            return new UnauthorizedResult();
+        }
+
+        var tokenResult = tokenService.GenerateToken(user);
+        return new OkObjectResult(new AuthTokenResponse(
+            tokenResult.AccessToken,
+            tokenResult.ExpiresAt,
+            MapUserProfile(user)));
     }
 
     private static UserProfileResponse MapUserProfile(ApplicationUser user)

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Panel } from "@/components/ui/Panel";
 import { useToast } from "@/components/ui/ToastSystem";
-import { setAuthToken, setAuthUser } from "@/lib/storage/auth";
+import { setAuthSession, setAuthUser } from "@/lib/storage/auth";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { useThemeMode } from "@/theme/ThemeModeProvider";
 
@@ -65,8 +65,8 @@ export function RegisterPage() {
         password,
         displayName: trimmedDisplayName || email,
       });
-      setAuthToken(response.accessToken);
-      setAuthUser(response.user);
+      setAuthSession({ token: response.accessToken, expiresAt: response.expiresAt, persist: false });
+      setAuthUser(response.user, { persist: false });
       toast("Account created!", "success");
       navigate("/account");
     } catch (err) {

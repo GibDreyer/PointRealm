@@ -26,9 +26,10 @@ export type ProfilePayload = {
 };
 
 export const authApi = {
-  register: (payload: RegisterPayload) => api.post<AuthResponse>('/auth/register', payload),
-  login: (payload: LoginPayload) => api.post<AuthResponse>('/auth/login', payload),
-  logout: () => api.post<void>('/auth/logout', {}),
-  whoami: () => api.get<AuthUser>('/auth/whoami'),
-  updateProfile: (payload: ProfilePayload) => api.put<AuthUser>('/auth/profile', payload),
+  register: (payload: RegisterPayload) => api.post<AuthResponse>('/auth/register', payload, { credentials: 'include' }),
+  login: (payload: LoginPayload) => api.post<AuthResponse>('/auth/login', payload, { credentials: 'include' }),
+  refresh: () => api.post<AuthResponse>('/auth/refresh', {}, { credentials: 'include' }),
+  logout: () => api.post<void>('/auth/logout', {}, { credentials: 'include' }),
+  whoami: () => api.get<AuthUser>('/auth/whoami', { credentials: 'include' }),
+  updateProfile: (payload: ProfilePayload) => api.put<AuthUser>('/auth/profile', payload, { credentials: 'include' }),
 };
