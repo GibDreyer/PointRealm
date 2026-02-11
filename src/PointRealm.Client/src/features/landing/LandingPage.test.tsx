@@ -66,9 +66,33 @@ describe('LandingPage', () => {
 
   it('renders key content', () => {
     renderPage();
-    
+
     expect(screen.getByText('PointRealm')).toBeInTheDocument();
     expect(screen.getByText('Co-op estimation')).toBeInTheDocument();
     expect(screen.getByText('Free, open source, self-host friendly.')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'How it works in 30 seconds' })).toBeInTheDocument();
+    expect(screen.getByText('1. Join a realm')).toBeInTheDocument();
+    expect(screen.getByText('2. Pick your rune')).toBeInTheDocument();
+    expect(screen.getByText('3. Reveal and align')).toBeInTheDocument();
+  });
+
+  it('updates the interactive demo when a rune is selected', () => {
+    renderPage();
+
+    expect(screen.getByText('Pick a rune to preview how consensus is revealed.')).toBeInTheDocument();
+
+    const runeFiveButton = screen.getByRole('button', { name: 'Pick rune 5' });
+    fireEvent.click(runeFiveButton);
+
+    expect(screen.getByText(/You picked 5\./i)).toBeInTheDocument();
+    expect(runeFiveButton).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('renders accessible demo controls', () => {
+    renderPage();
+
+    expect(screen.getByRole('region', { name: 'How PointRealm works' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Pick rune 1' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Pick rune 8' })).toBeInTheDocument();
   });
 });
