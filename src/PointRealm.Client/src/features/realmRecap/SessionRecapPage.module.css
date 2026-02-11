@@ -1,0 +1,86 @@
+.page {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: clamp(4.5rem, 6vw, 6rem) 1rem 2rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.statGrid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.statCard {
+  border: 1px solid color-mix(in srgb, var(--pr-border), transparent 30%);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--pr-surface), transparent 10%);
+  padding: 0.85rem;
+}
+
+.statLabel {
+  margin: 0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--pr-text-muted);
+}
+
+.statValue {
+  margin: 0.4rem 0 0;
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--pr-text);
+}
+
+.timeline {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.timelineItem {
+  border: 1px solid color-mix(in srgb, var(--pr-border), transparent 32%);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--pr-surface), transparent 12%);
+  padding: 0.9rem;
+}
+
+.pill {
+  display: inline-flex;
+  margin-right: 0.35rem;
+  margin-top: 0.35rem;
+  font-size: 0.73rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--pr-border), transparent 40%);
+}
+
+.trendRow {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.bar {
+  height: 0.55rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pr-primary), transparent 62%);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.fileInput {
+  display: none;
+}

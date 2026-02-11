@@ -11,6 +11,7 @@ import { RegisterPage } from "@/features/auth/RegisterPage";
 import { ErrorPage } from "@/components/ErrorPage";
 import { NotFoundPage } from "@/components/NotFoundPage";
 import { RealmScreen } from "@/features/realmPlay/RealmScreen";
+import { SessionRecapPage } from "@/features/realmRecap/SessionRecapPage";
 import { DevComponentsPage } from "@/features/dev/DevComponentsPage";
 import { StressTestPage } from "@/features/dev/StressTestPage";
 
@@ -70,6 +71,10 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <RealmScreen />,
+      },
+      {
+        path: "recap",
+        element: <SessionRecapPage />,
       },
     ],
   },
