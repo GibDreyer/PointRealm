@@ -146,6 +146,7 @@ export function GMPanel({
                 onClose={() => setIsManaging(false)}
                 quests={quests}
                 activeQuestId={activeQuestId}
+                canManage
             />
         </Panel>
     );
