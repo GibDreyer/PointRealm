@@ -41,38 +41,43 @@ PointRealm follows a **Clean Architecture** (Onion/Hexagonal) pattern, separatin
 - **Technology**: SignalR.
 - **Hub**: `RealmHub.cs`
 - **Groups**: Realms are managed as SignalR Groups.
-- **Client Connection**: Clients connect via `/realm-hub`.
+- **Client Connection**: Clients connect via `/hubs/realm`.
 
 ## 4. Authentication & Authorization
 
-- **Mechanism**: JWT Bearer Authentication.
-- **Token Storage**: Clients store the token in `sessionStorage`.
-- **Endpoints**:
-  - `POST /api/auth/register`
-  - `POST /api/auth/login`
-  - `POST /api/auth/refresh`
+- **Mechanisms**:
+  - Realm membership tokens are JWT bearer tokens used for realm-scoped API + hub access.
+  - Account/session auth supports ASP.NET Identity cookies and bearer tokens on protected endpoints.
+- **Headers**: Anonymous realm flows use `X-PointRealm-ClientId` to associate a caller with prior membership.
+- **Auth endpoints** (versioned):
+  - `POST /api/v1/auth/register`
+  - `POST /api/v1/auth/login`
+  - `POST /api/v1/auth/forgot-password`
+  - `POST /api/v1/auth/reset-password`
+  - `POST /api/v1/auth/logout`
+  - `GET /api/v1/auth/whoami`
+  - `PUT /api/v1/auth/profile`
 
 ## 5. Key Endpoints
 
 ### Realms
 
-- `POST /api/realms`: Create a new realm.
-- `GET /api/realms/{code}`: Get realm details.
-- `POST /api/realms/{code}/join`: Join a realm.
-- `POST /api/realms/{code}/leave`: Leave a realm.
+- `POST /api/v1/realms`: Create a new realm.
+- `GET /api/v1/realms/{code}`: Get realm details.
+- `POST /api/v1/realms/{code}/join`: Join a realm.
+- `PATCH /api/v1/realms/{code}/settings`: Update realm settings (GM only).
+- `GET /api/v1/realms/{code}/history`: Get completed encounter history.
+- `POST /api/v1/realms/{code}/quests/import/csv`: Import quests from CSV (GM only).
+- `GET /api/v1/realms/{code}/export/csv`: Export realm quests/history CSV.
+- `GET /api/v1/me/realms`: List realms for the current user or `X-PointRealm-ClientId`.
 
-### Quests
+### Realtime gameplay commands
 
-- `POST /api/realms/{code}/quests`: Create a quest.
-- `PUT /api/realms/{code}/quests/{questId}`: Update a quest.
-- `POST /api/realms/{code}/quests/{questId}/complete`: Complete a quest.
+Quest and encounter gameplay mutations are sent as SignalR commands over `/hubs/realm` and broadcast as snapshots (not as REST endpoints).
 
-### Encounters
+### Migration note (legacy docs)
 
-- `POST /api/realms/{code}/encounters`: Start an encounter.
-- `POST /api/realms/{code}/encounters/{encounterId}/vote`: Vote on an encounter.
-- `POST /api/realms/{code}/encounters/{encounterId}/reveal`: Reveal votes.
-- `POST /api/realms/{code}/encounters/{encounterId}/clear`: Clear votes.
+If you see older references to `/realm-hub` or non-versioned `/api/...` routes, treat them as legacy documentation. Current runtime paths are `/hubs/realm` and `/api/v1/...`.
 
 ## 6. Configuration & Environments
 

@@ -4,7 +4,7 @@ For onboarding, configuration, and endpoints, start with the developer handbook 
 
 ## System overview
 - **Frontend:** React + Vite client renders realm state snapshots and issues realtime commands. It never resolves conflicts locally.
-- **Backend API:** ASP.NET Core hosts REST endpoints (realm creation/join/settings) and the SignalR hub for realtime state.
+- **Backend API:** ASP.NET Core hosts versioned REST endpoints under `/api/v1` (realm creation/join/settings/auth) and the SignalR hub for realtime state.
 - **Shared contracts:** DTOs and command contracts live in `PointRealm.Shared` to keep server and client aligned.
 - **Persistence:** Entity Framework Core stores realms, members, quests, encounters, and votes in SQLite for local dev.
 
@@ -16,6 +16,15 @@ For onboarding, configuration, and endpoints, start with the developer handbook 
   - a lobby snapshot (`RealmSnapshot`) for the caller.
   - a full realm state (`RealmStateUpdated`) to synchronize the UI.
 - Clients can request a full refresh at any time via `RequestFullSnapshot`.
+
+## Endpoint conventions and auth behavior
+- REST routes are versioned (`/api/v1/...`), including auth and realm endpoints.
+- Protected profile/settings endpoints accept `Identity.Application` cookies and bearer tokens.
+- Anonymous realm continuity uses `X-PointRealm-ClientId` when no authenticated user is present.
+
+## Migration note for legacy references
+- Older docs may still mention `/realm-hub` or `/api/realms`; these are legacy references.
+- Runtime paths are `/hubs/realm` for SignalR and `/api/v1/...` for REST.
 
 ## Command pipeline (server truth rules)
 - The server is the single source of truth for Realm state; clients render snapshots and do not resolve conflicts locally.
