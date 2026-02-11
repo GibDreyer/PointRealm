@@ -1,12 +1,34 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
-export const PortalPreviewCard: React.FC = () => {
+type PortalPreviewCardProps = {
+  prefersReducedMotion?: boolean;
+};
+
+const RUNES = [1, 2, 3, 5, 8] as const;
+
+const CONSENSUS_EXAMPLES: Record<number, string> = {
+  1: 'Quick task. Everyone aligns around "tiny tweak".',
+  2: 'Small change. Team can deliver with little risk.',
+  3: 'Straightforward story. A bit of testing, still predictable.',
+  5: 'Medium quest. Some unknowns, but shared understanding emerges.',
+  8: 'Big uncertainty. Team agrees to split and clarify first.',
+};
+
+export const PortalPreviewCard: React.FC<PortalPreviewCardProps> = ({ prefersReducedMotion = false }) => {
+  const framerReducedMotion = useReducedMotion() ?? false;
+  const reducedMotion = prefersReducedMotion || framerReducedMotion;
+  const [selectedRune, setSelectedRune] = React.useState<number | null>(null);
+
+  const revealMessage = selectedRune
+    ? `You picked ${selectedRune}. ${CONSENSUS_EXAMPLES[selectedRune]}`
+    : 'Pick a rune to preview how consensus is revealed.';
+
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
+    <motion.div
+      initial={reducedMotion ? false : { opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: "easeOut", delay: 0.1 }}
+      transition={reducedMotion ? { duration: 0 } : { duration: 0.35, ease: 'easeOut', delay: 0.1 }}
       className="relative w-full max-w-sm mx-auto overflow-hidden border rounded-xl select-none"
       style={{
         backgroundColor: 'var(--pr-surface-elevated)',
@@ -16,17 +38,17 @@ export const PortalPreviewCard: React.FC = () => {
     >
       {/* Header with Title and Code */}
       <div className="p-6 pb-4">
-        <h3 
+        <h3
           className="text-lg font-bold mb-1"
           style={{ fontFamily: 'var(--pr-heading-font)', color: 'var(--pr-text)' }}
         >
-          Enter a Realm
+          30-second demo
         </h3>
-        <p 
+        <p
           className="text-sm mb-4"
           style={{ color: 'var(--pr-text-muted)' }}
         >
-          A place where parties forge an estimate.
+          Pick a rune like a teammate, then reveal what "team consensus" looks like.
         </p>
 
         {/* Fake Code Pill */}
@@ -54,26 +76,49 @@ export const PortalPreviewCard: React.FC = () => {
       {/* Rune Cards Section */}
       <div className="p-6 pt-2 bg-[color-mix(in_srgb,var(--pr-bg),transparent_80%)]">
         <div className="flex justify-between items-center space-x-2">
-          {[1, 2, 3, 5, 8].map((val, i) => (
-            <div 
+          {RUNES.map((val, i) => {
+            const isSelected = selectedRune === val;
+            return (
+            <button
               key={val}
+              type="button"
+              aria-label={`Pick rune ${val}`}
+              aria-pressed={isSelected}
+              onClick={() => setSelectedRune(val)}
               className="h-16 w-10 rounded border flex items-center justify-center relative"
               style={{
                 backgroundColor: 'var(--pr-surface)',
                 borderColor: 'var(--pr-border)',
                 boxShadow: 'inset 0 1px 0 color-mix(in srgb, var(--pr-text), transparent 95%)',
-                transform: `rotate(${i % 2 === 0 ? 2 : -2}deg)`
+                transform: `rotate(${i % 2 === 0 ? 2 : -2}deg)`,
+                outline: isSelected ? '2px solid var(--pr-primary)' : 'none',
+                outlineOffset: '2px',
               }}
             >
-              <span 
+              <span
                 className="font-bold text-sm"
-                style={{ color: 'var(--pr-text-muted)' }}
+                style={{ color: isSelected ? 'var(--pr-primary)' : 'var(--pr-text-muted)' }}
               >
                 {val}
               </span>
-            </div>
-          ))}
+            </button>
+            );
+          })}
         </div>
+        <motion.div
+          aria-live="polite"
+          className="mt-4 rounded-md border px-3 py-2 text-sm"
+          style={{
+            borderColor: 'var(--pr-border)',
+            backgroundColor: 'color-mix(in srgb, var(--pr-primary), transparent 92%)',
+            color: 'var(--pr-text)',
+          }}
+          initial={reducedMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={reducedMotion ? { duration: 0 } : { duration: 0.2 }}
+        >
+          {revealMessage}
+        </motion.div>
       </div>
 
       {/* Glow Effect (Subtle) under header */}
