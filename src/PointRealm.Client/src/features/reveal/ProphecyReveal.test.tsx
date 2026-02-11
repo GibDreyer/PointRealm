@@ -91,6 +91,33 @@ describe('ProphecyReveal', () => {
     expect(screen.queryByText('5')).not.toBeInTheDocument();
   });
 
+
+  it('renders session badge and insights when revealed numeric data is valid', () => {
+    renderReveal({
+      encounter: baseEncounter({
+        isRevealed: true,
+        votes: { m1: '8', m2: '8' },
+      }),
+      isGM: false,
+    });
+
+    expect(screen.getByText('Unanimous 🔥')).toBeInTheDocument();
+    expect(screen.getByText('8 led the picks')).toBeInTheDocument();
+    expect(screen.getByText('Party average: 8.0')).toBeInTheDocument();
+  });
+
+  it('does not render session highlights when data is hidden or invalid', () => {
+    renderReveal({
+      encounter: baseEncounter({
+        isRevealed: false,
+        votes: { m1: 'coffee', m2: null },
+      }),
+      isGM: false,
+    });
+
+    expect(screen.queryByLabelText('Session highlights')).not.toBeInTheDocument();
+  });
+
   it('disables flips when reduced motion is enabled', () => {
     const { container } = renderReveal({
       encounter: baseEncounter({
