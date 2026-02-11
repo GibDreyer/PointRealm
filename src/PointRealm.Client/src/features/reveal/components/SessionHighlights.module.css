@@ -1,0 +1,84 @@
+.wrapper {
+  margin: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.badge {
+  border-radius: 999px;
+  border: 1px solid transparent;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.badgesuccess {
+  color: var(--pr-success);
+  border-color: color-mix(in srgb, var(--pr-success) 60%, transparent);
+  background: color-mix(in srgb, var(--pr-success) 18%, transparent);
+}
+
+.badgewarning {
+  color: var(--pr-warning);
+  border-color: color-mix(in srgb, var(--pr-warning) 60%, transparent);
+  background: color-mix(in srgb, var(--pr-warning) 18%, transparent);
+}
+
+.badgedanger {
+  color: var(--pr-danger);
+  border-color: color-mix(in srgb, var(--pr-danger) 60%, transparent);
+  background: color-mix(in srgb, var(--pr-danger) 18%, transparent);
+}
+
+.insights {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.insightChip {
+  border-radius: 10px;
+  border: 1px solid var(--pr-border);
+  background: color-mix(in srgb, var(--pr-surface) 90%, transparent);
+  padding: 0.55rem 0.7rem;
+}
+
+.insightLabel {
+  margin: 0;
+  color: var(--pr-text-primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.insightDetail {
+  margin: 0.2rem 0 0;
+  color: var(--pr-text-muted);
+  font-size: 0.64rem;
+  line-height: 1.2;
+}
+
+@media (max-width: 960px) {
+  .insights {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .wrapper {
+    margin: 0 1rem;
+  }
+
+  .insights {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -8,6 +8,7 @@ import { VoteChart } from './components/VoteChart';
 import { SuggestedOathPanel } from './components/SuggestedOathPanel';
 import { OutcomeActions } from './components/OutcomeActions';
 import { VignettePulse } from './components/VignettePulse';
+import { SessionHighlights } from './components/SessionHighlights';
 import { useProphecyStats, getNumericVote } from './utils/statsHooks';
 import { useThemeMode } from '@/theme/ThemeModeProvider';
 import styles from './ProphecyReveal.module.css';
@@ -84,6 +85,8 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
     distribution,
     totalVotes,
     spread,
+    sessionHighlights,
+    insightChips,
   } = useProphecyStats(encounter, partyRoster, deckValues);
 
   const suggestion = useMemo(() => {
@@ -165,6 +168,13 @@ export const ProphecyReveal: React.FC<ProphecyRevealProps> = ({
                <span className={styles.stamp}>✓ Sealed</span>
             )}
           </motion.div>
+        )}
+
+        {revealed && (sessionHighlights.length > 0 || insightChips.length > 0) && (
+          <SessionHighlights
+            highlights={sessionHighlights}
+            insights={insightChips}
+          />
         )}
 
         <div className="relative min-h-[400px] flex flex-col p-6">
