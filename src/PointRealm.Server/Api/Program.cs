@@ -1,10 +1,14 @@
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 using PointRealm.Server.Api.Infrastructure;
+using PointRealm.Server.Api.Options;
 using PointRealm.Server.Api.Services;
 using PointRealm.Server.Api.Hubs;
 using PointRealm.Server.Application;
 using PointRealm.Server.Application.Abstractions;
 using PointRealm.Server.Infrastructure;
 using Scalar.AspNetCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +22,51 @@ builder.Services
     .AddApplication()
     .AddInfrastructure(builder.Configuration);
 
-builder.Services.AddMemoryCache();
+builder.Services.Configure<CommandDeduplicationOptions>(builder.Configuration.GetSection(CommandDeduplicationOptions.SectionName));
+
+var dedupeOptions = builder.Configuration.GetSection(CommandDeduplicationOptions.SectionName).Get<CommandDeduplicationOptions>()
+    ?? new CommandDeduplicationOptions();
+
+if (string.Equals(dedupeOptions.Provider, CommandDeduplicationOptions.Providers.Redis, StringComparison.OrdinalIgnoreCase))
+{
+    var redisConnectionString = dedupeOptions.Redis.ConnectionString
+        ?? builder.Configuration.GetConnectionString("Redis")
+        ?? builder.Configuration["Redis:ConnectionString"];
+
+    if (string.IsNullOrWhiteSpace(redisConnectionString))
+    {
+        throw new InvalidOperationException("Command deduplication provider is set to Redis, but no Redis connection string was configured.");
+    }
+
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = redisConnectionString;
+        options.InstanceName = dedupeOptions.Redis.InstanceName;
+    });
+
+    builder.Services.AddScoped<ICommandDeduplicator>(sp =>
+    {
+        var options = sp.GetRequiredService<IOptions<CommandDeduplicationOptions>>().Value;
+        return new DistributedCommandDeduplicator(
+            sp.GetRequiredService<IDistributedCache>(),
+            options.MaxEntriesPerMember,
+            options.Window);
+    });
+}
+else
+{
+    builder.Services.AddMemoryCache();
+    builder.Services.AddScoped<ICommandDeduplicator>(sp =>
+    {
+        var options = sp.GetRequiredService<IOptions<CommandDeduplicationOptions>>().Value;
+        return new InMemoryCommandDeduplicator(
+            sp.GetRequiredService<IMemoryCache>(),
+            options.MaxEntriesPerMember,
+            options.Window);
+    });
+}
+
 builder.Services.AddScoped<IRealmBroadcaster, RealmBroadcaster>();
-builder.Services.AddScoped<ICommandDeduplicator, InMemoryCommandDeduplicator>();
 builder.Services.AddScoped<IAuthSessionService, AuthSessionService>();
 builder.Services.AddScoped<IAuthPasswordService, AuthPasswordService>();
 builder.Services.AddScoped<IAuthProfileService, AuthProfileService>();
